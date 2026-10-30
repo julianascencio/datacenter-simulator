@@ -43,8 +43,32 @@ const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
     for (const extension of ['.csv', '.json']) {
       assert.equal(fs.existsSync(report.replace(/\.html$/, extension)), true);
     }
+    const svgPath = report.replace(/\.html$/, '-single-line.svg');
+    assert.ok(fs.existsSync(svgPath), 'Vector single-line export exists');
+    assert.ok(await page.locator('a[download][href$="-single-line.svg"]').count());
+    // Deep-link directly to the design view, then exercise its wide drawing on mobile.
+    await page.goto(pathToFileURL(report).href + '#dc-single-line');
+    await page.waitForFunction(() => !document.getElementById('panel-2').hidden);
+    await page.waitForFunction(() => {
+      const plot = document.getElementById('plot-2');
+      return plot._fullLayout.width >= plot.layout.meta.minimum_width;
+    });
+    const design = await page.locator('#plot-2').evaluate(plot => ({
+      meta: plot.layout.meta,
+      text: plot.layout.annotations.map(a => a.text).join(' '),
+    }));
+    assert.equal(design.meta.diagram, 'dc-single-line');
+    assert.equal(design.meta.branch_ids.length, 27);
+    assert.equal(design.meta.bus_ids.length, 28);
+    assert.match(design.text, /I out/);
+    assert.match(design.text, /R loop/);
+    assert.match(design.text, /LOAD/);
+    assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth), false);
+    assert.ok(await page.locator('#panel-2').evaluate(p => p.scrollWidth > p.clientWidth));
+    await page.locator('#panel-2').evaluate(p => { p.scrollLeft = p.scrollWidth; });
+    await page.screenshot({ path: path.join(screenshots, 'single-line-mobile.png'), fullPage: true });
     assert.deepEqual(errors, []);
-    console.log('7 tabs, WebGL scene, mobile width, exports and JavaScript error checks passed.');
+    console.log('7 tabs, WebGL, single-line symbols/deep link, mobile scrolling, exports and JavaScript checks passed.');
   } finally {
     await browser.close();
   }

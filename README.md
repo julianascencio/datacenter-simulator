@@ -13,7 +13,7 @@ python -m pip install -e '.[dev,docs]'
 python -m datacenter_simulator.cli --output outputs --hours 48
 ```
 
-Open **`outputs/reference-lab.html`**. No web server or external chart CDN is needed. CSV and JSON results are generated alongside it.
+Open **`outputs/reference-lab.html`**. No web server or external chart CDN is needed. CSV, JSON and a scalable `reference-lab-single-line.svg` are generated alongside it.
 
 ## Included
 
@@ -42,6 +42,27 @@ write_report(center, result, "outputs/my-center.html")
 
 Generation is connected at the **common facility bus**, with explicit unit/efficiency conversion. Use net electrical output from a PV, wind, biogas or other generation model. See [integration](docs/integration.rst) for using Series or CSV outputs from other simulators without assuming their APIs.
 
+## DC design single-line diagram
+
+The **DC single-line** lab tab draws the actual solved radial network with busbars,
+feeders, regulated DC/DC converter symbols and local loads. It labels bus voltage,
+cable loop resistance, output current/rating, converter efficiency/power rating,
+branch power and losses. Current overload, power overload and undervoltage are red.
+Hover shows converter input and output currents separately.
+
+```python
+from datacenter_simulator.utilities.single_line import dc_single_line, write_single_line_svg
+
+electrical = center.electrical.solve(center.bus_loads(0.7))
+dc_single_line(center.electrical, electrical).write_html("dc-design.html")
+write_single_line_svg(center.electrical, electrical, "dc-design.svg")
+```
+
+[Diagram guide](https://julianascencio.github.io/datacenter-simulator/user_guide/dc_single_line.html)
+· [Open the lab diagram](https://julianascencio.github.io/datacenter-simulator/_static/lab/reference-lab.html#dc-single-line).
+The single line represents the complete DC circuit, including return-path resistance.
+Protection devices, earthing and upstream generation wiring are outside this solver's boundary.
+
 ## Structure
 
 * `src/datacenter_simulator/models/`: device, electrical, communication and spatial metadata.
@@ -68,7 +89,7 @@ The documentation mirrors [OrbitalPV](https://julianascencio.github.io/orbital-p
 |---|---|---|
 | 01. Device models and spatial layouts | Power curves, ports, dimensioned 2D/3D placement | Beginner |
 | 02. Connect generation from Series and CSV | Units, timestamps, conversion losses, grid imports | Beginner |
-| 03. Compare 380, 400 and 800 V distribution | Feeder current, losses, rack voltage | Intermediate |
+| 03. Compare 380, 400 and 800 V distribution | Feeder current, losses, rack voltage, single-line export | Intermediate |
 | 04. Communication routing, failure and saturation | Redundant links, latency and overloaded paths | Intermediate |
 | 05. HVAC alternatives and cooling failure | Five cooling options and a thermal transient | Intermediate |
 | 06. Complete facility energy and resilience study | HVAC, generation, batteries, grid and islanded operation | Advanced |

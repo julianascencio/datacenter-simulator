@@ -55,6 +55,12 @@ const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
                    `Mobile page overflow: ${relative}`);
       await page.screenshot({ path: path.join(screenshots, `${name}-mobile.png`), fullPage: true });
     }
+    await page.goto(pathToFileURL(path.join(root, 'user_guide/dc_single_line.html')).href);
+    const diagram = page.locator('img[alt="Model-derived DC source, main busbar, rack converters and loads"]');
+    assert.ok(await diagram.evaluate(img => img.complete && img.naturalWidth > 0));
+    assert.ok(await page.locator('a.download[href$=".svg"]').count());
+    assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth), false);
+    await page.screenshot({ path: path.join(screenshots, 'single-line-guide-mobile.png'), fullPage: true });
     assert.deepEqual(errors, []);
     console.log('Documentation navigation, six tutorials, figures, downloads and mobile layout passed.');
   } finally {
