@@ -2,6 +2,10 @@
 
 from dataclasses import dataclass, field
 from math import isfinite
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from datacenter_simulator.models.performance import PowerCurve
 
 
 def finite(name: str, value: float, minimum: float = 0, *, strict: bool = False) -> None:
@@ -25,6 +29,7 @@ class Electrical:
     peak_kw: float
     power_exponent: float = 1.0
     minimum_voltage_pu: float = 0.90
+    curve: "PowerCurve | None" = None
 
     def __post_init__(self) -> None:
         finite("nominal_voltage_v", self.nominal_voltage_v, strict=True)
@@ -34,9 +39,13 @@ class Electrical:
         fraction("minimum_voltage_pu", self.minimum_voltage_pu, positive=True)
         if self.peak_kw < self.idle_kw:
             raise ValueError("peak_kw must be >= idle_kw")
+        if self.curve is not None and self.curve.provenance.boundary != "dc_terminal":
+            raise ValueError("device curve must be measured/modelled at the DC terminal")
 
     def power_kw(self, utilization: float) -> float:
         fraction("utilization", utilization)
+        if self.curve is not None:
+            return self.curve.evaluate(utilization)
         return self.idle_kw + (self.peak_kw - self.idle_kw) * utilization**self.power_exponent
 
 

@@ -1,0 +1,75 @@
+{
+  "url": "https://re.jrc.ec.europa.eu/api/v5_3/tmy?lat=28.46&lon=-16.25&outputformat=json",
+  "inputs": {
+    "location": {
+      "latitude": 28.46,
+      "longitude": -16.25,
+      "elevation": 6.0,
+      "irradiance_time_offset": 0.1526
+    },
+    "meteo_data": {
+      "radiation_db": "PVGIS-SARAH3",
+      "meteo_db": "ERA5",
+      "year_min": 2005,
+      "year_max": 2023,
+      "use_horizon": true,
+      "horizon_db": "DEM-calculated"
+    }
+  },
+  "months_selected": [
+    {
+      "month": 1,
+      "year": 2015
+    },
+    {
+      "month": 2,
+      "year": 2009
+    },
+    {
+      "month": 3,
+      "year": 2021
+    },
+    {
+      "month": 4,
+      "year": 2012
+    },
+    {
+      "month": 5,
+      "year": 2009
+    },
+    {
+      "month": 6,
+      "year": 2018
+    },
+    {
+      "month": 7,
+      "year": 2022
+    },
+    {
+      "month": 8,
+      "year": 2019
+    },
+    {
+      "month": 9,
+      "year": 2023
+    },
+    {
+      "month": 10,
+      "year": 2007
+    },
+    {
+      "month": 11,
+      "year": 2021
+    },
+    {
+      "month": 12,
+      "year": 2018
+    }
+  ],
+  "provider": "European Commission Joint Research Centre, PVGIS 5.3",
+  "kind": "TMY composite selected from reanalysis/satellite data; not measured site telemetry",
+  "calendar": "2021 synthetic non-leap UTC calendar; original timestamps preserved",
+  "retrieved_utc": "2026-10-30T22:36:55.083702+00:00",
+  "csv_sha256": "bfd8118bcd3d8559211319b68001f44a7fb829659317d2a824ebf1e67c3b6c20",
+  "source_documentation": "https://joint-research-centre.ec.europa.eu/photovoltaic-geographical-information-system-pvgis/using-pvgis-5/pvgis-5-tools/pvgis-typical-meteorological-year-tmy-generator_en"
+}

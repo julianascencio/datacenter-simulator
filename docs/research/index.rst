@@ -22,6 +22,7 @@ References and roadmap
    :maxdepth: 2
 
    ../references
+   engineering
    ../roadmap
 
 References distinguish published engineering context from the illustrative

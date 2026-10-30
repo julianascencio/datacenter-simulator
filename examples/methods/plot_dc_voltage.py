@@ -94,5 +94,6 @@ print("Overloaded branches:", diagram.layout.meta["overloaded_branches"])
 #    :target: ../../_static/lab/reference-lab-single-line.svg
 #
 # :doc:`../../user_guide/dc_single_line` explains the symbols, units and scope.
-# Protection coordination, earthing and multi-source DC connections are not
-# inferred by this schematic; those models are not implemented.
+# Protection coordination and earthing remain outside this model. For the
+# separate multi-source solver and its schematic, see
+# :doc:`../../user_guide/engineering`.

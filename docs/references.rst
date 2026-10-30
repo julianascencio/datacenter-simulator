@@ -21,6 +21,9 @@ context; the package does not claim to reproduce a validated model from them.
   browser visualization.
   `Official documentation <https://plotly.com/python/interactive-html-export/>`_.
 
+The additional methods, actual data snapshots and optional solver comparisons
+are documented in :doc:`research/engineering`.
+
 Preset provenance
 -------------------------
 

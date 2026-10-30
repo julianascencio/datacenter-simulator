@@ -63,7 +63,7 @@ Documentation
 User-facing functionality should have conceptual documentation and API
 docstrings. Keep examples deterministic and offline, identify their difficulty
 and assumptions, explain each modelling step, and include figures that help
-interpret the results. The documentation build executes the six gallery
+interpret the results. The documentation build executes the twelve gallery
 examples and builds the interactive lab.
 
 Documentation hosting

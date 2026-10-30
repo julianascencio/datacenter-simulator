@@ -1,41 +1,56 @@
 Development roadmap
-===========================
+===================
 
 Implemented foundation
-------------------------------
+----------------------
 
-* Typed equipment metadata, DC terminal power curves, ports and spatial geometry.
-* Radial resistive DC networks with converters, loss accounting and constraint flags.
-* Full-duplex traffic routing and explicit failed-link/node scenarios.
-* Five configurable lumped cooling alternatives and a standalone thermal mass model.
-* Facility-bus generation adapters, battery/grid/backup dispatch and energy KPIs.
-* Reusable Plotly diagrams, dimensioned 3D equipment scene and offline report exports.
+* Typed devices, DC-terminal demand, communication ports and physical placement.
+* Radial DC networks with regulated converters and model-derived single-line/SVG.
+* Offered-flow routing, five lumped cooling alternatives and a thermal zone model.
+* Facility-meter generation adapters, greedy storage/grid/backup energy balances.
+* Offline Plotly reports, OrbitalPV-style Sphinx guides and executable gallery.
 
-Next: calibrated equipment and electrical design
---------------------------------------------------------
+Implemented engineering studies in 0.2
+--------------------------------------
 
-1. Vendor-specific server/GPU/PSU and converter efficiency curves with source versions.
-2. Circuit protection metadata, feeder thermal derating, DC fault and grounding studies.
-3. A/B supplies, N+1 capacity cases and controlled failover; later a meshed DC solver.
-4. Native direct-DC generation/BESS coupling and AC front-end integration.
-5. Measured datasets, independent solver comparisons and reproducible calibration cases.
+* Attributed power curves, bounded converter maps, held-out calibration errors,
+  read-only Redfish payload parsing and seeded assumption sensitivity.
+* Route-derived electrothermal feeder sizing with explicit installation ratings.
+* Meshed resistive DC load flow with power/voltage/droop ports and constrained
+  direct-DC PV/battery/grid coupling, islanding and terminal-load shedding.
+* A/B transfer timing, hold-up, N+1 capacity, common causes and powered cooling.
+* CDU parallel branches, pump curves, finite-UA exchange and partial blockage.
+* Three real PVGIS TMY resource snapshots; humidity, dry/wet/hybrid rejection,
+  water accounting, bounded chiller maps and useful heat recovery.
+* Cost/carbon/reserve MILP storage dispatch, forecast-error replay and
+  deadline-constrained carbon-aware flexible job scheduling.
+* Fluid ECMP/max-min bandwidth allocation, compute/transfer phases, FIFO/EDF,
+  power/thermal throttling and exact interval integration into facility demand.
+* Six additional tutorials (twelve total), linked selections/time overlays across
+  2D/3D and schema views, shared routing geometry and independent PyPSA comparison.
 
-Next: cooling engineering and operational coupling
-----------------------------------------------------------
+See :doc:`user_guide/engineering` for the supported boundaries and
+:doc:`research/engineering` for the evidence and validation map.
 
-1. CDU/heat-exchanger component networks, pump curves, pipe pressure drops and valves.
-2. Weather-driven humidity/dewpoint checks, evaporative alternatives and water metrics.
-3. Chiller performance maps, staged equipment, part-load control and heat recovery.
-4. Room/rack transient temperatures tied to throttling, dispatch and failures.
-5. CFD or EnergyPlus/FMU coupling for spatial or dynamic thermal validation.
+Next: calibration and optional fidelity
+---------------------------------------
 
-Next: visual design workspace
--------------------------------------
+1. Permissioned device/GPU/PSU and CDU datasets, held-out whole-facility telemetry,
+   sensitivity with correlated inputs and measured uncertainty estimates.
+2. DC faults, grounding, protection/arc models and converter EMT as a separate
+   optional fidelity tier, including explicit bipolar midpoint behavior.
+3. Modelica/EnergyPlus/FMU and CFD comparisons for transient/spatial cooling;
+   packet-level ns-3 comparisons for communications. These are not yet executed.
+4. Joint nonlinear electrical/thermal economic optimization, equipment sizing,
+   degradation models, stochastic forecasts and calendar billing periods.
 
-1. Editable 2D/3D layouts with model serialization, rack units and collision checks.
-2. glTF equipment assets and facility geometry import/export.
-3. Cable/pipe routing with lengths fed back into electrical/hydraulic simulation.
-4. Time animation, linked selections and operational overlays across all views.
-5. Read-only telemetry adapters (Redfish, SNMP, gNMI, Modbus/BACnet) with replay tests.
+Next: editable workspace and operational data
+---------------------------------------------
 
-These are planned extensions, not functionality delivered by version 0.1.
+1. Persistent interactive layout editing, rack units, collision checks and automatic
+   routing. Current routes are authored in Python and reused by the solvers.
+2. Optional glTF/BIM/CAD assets and geometry import/export.
+3. Authenticated read-only telemetry collection and replay for Redfish, SNMP,
+   gNMI, Modbus/BACnet, with explicit schemas and measured time alignment.
+4. Calibrated fault likelihoods and common-cause models before probabilistic
+   availability metrics. Current resilience scenarios are deterministic.

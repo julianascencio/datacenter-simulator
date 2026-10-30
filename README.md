@@ -66,13 +66,14 @@ Optional extras, from the checkout:
 ```bash
 python -m pip install -e '.[dev]'
 python -m pip install -e '.[docs]'
+python -m pip install -e '.[solar,benchmarks]'  # pvlib and independent PyPSA checks
 ```
 
 See the [installation guide](https://julianascencio.github.io/datacenter-simulator/user_guide/installation.html) for an isolated environment and development setup.
 
 ## Foundation stack
 
-- **NumPy + pandas** — numerical arrays, timezone-aware profiles, and result tables.
+- **NumPy + pandas + SciPy** — numerical arrays, timezone-aware profiles, nonlinear solvers and MILP optimization.
 - **Python model and method modules** — device power curves, radial DC load flow, communication routing, cooling balances, and battery/grid dispatch.
 - **Plotly** — interactive equipment scenes, electrical and communication diagrams, and self-contained HTML reports.
 - **SVG export** — scalable DC single-line drawings generated from the solved network without a browser or additional rendering dependency.
@@ -102,7 +103,7 @@ See the [installation guide](https://julianascencio.github.io/datacenter-simulat
 
 [User Guide](https://julianascencio.github.io/datacenter-simulator/user_guide/index.html) · [Example Gallery](https://julianascencio.github.io/datacenter-simulator/gallery/index.html) · [API Reference](https://julianascencio.github.io/datacenter-simulator/reference/index.html) · [Research](https://julianascencio.github.io/datacenter-simulator/research/index.html) · [Contributing](https://julianascencio.github.io/datacenter-simulator/contributing/index.html)
 
-The documentation uses Sphinx, PyData Sphinx Theme, and Sphinx-Gallery. All six gallery examples execute during the documentation build and call the installed `datacenter_simulator` API.
+The documentation uses Sphinx, PyData Sphinx Theme, and Sphinx-Gallery. All twelve gallery examples execute during the documentation build and call the installed `datacenter_simulator` API.
 
 Build locally:
 
@@ -131,6 +132,18 @@ write_single_line_svg(center.electrical, electrical, "dc-design.svg")
 
 See the [single-line guide](https://julianascencio.github.io/datacenter-simulator/user_guide/dc_single_line.html) and [380/400/800 V gallery example](https://julianascencio.github.io/datacenter-simulator/gallery/methods/plot_dc_voltage.html).
 
+## Engineering methods in 0.2
+
+Eight additions extend the original facility model: evidence-backed device/converter maps; electrothermal feeder sizing; CDU hydraulics; meshed multi-source DC flow; A/B and N+1 contingencies; weather, water and heat recovery; optimized storage and carbon-aware job scheduling; and workload/network/thermal coupling.
+
+[Engineering guide](docs/user_guide/engineering.rst) · [Research and validation](docs/research/engineering.rst) · [Linked engineering lab](https://julianascencio.github.io/datacenter-simulator/_static/lab/engineering-lab.html)
+
+```bash
+python -m datacenter_simulator.analysis.engineering --output outputs/engineering
+```
+
+Open `outputs/engineering/engineering-lab.html` to select equipment across 2D/3D, electrical, cooling and communication views and replay an A/B feed failure. The export also contains a solved DC single-line, CSV results and a study manifest. Physical cable/pipe routes feed the electrical and hydraulic calculations. All figures and examples run offline; PVGIS source snapshots are bundled with provenance.
+
 ## Development
 
 ```bash
@@ -155,7 +168,7 @@ CI checks Python 3.11–3.13, builds the package, executes the gallery, and vali
 | Supply dispatch | Generation, battery, grid, and backup limits determine storage state, imports, export/curtailment, and unserved energy. |
 | Communication study | Port metadata, links, and offered traffic separately determine routes, link loading, and failure outcomes. |
 
-Generation connects at the **common facility meter boundary**. Use net electrical output from PV, wind, biogas, or another generation model through the [Series/CSV integration API](docs/integration.rst). Communication throughput does not automatically change the IT workload.
+Generation connects at the **common facility meter boundary**. Use net electrical output from PV, wind, biogas, or another generation model through the [Series/CSV integration API](docs/integration.rst). In this original workflow, communication throughput does not automatically change IT workload. The advanced workload model produces per-device power profiles for explicit coupling through `simulate(..., device_power_kw=...)`.
 
 ## Interactive simulation lab
 
@@ -179,8 +192,14 @@ Open `outputs/reference-lab.html`. It includes the Plotly runtime and works offl
 | [04. Communication routing, failure and saturation](https://julianascencio.github.io/datacenter-simulator/gallery/methods/plot_network_failure.html) | Redundant links, latency, and overloaded paths | Intermediate |
 | [05. HVAC alternatives and cooling failure](https://julianascencio.github.io/datacenter-simulator/gallery/methods/plot_cooling_failure.html) | Five cooling options and a thermal transient | Intermediate |
 | [06. Complete facility energy and resilience study](https://julianascencio.github.io/datacenter-simulator/gallery/analysis/plot_facility_comparison.html) | HVAC, generation, batteries, grid, and islanded operation | Advanced |
+| [07. Calibrated device curves and DC feeder design](https://julianascencio.github.io/datacenter-simulator/gallery/methods/plot_dc_design.html) | Measured curve provenance, electrothermal sizing, uncertainty | Intermediate |
+| [08. A/B feeds, N+1 and powered cooling](https://julianascencio.github.io/datacenter-simulator/gallery/analysis/plot_ab_resilience.html) | Transfer delay, hold-up, shared failures and thermal transients | Advanced |
+| [09. Balance a CDU and four cooling branches](https://julianascencio.github.io/datacenter-simulator/gallery/methods/plot_cdu_design.html) | Pump curves, pressure losses, finite-UA exchange and blockage | Intermediate |
+| [10. Compare climates, water and heat recovery](https://julianascencio.github.io/datacenter-simulator/gallery/analysis/plot_climate_cooling.html) | Three PVGIS TMY climates, dry/wet/hybrid rejection and water | Advanced |
+| [11. Direct-DC solar, storage and optimized dispatch](https://julianascencio.github.io/datacenter-simulator/gallery/analysis/plot_dc_microgrid.html) | DC/AC PV conversion, islanding, MILP and rolling forecasts | Advanced |
+| [12. Couple workloads, networks and cooling](https://julianascencio.github.io/datacenter-simulator/gallery/analysis/plot_workload_network.html) | ECMP fairness, job deadlines, thermal caps and carbon timing | Advanced |
 
-Each tutorial includes explained steps, plots, assumptions, and downloadable Python and Jupyter files. Reference data are deterministic and synthetic.
+Each tutorial includes explained steps, plots, assumptions, and downloadable Python and Jupyter files. Original reference data are deterministic and synthetic; the new engineering examples also include attributed SPECpower measurements and three offline PVGIS weather/resource snapshots.
 
 ## Literature and provenance
 
@@ -188,9 +207,9 @@ Each tutorial includes explained steps, plots, assumptions, and downloadable Pyt
 
 ## Roadmap and validation
 
-The [roadmap](docs/roadmap.rst) covers direct DC-coupled multi-source dispatch, A/B electrical failover, protection studies, live telemetry, CFD, and an editable design workspace.
+The [roadmap](docs/roadmap.rst) records delivered methods and the remaining vendor calibration, DC protection/EMT, live telemetry, CFD and editable workspace extensions.
 
-The current electrical solver is steady-state and radial; communications are flow-based; cooling is lumped. Numerical tests do not establish measured real-world accuracy. Shortfalls remain explicit without automatic workload shedding, and PUE uses gross facility demand before generation and storage. See [model boundaries and validation](docs/methodology.rst).
+Electrical models are steady-state and resistive; workload networking uses fluid flows; cooling uses lumped balances and steady hydraulics. Numerical verification and the independent PyPSA comparison do not establish measured facility accuracy. The original facility API preserves requested demand; the new microgrid and contingency methods explicitly calculate served power. See [engineering boundaries](docs/user_guide/engineering.rst) and [evidence and validation](docs/research/engineering.rst).
 
 ## Creator and contact
 

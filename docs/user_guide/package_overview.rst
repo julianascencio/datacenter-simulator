@@ -50,6 +50,8 @@ examples in :doc:`../gallery/methods/index`.
 :doc:`../gallery/analysis/plot_facility_comparison` and compare demand, storage,
 cooling and supply-shortfall results.
 
-All six gallery examples run offline and use synthetic, deterministic inputs.
+All twelve gallery examples run offline. Reference equipment is illustrative;
+advanced studies include attributed SPECpower and PVGIS data snapshots.
+See :doc:`engineering` for additional methods and their boundaries.
 They call the installed package's public functions rather than duplicating the
 simulation algorithms in the example scripts.

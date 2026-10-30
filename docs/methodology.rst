@@ -1,6 +1,11 @@
 Model boundaries and equations
 ======================================
 
+This page describes the original radial ``DCNetwork`` / ``simulate`` workflow.
+For the complementary meshed DC, electrothermal, hydraulic, weather, dispatch,
+contingency and workload methods added in 0.2, see :doc:`user_guide/engineering`.
+Its exclusions below apply to this original workflow, not every package module.
+
 Devices and electrical networks
 ---------------------------------------
 
@@ -29,7 +34,8 @@ Units are converted internally between kW and W. Cable resistance includes both
 conductors. Copper convenience calculations use 0.01724 ohm mm²/m at 20°C and
 0.00393/K temperature coefficient (NBS copper wire tables). Cable ampacity is an
 input; installation methods and thermal derating are not inferred. Converters
-use constant efficiency and reset the receiving bus to its nominal voltage.
+use constant efficiency or an optional bounded ``ConverterMap`` and reset the
+receiving bus to its nominal voltage.
 
 Overcurrent, power rating and undervoltage conditions are reported. Voltage
 collapse, nonconvergence, unknown nodes, parallel parents and disconnected
@@ -109,8 +115,9 @@ It is not a certified operational PUE meter implementation.
 Generation profiles supply available interval-average electrical power at the
 common facility bus (AC-equivalent meter boundary). Apply conversion losses in
 the adapter if the original power is upstream of an inverter. The internal DC
-network remains fed through the modeled rectifier. Direct DC-coupled generation
-and bidirectional multi-source DC load flow are future work.
+network remains fed through the modeled rectifier. The separate ``simulate_dc_microgrid`` and ``DCGrid`` APIs now support direct
+DC-coupled generation and bidirectional multi-source resistive load flow;
+see :doc:`user_guide/engineering` for their different boundaries.
 
 Surplus generation charges the battery before export/curtailment. Deficits draw
 from the battery, then the limited grid connection, then ideal backup capacity.
@@ -141,7 +148,9 @@ input/output currents, multi-voltage conservation, voltage collapse and overload
 directional traffic and rerouting, heat/fluid balances, thermal equilibrium,
 randomized battery trajectories, exact SOC limits, time alignment, PUE boundaries
 and report generation. Numerical invariants do not establish real-world accuracy.
-Measured validation, vendor calibration and external solver benchmarking remain open.
+Measured facility validation and vendor calibration remain open. The advanced
+DC solver has an optional independent PyPSA comparison; see
+:doc:`research/engineering` for exactly what is checked.
 
 This initial implementation was substantially AI-generated from the stated
 requirements, physical balances and the references listed here. It may contain
