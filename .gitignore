@@ -10,5 +10,6 @@ dist/
 outputs/
 docs/_build/
 docs/auto_examples/
+docs/gallery/
 docs/_static/lab/
 docs/sg_execution_times.rst

@@ -1,4 +1,5 @@
 Connectors
 ==========
 
-Adapt measured or simulated generation without hiding units or time alignment.
+A beginner tutorial for generation inputs: preserve units, interval boundaries
+and timezone information when connecting CSV or in-memory simulation outputs.

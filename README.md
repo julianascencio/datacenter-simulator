@@ -60,6 +60,23 @@ Unserved power and cooling shortfalls are reported explicitly, without automatic
 
 Much of this initial code was AI-generated from the project requirements, physical balances and [specific primary references](docs/references.rst). It may contain errors, and real-world validation is not yet extensive. See [model boundaries and validation](docs/methodology.rst) before interpreting results.
 
+## Documentation and six-example gallery
+
+The documentation mirrors [OrbitalPV](https://julianascencio.github.io/orbital-pv/): the PyData Sphinx theme, blue palette, ASVA branding, and User Guide / Example Gallery / API Reference / Research / Contributing navigation. It includes the developer-selected literature and AI-assistance/validation notes.
+
+| Example | Subject | Complexity |
+|---|---|---|
+| 01. Device models and spatial layouts | Power curves, ports, dimensioned 2D/3D placement | Beginner |
+| 02. Connect generation from Series and CSV | Units, timestamps, conversion losses, grid imports | Beginner |
+| 03. Compare 380, 400 and 800 V distribution | Feeder current, losses, rack voltage | Intermediate |
+| 04. Communication routing, failure and saturation | Redundant links, latency and overloaded paths | Intermediate |
+| 05. HVAC alternatives and cooling failure | Five cooling options and a thermal transient | Intermediate |
+| 06. Complete facility energy and resilience study | HVAC, generation, batteries, grid and islanded operation | Advanced |
+
+All six tutorials execute during the documentation build, include plotted results, and offer Python/Jupyter downloads. The gallery is generated at `gallery/index.html`.
+
+The documentation workflow validates PRs and uploads a preview artifact. On `main`, it publishes through GitHub Actions when repository Pages is configured with **GitHub Actions** as its source. See [hosting setup](docs/contributing/index.rst); the workflow reports the setting required if hosting is not enabled.
+
 ## Development and documentation
 
 ```bash
@@ -70,4 +87,4 @@ python -m pytest
 python -m sphinx -W --keep-going -b html docs docs/_build/html
 ```
 
-Open `docs/_build/html/index.html` for the documentation, example gallery and interactive lab. GitHub Actions checks Python 3.11–3.13, builds the package, executes the examples and uploads the documentation/lab artifact. No hosted deployment is required for local use.
+Open `docs/_build/html/index.html` for the documentation, example gallery and interactive lab. GitHub Actions checks Python 3.11–3.13 and builds the package. A separate documentation workflow executes the six examples, validates desktop/mobile pages and uploads the documentation/lab artifact. No hosted deployment is required for local use.

@@ -1,4 +1,5 @@
-Integrated analyses
+Integrated Analyses
 ===================
 
-Couple equipment demand, power networks, HVAC and generation/storage dispatch.
+Combine the layers in an advanced, reproducible facility study with demand,
+HVAC, generation, battery dispatch and an islanded supply-shortfall scenario.
