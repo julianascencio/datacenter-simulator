@@ -1,0 +1,14 @@
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+build/
+dist/
+outputs/
+docs/_build/
+docs/auto_examples/
+docs/_static/lab/
+docs/sg_execution_times.rst
