@@ -158,7 +158,7 @@ def max_min_rates(
         candidates = np.divide(
             residual, slopes, out=np.full_like(residual, np.inf), where=slopes > 0
         )
-        increment = min(float(candidates.min()), float((ceilings[ids] - rates[ids]).min()))
+        increment = min(min(map(float, candidates)), min(map(float, ceilings[ids] - rates[ids])))
         rates[ids] += increment
         saturated = (a @ rates >= caps - 1e-9) & (slopes > 0)
         frozen = {j for j in ids if rates[j] >= ceilings[j] - 1e-9 or np.any(a[saturated, j] > 0)}
