@@ -56,10 +56,15 @@ if(!plot||!plot._fullLayout)return;
 plot.dataset.fullTitle=plot.dataset.fullTitle||plot.layout.title.text;
 plot.dataset.fullHeight=plot.dataset.fullHeight||plot.layout.height;
 const mobile=panel.clientWidth<600;
-Plotly.relayout(plot,{width:panel.clientWidth,
+const changes={width:panel.clientWidth,
 height:mobile?Math.min(Number(plot.dataset.fullHeight),560):Number(plot.dataset.fullHeight),
 'title.text':mobile?plot.dataset.fullTitle.split(' · ')[0]:plot.dataset.fullTitle,
-'title.font.size':mobile?13:17,'margin.l':mobile?35:45,'margin.r':mobile?15:30});}
+'title.font.size':mobile?13:17,'margin.l':mobile?35:45,'margin.r':mobile?15:30};
+const mode=mobile?'mobile':'desktop';
+if(plot.layout.scene&&plot.dataset.viewMode!==mode){
+changes['scene.camera.eye']=mobile?{x:2.4,y:-2.6,z:1.8}:{x:1.5,y:-1.6,z:1.1};
+plot.dataset.viewMode=mode;}
+Plotly.relayout(plot,changes);}
 window.addEventListener('resize',()=>requestAnimationFrame(fitActivePlot));
 window.addEventListener('load',()=>requestAnimationFrame(fitActivePlot));
 </script></body></html>

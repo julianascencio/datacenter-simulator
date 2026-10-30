@@ -174,7 +174,7 @@ def equipment_3d(center: DataCenter, utilization: float = 0.7) -> go.Figure:
             y=[4.2],
             z=[2],
             mode="text",
-            text=[html.escape(center.cooling.name)],
+            text=["Cooling / CDU"],
             showlegend=False,
         )
     )
