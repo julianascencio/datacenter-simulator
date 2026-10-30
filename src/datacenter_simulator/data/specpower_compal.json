@@ -1,0 +1,13 @@
+{
+  "provenance": {
+    "source": "https://spec.org/power_ssj2008/results/res2026q2/power_ssj2008-20260329-01559.html",
+    "configuration": "Compal SR224-2A, two AMD EPYC 9965, 384 GB RAM, Windows Server 2022; tested 2026-03-18. See original result for firmware and workload settings.",
+    "kind": "measured",
+    "boundary": "ac_input",
+    "relative_uncertainty": null
+  },
+  "attribution": "SPECpower_ssj2008 published factual measurements, submitted by Compal Electronics, Inc. SPEC is a trademark of Standard Performance Evaluation Corporation. No endorsement claimed.",
+  "utilization_definition": "Target fraction of calibrated benchmark throughput, not CPU utilization. 100% target achieved 99.7% in this result.",
+  "units": "power_kw converted from published average active watts; no PSU-loss correction applied",
+  "scope": "One CPU server/workload configuration; not a universal server or AI/GPU curve. Published rounding retained. Unknown measurement uncertainty remains unknown."
+}

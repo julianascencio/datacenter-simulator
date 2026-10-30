@@ -1,4 +1,4 @@
-// Exercise the generated documentation as a reader, including all six tutorials.
+// Exercise the generated documentation as a reader, including all twelve tutorials.
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
@@ -22,12 +22,14 @@ const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
     assert.ok(await page.locator('img[alt="ASVA Consulting"]').evaluate(img => img.naturalWidth > 0));
     await page.screenshot({ path: path.join(screenshots, 'home-desktop.png'), fullPage: true });
     await page.locator('a[href="gallery/index.html"]').first().click();
+    await page.waitForURL('**/gallery/index.html');
     const cards = page.locator('.sphx-glr-thumbcontainer');
-    assert.equal(await cards.count(), 6, 'The gallery should contain six executable tutorials');
+    await cards.first().waitFor({ state: 'visible' });
+    assert.equal(await cards.count(), 12, 'The gallery should contain twelve executable tutorials');
     await page.screenshot({ path: path.join(screenshots, 'gallery-desktop.png'), fullPage: true });
     const examples = await cards.locator('a.reference.internal').evaluateAll(links =>
       [...new Set(links.map(link => link.href.split('#')[0]))]);
-    assert.equal(examples.length, 6);
+    assert.equal(examples.length, 12);
     for (const url of examples) {
       await page.goto(url);
       const text = await page.locator('article').innerText();
@@ -49,6 +51,7 @@ const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
     for (const [name, relative] of [
       ['home', 'index.html'], ['gallery', 'gallery/index.html'],
       ['tutorial', 'gallery/methods/plot_device_models.html'],
+      ['engineering', 'user_guide/engineering.html'],
     ]) {
       await page.goto(pathToFileURL(path.join(root, relative)).href);
       assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth), false,
@@ -62,7 +65,7 @@ const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
     assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth), false);
     await page.screenshot({ path: path.join(screenshots, 'single-line-guide-mobile.png'), fullPage: true });
     assert.deepEqual(errors, []);
-    console.log('Documentation navigation, six tutorials, figures, downloads and mobile layout passed.');
+    console.log('Documentation navigation, twelve tutorials, figures, downloads and mobile layout passed.');
   } finally {
     await browser.close();
   }

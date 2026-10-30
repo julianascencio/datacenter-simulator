@@ -71,9 +71,12 @@ def simulate(
     grid_import_limit_kw: float = 1e9,
     grid_export_limit_kw: float = 0,
     backup_capacity_kw: float = 0,
+    device_power_kw: pd.DataFrame | None = None,
 ) -> SimulationResult:
     """Evaluate interval-average profiles (utilization, ambient_c) on a regular timeline.
 
+    Optional device_power_kw overrides utilization-derived demand at DC terminals,
+    enabling energy-preserving workload or telemetry replay. All devices must be present.
     PUE uses gross facility demand before generation/storage. Insufficient power or
     cooling is reported as unmet demand; there is no implicit IT load shedding or
     thermal throttling. All IT terminal power becomes heat; facility auxiliaries and
@@ -93,6 +96,14 @@ def simulate(
     values = profiles[["utilization", "ambient_c"]].to_numpy(dtype=float)
     if not np.isfinite(values).all():
         raise ValueError("profile values must be finite")
+    if device_power_kw is not None:
+        if not device_power_kw.index.equals(profiles.index):
+            raise ValueError("device power timestamps must match profiles")
+        if set(device_power_kw) != {d.id for d in center.devices}:
+            raise ValueError("device power columns must match all equipment ids")
+        terminal_values = device_power_kw.to_numpy(dtype=float)
+        if not np.isfinite(terminal_values).all() or (terminal_values < 0).any():
+            raise ValueError("device powers must be finite and nonnegative DC-terminal kW")
     sources = {
         name: generation_from_series(series, profiles.index)
         for name, series in (generation or {}).items()
@@ -101,7 +112,12 @@ def simulate(
     rows = []
     warnings: set[str] = set()
     for position, sample in enumerate(values):
-        electrical = center.electrical.solve(center.bus_loads(float(sample[0])))
+        loads = center.bus_loads(float(sample[0]))
+        if device_power_kw is not None:
+            loads = dict.fromkeys(center.electrical.buses, 0.0)
+            for device in center.devices:
+                loads[device.bus_id] += float(device_power_kw[device.id].iloc[position])
+        electrical = center.electrical.solve(loads)
         warnings.update(electrical.warnings)
         for device in center.devices:
             pu = cast(float, electrical.buses.at[device.bus_id, "voltage_pu"])

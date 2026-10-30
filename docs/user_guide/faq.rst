@@ -4,8 +4,10 @@ Frequently asked questions
 Are the example inputs measured?
 ----------------------------------------
 
-No. The six examples use explicitly labelled synthetic inputs and illustrative
-equipment parameters. CSV/Series adapters accept measured or simulated generation,
+Most equipment parameters and workload profiles are illustrative. Example 07
+uses published SPECpower measurements; examples 10–11 use bundled PVGIS TMY
+resources. Their source and measurement boundaries are explicit. CSV/Series
+adapters also accept measured or simulated generation,
 but a data adapter does not validate the source model or measurements.
 
 Does adding PV reduce PUE?
@@ -18,8 +20,9 @@ Does the 3D hall simulate airflow?
 ------------------------------------------
 
 No. It visualizes device positions and dimensions. Cooling is a lumped energy
-model; support routing and server faces are illustrative. CFD and detailed
-hydraulics are on the :doc:`../roadmap`.
+model; support routing and server faces are illustrative. The advanced model
+solves steady CDU branch hydraulics; spatial airflow/CFD remains on the
+:doc:`../roadmap`.
 
 Can the examples run without Internet access?
 -----------------------------------------------------
@@ -31,6 +34,16 @@ browser. Standard documentation math rendering may use an external MathJax CDN.
 Why is a shortage still followed by IT demand?
 ------------------------------------------------------
 
-The simulator reports unmet requested demand and flags infeasibility. It does
-not automatically shed computing load, throttle devices or infer served traffic.
+The original ``simulate`` workflow reports unmet requested demand and flags
+infeasibility while preserving requested load. The separate microgrid, workload
+and contingency APIs calculate shedding, throttling or served power within their
+declared boundaries; see :doc:`engineering`.
 See :doc:`../methodology` before interpreting failure scenarios.
+
+What changed in version 0.2?
+-----------------------------
+
+Six new examples cover the :doc:`engineering` methods. Bundled measured SPECpower
+points and PVGIS weather resources have explicit provenance; they do not validate
+a complete facility. The :doc:`../research/engineering` page separates analytical
+checks, independent comparisons and remaining measured-validation work.

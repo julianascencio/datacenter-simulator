@@ -17,6 +17,7 @@ small component examples before combining the models into a facility study.
    :maxdepth: 2
 
    dc_single_line
+   engineering
    ../methodology
    ../integration
 

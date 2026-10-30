@@ -9,6 +9,7 @@ from math import isclose
 import pandas as pd
 
 from datacenter_simulator.models.devices import finite, fraction
+from datacenter_simulator.models.performance import ConverterMap
 
 
 @dataclass(frozen=True)
@@ -40,6 +41,8 @@ class DCBranch:
     efficiency: float = 1
     kind: str = "cable"
     rated_power_kw: float | None = None
+    performance: ConverterMap | None = None
+    converter_temperature_c: float = 25
 
     def __post_init__(self) -> None:
         if not self.id or self.source == self.target:
@@ -55,6 +58,8 @@ class DCBranch:
             raise ValueError("converter losses use efficiency; model cables as separate branches")
         if self.rated_power_kw is not None:
             finite("rated_power_kw", self.rated_power_kw, strict=True)
+        if self.performance is not None and self.kind != "converter":
+            raise ValueError("performance maps apply only to converter branches")
 
     @classmethod
     def copper_cable(
@@ -149,6 +154,13 @@ class DCNetwork:
                         if edge.kind == "converter"
                         else current[edge.id] ** 2 * edge.resistance_ohm / 1000
                     )
+                    if edge.performance is not None:
+                        loss = (
+                            edge.performance.input_kw(
+                                demand[edge.target], edge.converter_temperature_c
+                            )
+                            - demand[edge.target]
+                        )
                     losses[edge.id] = loss
                     send[edge.id] = demand[edge.target] + loss
                     demand[bus] += send[edge.id]

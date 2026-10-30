@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Data Center Engineering Lab · ASVA Consulting</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#091522;color:#e2edf7;font:15px system-ui,sans-serif}main{max-width:1500px;margin:auto;padding:24px}a{color:#66c9e5}h1{font-size:clamp(25px,4vw,40px);margin:8px 0}p{line-height:1.55;color:#b7cbde}.eyebrow{color:#43dab6;letter-spacing:.14em;font-size:12px}header{padding-bottom:20px}.controls{display:flex;flex-wrap:wrap;gap:18px;align-items:center;padding:18px;background:#15283e;border-radius:12px;position:sticky;top:0;z-index:10}.controls label{display:flex;gap:8px;align-items:center}select,button{font:inherit;background:#203951;color:#fff;border:1px solid #4c6c88;border-radius:6px;padding:8px}input{max-width:100%}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;margin-top:18px}.panel{min-width:0;background:#102033;border:1px solid #28415a;border-radius:12px;overflow:hidden}.plot{width:100%;min-width:0;height:440px}#details{padding:18px;min-height:180px;white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.6}.status{font-variant-numeric:tabular-nums;color:#6fe6c4}.legend{display:flex;gap:14px;flex-wrap:wrap;margin-top:16px;font-size:13px}.legend span{padding:5px 10px;border-radius:5px;background:#14293d}footer{margin:24px 0;font-size:13px;color:#93acc4}@media(max-width:700px){main{padding:12px}.grid{grid-template-columns:1fr}.controls{position:static}.controls label{flex-wrap:wrap}.plot{height:400px}}
+</style></head><body><main>
+<header><div class="eyebrow">ASVA CONSULTING / ENGINEERING STUDIES</div><h1>One facility. Connected views.</h1><p>Select a rack to inspect its feeds, coolant branch, communication link and physical routes. Move through the simulated feed failure to see delivered power and temperature.</p></header>
+<div class="controls"><label>Equipment <select id="equipment"><option value="">All equipment</option></select></label><label>Scenario time <input id="time" type="range" min="0" value="0" aria-label="Scenario time"></label><button id="play" type="button">Play</button><span id="time-label" class="status"></span></div>
+<div class="legend"><span>Amber · DC electrical</span><span>Cyan · cooling</span><span>Violet · communications</span><span>Red · unavailable / interrupted</span></div>
+<div class="grid"><section class="panel"><div id="scene" class="plot"></div></section><section class="panel"><div id="plan" class="plot"></div></section><section class="panel"><div id="electrical" class="plot"></div></section><section class="panel"><div id="cooling" class="plot"></div></section><section class="panel"><div id="communications" class="plot"></div></section><section class="panel"><div id="details" aria-live="polite"></div></section></div>
+<footer>Illustrative capacity and transfer study. Routes also determine electrical cable and hydraulic pipe lengths in the engineering examples. Colours show availability and supplied power; this view does not calculate fault currents or switching transients. <a href="https://asvaconsulting.com">ASVA Consulting</a> · <a href="mailto:contacto@asvaconsulting.com">contacto@asvaconsulting.com</a></footer>
+</main><script>__PLOTLY__</script><script id="lab-data" type="application/json">__DATA__</script><script>
+'use strict';
+const model=JSON.parse(document.getElementById('lab-data').textContent);
+const selector=document.getElementById('equipment'),slider=document.getElementById('time');
+for(const id of model.assets){const option=document.createElement('option');option.value=id;option.textContent=id;selector.append(option)}
+slider.max=String(model.frames.length-1);
+const domains=Object.keys(model.figures);let timer=null;
+const ready=Promise.all(domains.map(async domain=>{const figure=model.figures[domain];await Plotly.newPlot(domain,figure.data,figure.layout,{responsive:true,displaylogo:false});document.getElementById(domain).on('plotly_click',event=>{const id=event.points[0].customdata;if(model.assets.includes(id)){selector.value=id;render()}})}));
+let rendering=false,pending=false;
+async function render(){
+ if(rendering){pending=true;return}rendering=true;
+ try{
+ const selected=selector.value,frame=model.frames[Number(slider.value)],related=new Set(selected?[selected]:model.assets);
+ if(selected)for(const figure of Object.values(model.figures))for(const trace of figure.data){const ids=trace.meta?.equipment_ids||[];if(ids.includes(selected))for(const id of ids)related.add(id)}
+ const unavailable=new Set(frame.failed);for(const feed of frame.feeds)if(feed.available_kw===0)unavailable.add(feed.feed);
+ for(const rack of frame.racks)if(rack.unserved_kw>1e-6)unavailable.add(rack.equipment_id);
+ const updates=[];
+ for(const domain of domains){const figure=model.figures[domain],opacity=[],assetIndices=[],assetColors=[],connectionIndices=[],connectionColors=[];figure.data.forEach((trace,index)=>{const ids=trace.meta?.equipment_ids||[],role=trace.meta?.role;
+ const visible=!selected||(role==='asset'?related.has(ids[0]):ids.includes(selected));
+ opacity.push(visible?1:.12);
+ if(role==='asset'){const color=unavailable.has(ids[0])?'#f05b68':'#45d5b5';assetIndices.push(index);assetColors.push(color)}
+ if(role==='connection'){const rack=frame.racks.find(r=>ids.includes(r.equipment_id));let live=!ids.some(id=>unavailable.has(id));if(trace.meta.domain==='electrical'&&rack)live=live&&ids.includes(rack.feed)&&rack.served_kw>0;connectionIndices.push(index);connectionColors.push(live?({electrical:'#e9a23b',cooling:'#32b6c7',communications:'#9c8aff'}[trace.meta.domain]):'#526378')}
+ });
+ updates.push(Plotly.restyle(domain,{opacity}));
+ if(assetIndices.length)updates.push(Plotly.restyle(domain,{[domain==='scene'?'color':'marker.color']:assetColors},assetIndices));
+ if(connectionIndices.length)updates.push(Plotly.restyle(domain,{'line.color':connectionColors},connectionIndices));
+ }
+ await Promise.all(updates);
+ document.getElementById('time-label').textContent=`${frame.time_s.toFixed(1)} s · ${frame.failed.length?'Failed: '+frame.failed.join(', '):'All components available'}`;
+ const rack=frame.racks.find(r=>r.equipment_id===selected);
+ document.getElementById('details').textContent=rack?`${rack.equipment_id}\nActive feed: ${rack.feed||'none'}\nRequested / supplied: ${rack.demand_kw.toFixed(1)} / ${rack.served_kw.toFixed(1)} kW\nHold-up power: ${rack.hold_up_kw.toFixed(1)} kW\nHeat removed: ${rack.removed_heat_kw.toFixed(1)} kW\nZone temperature at interval end: ${rack.temperature_c.toFixed(2)} °C\nInterval: ${rack.time_s.toFixed(1)}–${(rack.time_s+rack.duration_s).toFixed(1)} s`:`${selected||'Facility overview'}\n${frame.racks.length} racks · total delivered ${frame.racks.reduce((sum,r)=>sum+r.served_kw,0).toFixed(1)} kW\nSelect a rack in any view or the equipment selector.\nBoth electrical feeds remain visible; the active path is highlighted.\nRack temperature is a lumped zone estimate.`;
+ window.labState={selected,time_s:frame.time_s,related:[...related]};
+ }finally{rendering=false;if(pending){pending=false;render()}}
+}
+selector.addEventListener('change',render);slider.addEventListener('input',render);
+document.getElementById('play').addEventListener('click',()=>{if(timer){clearInterval(timer);timer=null;document.getElementById('play').textContent='Play';return}document.getElementById('play').textContent='Pause';timer=setInterval(()=>{slider.value=String((Number(slider.value)+1)%model.frames.length);render()},500)});
+ready.then(async()=>{await render();window.labReady=true});
+</script></body></html>
