@@ -38,7 +38,7 @@ def generation_from_series(
         raise ValueError("unit must be W, kW or MW")
     converted = power.copy()
     converted.index = power.index.tz_convert(timeline.tz)
-    if not converted.index.equals(timeline):
+    if len(converted) != len(timeline) or not (converted.index == timeline).all():
         raise ValueError("generation timestamps must exactly match the simulation timeline")
     values = converted.to_numpy(dtype=float)
     if not np.isfinite(values).all() or (values < 0).any():

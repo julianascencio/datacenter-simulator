@@ -80,6 +80,15 @@ def test_irregular_profile_rejected() -> None:
         simulate(reference_center(), profiles.iloc[[0, 2]])
 
 
+@pytest.mark.parametrize("resolution", ["s", "ms", "us", "ns"])
+def test_datetime_storage_resolution_does_not_change_intervals(resolution: str) -> None:
+    profiles, generation = reference_profiles(2)
+    profiles.index = profiles.index.as_unit(resolution)
+    r = simulate(reference_center(), profiles, generation=generation)
+    assert r.summary["facility_kwh"] > 0
+    assert r.summary["max_balance_error_kw"] < 1e-8
+
+
 def test_device_ports_validated_against_topology() -> None:
     center = reference_center()
     devices = center.devices.copy()

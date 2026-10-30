@@ -84,7 +84,8 @@ def simulate(
     validate_timeline(profiles.index)
     finite("dt_hours", dt_hours, strict=True)
     if len(profiles) > 1:
-        spacing = np.diff(profiles.index.asi8) / 3.6e12
+        # pandas may store datetime values in s/ms/us/ns; use timedeltas, not raw integers.
+        spacing = (profiles.index[1:] - profiles.index[:-1]).total_seconds().to_numpy() / 3600
         if not np.allclose(spacing, dt_hours, rtol=0, atol=1e-9):
             raise ValueError("profile intervals must match dt_hours")
     if not {"utilization", "ambient_c"} <= set(profiles.columns):
