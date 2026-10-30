@@ -18,6 +18,7 @@ from datacenter_simulator.utilities.plotting import (
     floor_plan,
     power_timeseries,
 )
+from datacenter_simulator.utilities.single_line import write_single_line_svg
 
 
 def write_report(
@@ -38,6 +39,8 @@ def write_report(
     target = Path(path)
     target.parent.mkdir(parents=True, exist_ok=True)
     electrical = center.electrical.solve(center.bus_loads(utilization))
+    svg_target = target.with_name(target.stem + "-single-line.svg")
+    write_single_line_svg(center.electrical, electrical, svg_target)
     comm = center.communications.evaluate(traffic or [])
     heat = electrical.load_kw + electrical.loss_kw * center.conditioned_loss_fraction
     figures: list[tuple[str, go.Figure]] = [
@@ -69,7 +72,8 @@ def write_report(
             },
         )
         panels.append(
-            f'<section id="panel-{number}" class="panel" role="tabpanel" '
+            f'<section id="panel-{number}" class="panel{" sld-scroll" if number == 2 else ""}" '
+            f'role="tabpanel" '
             f'aria-labelledby="tab-{number}" {"hidden" if number else ""}>'
             f"{plot}</section>"
         )
@@ -110,6 +114,7 @@ def write_report(
         "__CENTER__": html.escape(center.name + " / " + center.cooling.name),
         "__CSV__": html.escape(csv_name, quote=True),
         "__JSON__": html.escape(json_name, quote=True),
+        "__SLD__": html.escape(svg_target.name, quote=True),
     }.items():
         document = document.replace(placeholder, value)
     target.write_text(document, encoding="utf-8")

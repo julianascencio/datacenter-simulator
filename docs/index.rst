@@ -28,6 +28,7 @@ Start here
 * Follow the :doc:`quickstart` to install and run the offline simulation lab.
 * Explore six worked examples in the :doc:`gallery/index`, from device basics
   to a complete facility study.
+* Inspect the :doc:`user_guide/dc_single_line` with electrical ratings and SVG export.
 * Use the :doc:`reference/index` for classes, functions and source code.
 
 .. raw:: html

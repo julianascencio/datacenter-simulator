@@ -1,7 +1,6 @@
 """Interactive 2D/3D equipment layouts, single-line diagrams and result plots."""
 
 import html
-from typing import cast
 
 import numpy as np
 import plotly.graph_objects as go
@@ -10,6 +9,7 @@ from plotly.subplots import make_subplots
 from datacenter_simulator.methods.communications import CommunicationResult
 from datacenter_simulator.methods.electrical import ElectricalResult
 from datacenter_simulator.simulation import DataCenter, SimulationResult
+from datacenter_simulator.utilities.single_line import dc_single_line
 
 PALETTE = ["#50dfbd", "#5bbcff", "#ffbd69", "#b69cff", "#ff7489", "#e4eaef"]
 BACKGROUND = "#101b2b"
@@ -192,87 +192,11 @@ def equipment_3d(center: DataCenter, utilization: float = 0.7) -> go.Figure:
 
 
 def electrical_diagram(center: DataCenter, result: ElectricalResult) -> go.Figure:
-    """Directed DC single-line diagram derived from the exact simulation topology."""
-    network = center.electrical
-    depth = {network.source_bus: 0}
-    positions: dict[str, tuple[float, float]] = {}
-    leaves = [bus for bus in network.order if not network.children[bus]]
-    for number, leaf in enumerate(leaves):
-        positions[leaf] = (0, float(number))
-    for bus in network.order:
-        for edge in network.children[bus]:
-            depth[edge.target] = depth[bus] + 1
-    for bus in reversed(network.order):
-        children = network.children[bus]
-        ordinate = (
-            float(np.mean([positions[e.target][1] for e in children]))
-            if children
-            else (positions[bus][1])
-        )
-        positions[bus] = (depth[bus], ordinate)
-    fig = go.Figure()
-    for edge in network.branches:
-        x0, y0 = positions[edge.source]
-        x1, y1 = positions[edge.target]
-        row = result.branches.loc[edge.id]
-        color = (
-            PALETTE[4]
-            if row.loading_pu > 1
-            else (PALETTE[2] if edge.kind == "converter" else PALETTE[1])
-        )
-        fig.add_trace(
-            go.Scatter(
-                x=[x0, (x0 + x1) / 2, x1],
-                y=[y0, (y0 + y1) / 2, y1],
-                mode="lines+markers",
-                marker=dict(
-                    size=[0, 9, 0], symbol="diamond" if edge.kind == "converter" else "circle"
-                ),
-                line=dict(color=color, width=2),
-                showlegend=False,
-                hovertemplate=f"{html.escape(edge.id)} ({edge.kind})<br>"
-                f"{row.sending_kw:.2f} kW → {row.receiving_kw:.2f} kW<br>"
-                f"Loss {row.loss_kw:.3f} kW<br>Output {row.current_a:.1f} A; "
-                f"loading {row.loading_pu:.1%}<extra></extra>",
-            )
-        )
-        fig.add_annotation(
-            x=x1,
-            y=y1,
-            ax=(x0 + x1) / 2,
-            ay=(y0 + y1) / 2,
-            xref="x",
-            yref="y",
-            axref="x",
-            ayref="y",
-            showarrow=True,
-            arrowhead=2,
-            arrowcolor=color,
-            arrowsize=0.8,
-            text="",
-        )
-    fig.add_trace(
-        go.Scatter(
-            x=[positions[b][0] for b in network.buses],
-            y=[positions[b][1] for b in network.buses],
-            mode="markers+text",
-            marker=dict(size=11, color=PALETTE[0]),
-            text=[
-                f"{html.escape(b)}<br>{cast(float, result.buses.at[b, 'voltage_v']):.1f} V"
-                for b in network.buses
-            ],
-            textposition="top center",
-            textfont=dict(size=10),
-            hovertext=[
-                f"Load {cast(float, result.buses.at[b, 'load_kw']):.1f} kW" for b in network.buses
-            ],
-            hoverinfo="text",
-            showlegend=False,
-        )
-    )
-    fig.update_xaxes(visible=False, range=[-0.4, max(depth.values()) + 0.5])
-    fig.update_yaxes(visible=False, range=[-0.7, len(leaves) + 0.2])
-    return _style(fig, "03 / DC single-line · orange diamonds = regulated converters", 780)
+    """DC single-line with busbars, converter symbols, ratings and solved results.
+
+    Compatibility wrapper around :func:`.single_line.dc_single_line`.
+    """
+    return dc_single_line(center.electrical, result)
 
 
 def communications_diagram(center: DataCenter, result: CommunicationResult) -> go.Figure:

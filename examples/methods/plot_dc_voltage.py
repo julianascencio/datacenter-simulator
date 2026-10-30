@@ -14,6 +14,7 @@ interactive single-line regulate the racks; this is not a bipolar pole model.
 import matplotlib.pyplot as plt
 
 from datacenter_simulator.use_cases import reference_center
+from datacenter_simulator.utilities.single_line import dc_single_line
 
 # %%
 # Step 1: change distribution voltage while preserving rack equipment
@@ -64,3 +65,34 @@ ax.axhline(1, linestyle="--", color="#555555", label="Nominal voltage")
 ax.set(ylabel="Voltage [pu]", xlabel="First rack power path")
 ax.legend()
 print("Power balance residual [kW]:", result.source_kw - result.load_kw - result.loss_kw)
+
+# %%
+# Step 4: inspect the DC design single-line
+# -------------------------------------------------
+# Generate the schematic from this exact 400 V, 80% utilization solution.
+# Each blue cable carries a loop-resistance label; amber blocks are regulated
+# DC/DC converters. Busbars connect outgoing circuits, and load boxes show
+# local terminal demand. Both current and power ratings are checked for colour.
+diagram = dc_single_line(center.electrical, result)
+print("Diagram branches:", len(diagram.layout.meta["branch_ids"]))
+print("Overloaded branches:", diagram.layout.meta["overloaded_branches"])
+
+# %%
+# Export this solution as an interactive HTML file or a standalone vector:
+#
+# .. code-block:: python
+#
+#    from datacenter_simulator.utilities.single_line import write_single_line_svg
+#    diagram.write_html("dc-design.html")
+#    write_single_line_svg(center.electrical, result, "dc-design.svg")
+#
+# The published preview below is the lab's separate **70% utilization** snapshot
+# of the same 400 V topology. Open its SVG for readable zoom at any scale.
+#
+# .. image:: /_static/lab/reference-lab-single-line.svg
+#    :alt: DC single-line showing the source, common bus, eight rack circuits and two switches
+#    :target: ../../_static/lab/reference-lab-single-line.svg
+#
+# :doc:`../../user_guide/dc_single_line` explains the symbols, units and scope.
+# Protection coordination, earthing and multi-source DC connections are not
+# inferred by this schematic; those models are not implemented.

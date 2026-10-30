@@ -9,7 +9,7 @@ Install from a checkout (Python 3.11+):
    python -m datacenter_simulator.cli --output outputs --hours 48
 
 Open ``outputs/reference-lab.html`` in a browser. It contains its Plotly runtime
-and works offline. CSV and JSON exports sit beside it. The 3D view needs WebGL;
+and works offline. CSV, JSON and a scalable ``reference-lab-single-line.svg`` sit beside it. The 3D view needs WebGL;
 the 2D diagrams and charts remain available on devices without it.
 
 Python API
