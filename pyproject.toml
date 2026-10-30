@@ -1,0 +1,39 @@
+[build-system]
+requires = ["setuptools>=69"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "datacenter-simulator"
+version = "0.1.0"
+description = "Composable data center models for DC power, communications, cooling and generation"
+readme = "README.md"
+requires-python = ">=3.11"
+authors = [{name = "ASVA Consulting", email = "contacto@asvaconsulting.com"}]
+dependencies = ["numpy>=1.26", "pandas>=2.2", "plotly>=5.24"]
+
+[project.optional-dependencies]
+dev = ["pytest>=8", "ruff>=0.9", "mypy>=1.14", "pandas-stubs>=2.2", "build>=1.2"]
+docs = ["sphinx>=8", "sphinx-gallery>=0.18", "pydata-sphinx-theme>=0.16", "matplotlib>=3.8"]
+
+[project.scripts]
+datacenter-sim = "datacenter_simulator.cli:main"
+
+[tool.setuptools.package-data]
+datacenter_simulator = ["py.typed", "utilities/report.html"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP"]
+
+[tool.mypy]
+python_version = "3.11"
+check_untyped_defs = true
+disallow_untyped_defs = true
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra"
