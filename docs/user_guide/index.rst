@@ -9,6 +9,7 @@ small component examples before combining the models into a facility study.
    :maxdepth: 2
 
    package_overview
+   installation
    ../quickstart
 
 .. toctree::
@@ -21,7 +22,7 @@ small component examples before combining the models into a facility study.
 
 .. toctree::
    :caption: Extras
-   :maxdepth: 1
+   :maxdepth: 2
 
    nomenclature
    faq

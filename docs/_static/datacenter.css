@@ -1,7 +1,27 @@
-/* Match OrbitalPV's PyData palette and reading width. */
-:root { --pst-color-primary: #2f6fdb; }
-.bd-page-width { max-width: 92rem; }
-div.highlight-text pre { line-height: 1.45; }
-.asva-brand { text-align: center; margin: 1.5rem 0 2rem; }
-.asva-brand img { max-width: 280px; width: 100%; height: auto; }
-.asva-brand p { margin-top: 0.75rem; }
+/* Shared PyData presentation with the OrbitalPV documentation. */
+:root {
+  --pst-color-primary: #2f6fdb;
+}
+
+.bd-page-width {
+  max-width: 92rem;
+}
+
+div.highlight-text pre {
+  line-height: 1.45;
+}
+
+.asva-brand {
+  text-align: center;
+  margin: 1.5rem 0 2rem;
+}
+
+.asva-brand img {
+  max-width: 280px;
+  width: 100%;
+  height: auto;
+}
+
+.asva-brand p {
+  margin-top: 0.75rem;
+}
