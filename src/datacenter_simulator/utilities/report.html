@@ -75,8 +75,10 @@ changes['scene.camera.eye']=mobile?{x:2.4,y:-2.6,z:1.8}:{x:1.5,y:-1.6,z:1.1};
 plot.dataset.viewMode=mode;}
 Plotly.relayout(plot,changes);}
 window.addEventListener('resize',()=>requestAnimationFrame(fitActivePlot));
-window.addEventListener('load',()=>{
+function applyLocation(){
 if(location.hash==='#dc-single-line')showTab(2);
 else requestAnimationFrame(fitActivePlot);
-});
+}
+window.addEventListener('load',applyLocation);
+window.addEventListener('hashchange',applyLocation);
 </script></body></html>

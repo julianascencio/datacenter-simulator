@@ -53,6 +53,13 @@ const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
       const plot = document.getElementById('plot-2');
       return plot._fullLayout.width >= plot.layout.meta.minimum_width;
     });
+    // A fresh navigation must select the same panel, not only an in-page hash change.
+    await page.reload();
+    await page.waitForFunction(() => !document.getElementById('panel-2').hidden);
+    await page.waitForFunction(() => {
+      const plot = document.getElementById('plot-2');
+      return plot._fullLayout.width >= plot.layout.meta.minimum_width;
+    });
     const design = await page.locator('#plot-2').evaluate(plot => ({
       meta: plot.layout.meta,
       text: plot.layout.annotations.map(a => a.text).join(' '),
