@@ -23,12 +23,21 @@ const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
     for (let i = 0; i < 7; i++) {
       await page.locator('#tab-' + i).click();
       await page.waitForFunction(n => !document.getElementById('panel-' + n).hidden, i);
+      await page.waitForFunction(n => {
+        const plot = document.getElementById('plot-' + n);
+        return Math.abs(plot._fullLayout.width - plot.getBoundingClientRect().width) < 2;
+      }, i);
       assert.equal(await page.locator('.panel:visible').count(), 1);
       assert.equal(await page.locator('#tab-' + i).getAttribute('aria-selected'), 'true');
       await page.screenshot({ path: path.join(screenshots, `view-${i}.png`), fullPage: true });
     }
     await page.setViewportSize({ width: 390, height: 844 });
     await page.locator('#tab-0').click();
+    await page.waitForFunction(() => {
+      const plot = document.getElementById('plot-0');
+      return plot._fullLayout.width < 390 &&
+        Math.abs(plot._fullLayout.width - plot.getBoundingClientRect().width) < 2;
+    });
     assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth), false);
     await page.screenshot({ path: path.join(screenshots, 'mobile.png'), fullPage: true });
     for (const extension of ['.csv', '.json']) {
