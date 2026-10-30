@@ -9,4 +9,3 @@ Visualization and reporting
 
 .. automodule:: datacenter_simulator.cli
    :members:
-
