@@ -14,6 +14,7 @@ page links to the implementation and documents units and model boundaries.
    devices
    electrical
    engineering
+   gpu_lab
    communications
    cooling
    energy

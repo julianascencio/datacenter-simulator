@@ -12,11 +12,36 @@ from datacenter_simulator.methods.energy import Battery
 from datacenter_simulator.models.devices import finite, fraction
 
 
+@dataclass(frozen=True)
+class DemandOption:
+    """One nonpreemptive execution alternative at the common facility bus.
+
+    delta_kw is incremental demand above the idle baseline for consecutive slots;
+    the resource is reserved for every listed slot (including a partial last one).
+    Alternatives in each group represent the same required work and quality.
+    """
+
+    id: str
+    group: str
+    resource: str
+    start_slot: int
+    delta_kw: tuple[float, ...]
+
+    def __post_init__(self) -> None:
+        if not self.id or not self.group or not self.resource:
+            raise ValueError("demand option requires id, group and resource")
+        if not isinstance(self.start_slot, int) or self.start_slot < 0 or not self.delta_kw:
+            raise ValueError("option needs a nonnegative start slot and demand intervals")
+        if not np.isfinite(self.delta_kw).all() or min(self.delta_kw) < 0:
+            raise ValueError("option incremental power must be finite and nonnegative")
+
+
 @dataclass
 class OptimizedDispatch:
     timeseries: pd.DataFrame
     objective: float
     summary: dict[str, float]
+    selected_options: tuple[str, ...] = ()
 
 
 def _profiles(frame: pd.DataFrame, dt_hours: float) -> None:
@@ -52,12 +77,20 @@ def optimize_dispatch(
     carbon_price_per_kg: float = 0,
     throughput_cost_per_kwh: float = 0.01,
     unserved_cost_per_kwh: float = 1e6,
+    terminal_soc_exact: bool = False,
+    require_served: bool = False,
+    demand_options: tuple[DemandOption, ...] = (),
+    required_groups: tuple[str, ...] = (),
 ) -> OptimizedDispatch:
     """Optimize a declared common-bus boundary with mutually exclusive flow directions.
 
     Optional columns: export_price, carbon_kg_kwh, grid_limit_kw. Demand charges
     apply once to this horizon, not automatically to a calendar billing month.
     Unserved load is penalized explicitly; always inspect it before interpreting cost.
+    Optional demand alternatives extend the SAME MILP with one binary selection
+    per candidate, one choice per required group, and nonoverlapping resources.
+    Scheduling and battery dispatch are then genuinely joint. Exact terminal SOC
+    and hard served-load constraints are opt-in, preserving existing defaults.
     """
     _profiles(profiles, dt_hours)
     for name, value in (
@@ -75,6 +108,8 @@ def optimize_dispatch(
         fraction(name, value)
         if not battery.minimum_soc <= value <= battery.maximum_soc:
             raise ValueError(f"{name} outside battery bounds")
+    if terminal_soc_exact and terminal < reserve:
+        raise ValueError("exact terminal SOC cannot be below reserve SOC")
     initial = (
         battery.initial_soc * battery.capacity_kwh
         if initial_energy_kwh is None
@@ -92,8 +127,17 @@ def optimize_dispatch(
     limits = profiles.get("grid_limit_kw", pd.Series(grid_limit_kw, index=profiles.index)).to_numpy(
         dtype=float
     )
+    if len(set(required_groups)) != len(required_groups):
+        raise ValueError("required demand groups must be unique")
+    if {option.group for option in demand_options} != set(required_groups):
+        raise ValueError("every required group needs at least one demand option")
+    if len({option.id for option in demand_options}) != len(demand_options):
+        raise ValueError("demand option ids must be unique")
+    if any(option.start_slot + len(option.delta_kw) > n for option in demand_options):
+        raise ValueError("demand option exceeds dispatch horizon")
     # Blocks: import/export, charge/discharge, energy, curtail/unserved, two direction modes.
-    size, peak = 9 * n + 1, 9 * n
+    base_size, peak = 9 * n + 1, 9 * n
+    size = base_size + len(demand_options)
     lower, upper, cost = np.zeros(size), np.full(size, np.inf), np.zeros(size)
     integrality = np.zeros(size)
     upper[:n], upper[n : 2 * n] = limits, export_limit_kw
@@ -103,15 +147,37 @@ def optimize_dispatch(
         battery.maximum_soc * battery.capacity_kwh,
     )
     lower[5 * n - 1] = max(lower[5 * n - 1], terminal * battery.capacity_kwh)
-    upper[5 * n : 6 * n], upper[6 * n : 7 * n] = generation, demand
+    if terminal_soc_exact:
+        lower[5 * n - 1] = upper[5 * n - 1] = terminal * battery.capacity_kwh
+    maximum_demand = demand.copy()
+    for option in demand_options:
+        maximum_demand[option.start_slot : option.start_slot + len(option.delta_kw)] += (
+            option.delta_kw
+        )
+    upper[5 * n : 6 * n] = generation
+    upper[6 * n : 7 * n] = 0 if require_served else maximum_demand
+    upper[base_size:], integrality[base_size:] = 1, 1
     upper[7 * n : 9 * n], integrality[7 * n : 9 * n] = 1, 1
     cost[:n] = dt_hours * (prices + carbon_price_per_kg * carbon)
     cost[n : 2 * n] = -dt_hours * exports
     cost[2 * n : 4 * n] = dt_hours * throughput_cost_per_kwh
     cost[6 * n : 7 * n] = dt_hours * unserved_cost_per_kwh
     cost[peak] = demand_charge_per_kw
-    a = lil_matrix((7 * n, size), dtype=float)
-    lo, hi = np.full(7 * n, -np.inf), np.full(7 * n, np.inf)
+    resources = sorted({option.resource for option in demand_options})
+    rows = 7 * n + len(required_groups) + len(resources) * n
+    a = lil_matrix((rows, size), dtype=float)
+    lo, hi = np.full(rows, -np.inf), np.full(rows, np.inf)
+    for k, option in enumerate(demand_options):
+        col = base_size + k
+        group_row = 7 * n + required_groups.index(option.group)
+        a[group_row, col] = 1
+        lo[group_row] = hi[group_row] = 1
+        for offset, delta in enumerate(option.delta_kw):
+            t = option.start_slot + offset
+            a[t, col] = -delta
+            resource_row = 7 * n + len(required_groups) + resources.index(option.resource) * n + t
+            a[resource_row, col] = 1
+            hi[resource_row] = 1
     for t in range(n):
         a[t, [t, n + t, 2 * n + t, 3 * n + t, 5 * n + t, 6 * n + t]] = [1, -1, -1, 1, -1, 1]
         lo[t] = hi[t] = demand[t] - generation[t]
@@ -145,6 +211,11 @@ def optimize_dispatch(
     if not solution.success or solution.x is None:
         raise ValueError(f"dispatch optimization failed: {solution.message}")
     x = solution.x
+    selected = tuple(option.id for k, option in enumerate(demand_options) if x[base_size + k] > 0.5)
+    demand = demand.copy()
+    for option in demand_options:
+        if option.id in selected:
+            demand[option.start_slot : option.start_slot + len(option.delta_kw)] += option.delta_kw
     frame = pd.DataFrame(
         {
             "demand_kw": demand,
@@ -182,6 +253,7 @@ def optimize_dispatch(
             "throughput_kwh": float(dt_hours * (x[2 * n : 3 * n].sum() + x[3 * n : 4 * n].sum())),
             "unserved_kwh": float(dt_hours * x[6 * n : 7 * n].sum()),
         },
+        selected,
     )
 
 

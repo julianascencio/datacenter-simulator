@@ -17,9 +17,12 @@ docs = ["sphinx>=8", "sphinx-gallery>=0.18", "pydata-sphinx-theme>=0.16", "matpl
 
 solar = ["pvlib>=0.11"]
 benchmarks = ["pypsa>=0.35"]
+gpu = ["nvidia-ml-py>=12.560"]
+gpu-benchmark = ["nvidia-ml-py>=12.560", "zeus>=0.16,<0.17", "torch>=2.5", "scikit-learn>=1.5"]
 
 [project.scripts]
 datacenter-sim = "datacenter_simulator.cli:main"
+datacenter-gpu-lab = "datacenter_simulator.gpu_lab:main"
 
 [tool.setuptools.package-data]
 datacenter_simulator = ["py.typed", "utilities/report.html", "utilities/engineering.html", "data/*.csv", "data/*.json"]

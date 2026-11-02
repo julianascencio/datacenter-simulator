@@ -55,6 +55,7 @@ sphinx_gallery_conf = {
             "../examples/methods",
             "../examples/connectors",
             "../examples/analysis",
+            "../examples/gpu_lab",
         ]
     ),
     "within_subsection_order": "ExampleTitleSortKey",

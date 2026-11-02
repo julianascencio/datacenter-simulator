@@ -35,3 +35,11 @@ traceable manufacturer or measurement data before evaluating a real facility.
 
 Created by `ASVA Consulting <https://asvaconsulting.com>`_.
 Contact: contacto@asvaconsulting.com.
+
+GPU measurement and inference
+-----------------------------
+
+The :ref:`gpu-primary-sources` section records the reviewed official NVML API,
+NVIDIA Python bindings, Zeus v0.16.0 and UCI/scikit-learn dataset provenance.
+GPU gallery traces and performance curves are synthetic fixtures; hardware
+measurements and facility calibration remain pending.

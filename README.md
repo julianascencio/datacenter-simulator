@@ -198,8 +198,32 @@ Open `outputs/reference-lab.html`. It includes the Plotly runtime and works offl
 | [10. Compare climates, water and heat recovery](https://julianascencio.github.io/datacenter-simulator/gallery/analysis/plot_climate_cooling.html) | Three PVGIS TMY climates, dry/wet/hybrid rejection and water | Advanced |
 | [11. Direct-DC solar, storage and optimized dispatch](https://julianascencio.github.io/datacenter-simulator/gallery/analysis/plot_dc_microgrid.html) | DC/AC PV conversion, islanding, MILP and rolling forecasts | Advanced |
 | [12. Couple workloads, networks and cooling](https://julianascencio.github.io/datacenter-simulator/gallery/analysis/plot_workload_network.html) | ECMP fairness, job deadlines, thermal caps and carbon timing | Advanced |
+| [13. GPU Energy & Performance Lab](https://julianascencio.github.io/datacenter-simulator/gallery/gpu_lab/plot_gpu_energy_lab.html) | Trace replay, quality-specific throughput, joint scheduling/storage and forecast errors | Advanced |
 
 Each tutorial includes explained steps, plots, assumptions, and downloadable Python and Jupyter files. Original reference data are deterministic and synthetic; the new engineering examples also include attributed SPECpower measurements and three offline PVGIS weather/resource snapshots.
+
+## GPU Energy & Performance Lab
+
+Read the [GPU lab guide](docs/user_guide/gpu_lab.rst) and the
+[flagship runnable tutorial](examples/gpu_lab/plot_gpu_energy_lab.py).
+The offline comparison uses explicitly **synthetic** performance inputs and
+**simulated** facility results. No GPU hardware validation is claimed.
+
+```bash
+python -m datacenter_simulator.gpu_lab replay --output outputs/gpu-replay
+python -m datacenter_simulator.gpu_lab study --output outputs/gpu-lab --sensitivity
+# On a supported GPU host (read-only by default):
+python -m pip install -e '.[gpu-benchmark]'
+CUBLAS_WORKSPACE_CONFIG=:4096:8 python -m datacenter_simulator.gpu_lab benchmark \
+  --device 0 --cuda-device 0 --repetitions 100000 --output outputs/gpu-default
+```
+
+The optional NVML connector exports timestamped CSV traces with provenance;
+Zeus measures fixed-quality inference windows. Board/server boundary conversion
+feeds the existing facility simulator. Four policies share identical work and
+battery endpoints, with joint scheduling/storage optimization and forecast-error
+stress tests. Power-limit writes require explicit opt-in and restore the captured
+setting. See the guide for hardware identity checks, calibration limits and commands.
 
 ## Literature and provenance
 

@@ -516,18 +516,10 @@ def workload_power_profile(
     finite("step_s", step_s, strict=True)
     if start.tzinfo is None:
         raise ValueError("start must be timezone-aware")
-    devices = sorted(result.devices.equipment_id.unique())
-    count = int(np.ceil(result.summary["elapsed_s"] / step_s))
-    values = np.zeros((count, len(devices)))
-    for row in result.devices.to_dict("records"):
-        begin, end = float(row["time_s"]), float(row["time_s"] + row["duration_s"])
-        column = devices.index(str(row["equipment_id"]))
-        first, last = int(begin // step_s), min(count - 1, int(np.ceil(end / step_s) - 1))
-        for slot in range(first, last + 1):
-            overlap = max(0, min(end, (slot + 1) * step_s) - max(begin, slot * step_s))
-            values[slot, column] += float(row["power_kw"]) * overlap / step_s
-    return pd.DataFrame(
-        values,
-        columns=devices,
-        index=pd.date_range(start, periods=count, freq=pd.Timedelta(seconds=step_s)),
-    )
+    from datacenter_simulator.utilities.timeseries import resample_intervals
+
+    profiles = {}
+    for device in sorted(result.devices.equipment_id.unique()):
+        intervals = result.devices[result.devices.equipment_id == device]
+        profiles[device] = resample_intervals(intervals, start, step_s=step_s)
+    return pd.DataFrame(profiles)
