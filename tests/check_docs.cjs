@@ -1,4 +1,4 @@
-// Exercise the generated documentation as a reader, including all twelve tutorials.
+// Exercise the generated documentation as a reader, including all thirteen tutorials.
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
@@ -25,11 +25,11 @@ const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
     await page.waitForURL('**/gallery/index.html');
     const cards = page.locator('.sphx-glr-thumbcontainer');
     await cards.first().waitFor({ state: 'visible' });
-    assert.equal(await cards.count(), 12, 'The gallery should contain twelve executable tutorials');
+    assert.equal(await cards.count(), 13, 'The gallery should contain thirteen executable tutorials');
     await page.screenshot({ path: path.join(screenshots, 'gallery-desktop.png'), fullPage: true });
     const examples = await cards.locator('a.reference.internal').evaluateAll(links =>
       [...new Set(links.map(link => link.href.split('#')[0]))]);
-    assert.equal(examples.length, 12);
+    assert.equal(examples.length, 13);
     for (const url of examples) {
       await page.goto(url);
       const text = await page.locator('article').innerText();
@@ -52,6 +52,8 @@ const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
       ['home', 'index.html'], ['gallery', 'gallery/index.html'],
       ['tutorial', 'gallery/methods/plot_device_models.html'],
       ['engineering', 'user_guide/engineering.html'],
+      ['gpu-lab', 'user_guide/gpu_lab.html'],
+      ['gpu-tutorial', 'gallery/gpu_lab/plot_gpu_energy_lab.html'],
     ]) {
       await page.goto(pathToFileURL(path.join(root, relative)).href);
       assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth), false,

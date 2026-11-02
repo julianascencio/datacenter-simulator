@@ -48,7 +48,7 @@ If you are new to Data Center Simulator:
 * Read the :doc:`user_guide/package_overview`.
 * Follow :doc:`user_guide/installation` to install the package and optional tools.
 * Run the :doc:`quickstart` to generate an offline simulation lab.
-* Explore twelve worked examples in the :doc:`gallery/index`, from device basics
+* Explore thirteen worked examples in the :doc:`gallery/index`, from device basics
   to coupled electrical, cooling, energy and workload studies.
 * Follow :doc:`user_guide/engineering` for the eight advanced methods and linked lab.
 * Inspect the :doc:`user_guide/dc_single_line` with electrical ratings and SVG export.
