@@ -102,3 +102,12 @@ Contributing explains the development and evidence requirements.
    reference/index
    research/index
    contributing/index
+
+License
+-------
+
+Copyright (c) 2026 ASVA Consulting TFE SL. Original software is source-available
+for noncommercial use only. Internal business use, paid services, and commercial
+products require separate written permission. Third-party materials keep their
+own terms. Read the `full license <https://github.com/julianascencio/datacenter-simulator/blob/main/LICENSE>`_
+and `licensing scope <https://github.com/julianascencio/datacenter-simulator/blob/main/LICENSING.md>`_.

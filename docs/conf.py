@@ -13,7 +13,7 @@ author = "ASVA Consulting"
 ROOT = Path(__file__).resolve().parents[1]
 release = tomllib.loads((ROOT / "pyproject.toml").read_text())["project"]["version"]
 version = release
-copyright = "2026, ASVA Consulting"
+copyright = "2026, ASVA Consulting TFE SL"
 extensions = [
     "sphinx.ext.autodoc",
     "sphinx.ext.autosummary",

@@ -1,8 +1,10 @@
 [build-system]
-requires = ["setuptools>=69"]
+requires = ["setuptools>=77"]
 build-backend = "setuptools.build_meta"
 
 [project]
+license = "LicenseRef-ASVA-Noncommercial-1.0"
+license-files = ["LICENSE", "LICENSING.md"]
 name = "datacenter-simulator"
 version = "0.2.0"
 description = "Composable data center models for DC power, communications, cooling and generation"

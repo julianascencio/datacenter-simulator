@@ -241,3 +241,13 @@ Data Center Simulator is created and maintained by **ASVA Consulting**.
 
 - Website: [asvaconsulting.com](https://asvaconsulting.com)
 - Contact: [contacto@asvaconsulting.com](mailto:contacto@asvaconsulting.com)
+
+## License
+
+Copyright (c) 2026 **ASVA Consulting TFE SL**. The original software is
+source-available under the [ASVA Noncommercial Software License 1.0](LICENSE).
+**Commercial use is prohibited**, including internal business use, paid client
+work, commercial products, and paid hosted services. Noncommercial use,
+modification, and sharing are allowed subject to the license.
+
+Third-party materials retain their own terms. See [licensing scope](LICENSING.md).
