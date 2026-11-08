@@ -95,6 +95,27 @@ The grid manager is a common-bus scheduling model, not an AC transmission or tra
 [Grid example](examples/methods/plot_grid_management.py) ·
 [Recovery example](examples/analysis/plot_wyoming_recovery.py)
 
+## Synthetic data center equipment and capital study
+
+The infographic-inspired example reproduces twelve unverified per-MW content rates,
+then builds an explicitly synthetic 20 MW IT facility. It adds modular N+1 equipment
+sizing, UPS power/energy checks and reusable capital accounting, reusing the existing
+cooling model for power and heat balances. Cost rates and engineering unit counts are
+kept separate because the image's MW basis and redundancy inclusions are unspecified.
+
+```bash
+python -m datacenter_simulator.analysis.infrastructure --it-mw 20 --output outputs/infrastructure
+```
+
+Open `outputs/infrastructure/infrastructure-study.html` for the offline report,
+waterfall, power balance, 48-hour operation, sensitivities and ten CSV/JSON audit files.
+The image's listed subtotal is $42.7m per assumed IT MW; this is incomplete project
+scope, not a validated construction budget. All engineering ratings are assumptions.
+
+[Runnable gallery example](examples/analysis/plot_infrastructure_content.py) ·
+[Equations and scope](docs/user_guide/infrastructure.rst) ·
+[API reference](docs/reference/infrastructure.rst)
+
 ## Foundation stack
 
 - **NumPy + pandas + SciPy** — numerical arrays, timezone-aware profiles, nonlinear solvers and MILP optimization.
@@ -127,7 +148,7 @@ The grid manager is a common-bus scheduling model, not an AC transmission or tra
 
 [User Guide](https://julianascencio.github.io/datacenter-simulator/user_guide/index.html) · [Example Gallery](https://julianascencio.github.io/datacenter-simulator/gallery/index.html) · [API Reference](https://julianascencio.github.io/datacenter-simulator/reference/index.html) · [Research](https://julianascencio.github.io/datacenter-simulator/research/index.html) · [Contributing](https://julianascencio.github.io/datacenter-simulator/contributing/index.html)
 
-The documentation uses Sphinx, PyData Sphinx Theme, and Sphinx-Gallery. All fifteen gallery examples execute during the documentation build and call the installed `datacenter_simulator` API.
+The documentation uses Sphinx, PyData Sphinx Theme, and Sphinx-Gallery. All sixteen gallery examples execute during the documentation build and call the installed `datacenter_simulator` API.
 
 Build locally:
 
@@ -223,6 +244,7 @@ Open `outputs/reference-lab.html`. It includes the Plotly runtime and works offl
 | [11. Direct-DC solar, storage and optimized dispatch](https://julianascencio.github.io/datacenter-simulator/gallery/analysis/plot_dc_microgrid.html) | DC/AC PV conversion, islanding, MILP and rolling forecasts | Advanced |
 | [12. Couple workloads, networks and cooling](https://julianascencio.github.io/datacenter-simulator/gallery/analysis/plot_workload_network.html) | ECMP fairness, job deadlines, thermal caps and carbon timing | Advanced |
 | [13. GPU Energy & Performance Lab](https://julianascencio.github.io/datacenter-simulator/gallery/gpu_lab/plot_gpu_energy_lab.html) | Trace replay, quality-specific throughput, joint scheduling/storage and forecast errors | Advanced |
+| [16. Synthetic equipment-content study](https://julianascencio.github.io/datacenter-simulator/gallery/analysis/plot_infrastructure_content.html) | Cost boundaries, modular sizing, UPS autonomy and cooling | Advanced |
 
 Each tutorial includes explained steps, plots, assumptions, and downloadable Python and Jupyter files. Original reference data are deterministic and synthetic; the new engineering examples also include attributed SPECpower measurements and three offline PVGIS weather/resource snapshots.
 

@@ -43,3 +43,12 @@ The :ref:`gpu-primary-sources` section records the reviewed official NVML API,
 NVIDIA Python bindings, Zeus v0.16.0 and UCI/scikit-learn dataset provenance.
 GPU gallery traces and performance curves are synthetic fixtures; hardware
 measurements and facility calibration remain pending.
+
+Synthetic infrastructure content
+--------------------------------
+
+The :doc:`equipment-content study <user_guide/infrastructure>` transcribes twelve
+unverified image rates supplied by the user. The linked post was inaccessible;
+no market-price verification or vendor-performance calibration is asserted.
+The packaged evidence JSON records the source limitations, assumed denominator,
+unpriced scope and primary DOE/FEMP/Eaton engineering context.

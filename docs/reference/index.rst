@@ -19,6 +19,7 @@ page links to the implementation and documents units and model boundaries.
    cooling
    energy
    grid_management
+   infrastructure
    connectors
    simulation
    visualization
