@@ -297,3 +297,23 @@ work, commercial products, and paid hosted services. Noncommercial use,
 modification, and sharing are allowed subject to the license.
 
 Third-party materials retain their own terms. See [licensing scope](LICENSING.md).
+
+### Data center SCADA models
+
+[Standards and commissioning guide](https://julianascencio.github.io/datacenter-simulator/user_guide/scada.html)
+· [Searchable device dictionary](https://julianascencio.github.io/datacenter-simulator/_static/lab/scada/scada-model.html)
+· [Runnable example](examples/connectors/plot_scada_model.py)
+
+Export 50 device/space profiles with per-device JSON Schemas, points, attributes,
+quality/timestamps, alarms, topology, read bindings and control-intent definitions:
+
+```bash
+python -m datacenter_simulator.analysis.scada --output outputs/scada
+```
+
+Open `outputs/scada/scada-model.html`. Redfish, BACnet, SNMP MIBs and Modbus are the
+primary integration choices; OPC UA is an additional interchange and Brick a
+relationship design reference. These are project-defined engineering profiles,
+not native-protocol conformance claims. Importers work on offline decoded records.
+Installed-device support and vendor-specific mappings require commissioning; no
+universal Modbus addresses or live control are assumed.

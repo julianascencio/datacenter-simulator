@@ -1,0 +1,29 @@
+{
+  "schema_version": "1.0.0",
+  "reviewed_on": "2026-11-08",
+  "selection_basis": "Evidence of cross-vendor implementation and standard applicability, not a measured market-share ranking.",
+  "canonical_scope": "ASVA engineering profiles are a project-defined interoperable superset, not certified native Redfish/BACnet/OPC UA schemas. Profile fields and poll intervals are engineering selections. Actual device support requires discovery and vendor documentation.",
+  "sources": [
+    {"id":"dmtf-model-2026-1","title":"DMTF DSP0268 Redfish Data Model Specification 2026.1","url":"https://redfish.dmtf.org/schemas/DSP0268_2026.1.html","version":"2026.1, 2026-04-02","use":"Pinned resource vocabulary for IT, power distribution and liquid cooling; not a claim that installed devices implement all resources."},
+    {"id":"dmtf-sensor-1-11","title":"DMTF Sensor JSON Schema","url":"https://redfish.dmtf.org/schemas/v1/Sensor.v1_11_0.json","version":"Sensor 1.11.0","use":"Reading, ReadingUnits and ReadingTime normalization contract. Reader is a subset importer, not full service conformance validation."},
+    {"id":"dell-redfish","title":"Dell iDRAC Redfish API","url":"https://www.dell.com/support/kbdoc/en-us/000178045/redfish-api-with-dell-integrated-remote-access-controller","use":"First-party implementation evidence for server management."},
+    {"id":"hpe-redfish","title":"HPE server management getting started","url":"https://servermanagementportal.ext.hpe.com/docs/concepts/gettingstarted","use":"First-party Redfish implementation evidence across HPE compute platforms and PDUs."},
+    {"id":"vertiv-protocols","title":"Vertiv Environet Alert FAQ","url":"https://www.vertiv.com/en-us/support/faqs/environet-alert/","use":"First-party DCIM support for SNMP, Modbus TCP/IP and BACnet/IP, including third-party equipment."},
+    {"id":"bacnet-scope","title":"BACnet Committee FAQ","url":"https://bacnet.org/faq/","use":"Object/property interoperability, BTL/PICS discovery and distinction from Modbus register semantics."},
+    {"id":"bacnet-ua","title":"OPC 30030 BACnet information model, BACnetAnalogType","url":"https://reference.opcfoundation.org/specs/OPC-30030/7.4","version":"2.00.1 as displayed","use":"Present_Value, units, reliability, status flags, out-of-service, priority semantics; object instances remain site-specific."},
+    {"id":"rfc1628","title":"IETF RFC 1628 UPS Management Information Base","url":"https://www.rfc-editor.org/rfc/rfc1628","version":"RFC 1628","use":"Exact UPS scalar OIDs, units/enumerations and output-line table indices."},
+    {"id":"rfc3433","title":"IETF RFC 3433 Entity Sensor MIB","url":"https://www.rfc-editor.org/rfc/rfc3433","version":"RFC 3433","use":"Sensor type, scale, precision, operational status and sysUpTime-based timestamps."},
+    {"id":"modbus-1-1b3","title":"Modbus Application Protocol Specification","url":"https://www.modbus.org/file/secure/modbusprotocolspecification.pdf","version":"V1.1b3, 2012-04-26","use":"Register data model and FC03/04 read semantics. Device register offsets, word order and scale are vendor/site mappings."},
+    {"id":"opcua-datavalue","title":"OPC UA Part 4 DataValue","url":"https://reference.opcfoundation.org/specs/OPC-10000-4/7.11","version":"1.05.07 as displayed","use":"Value, quality StatusCode, source timestamp and server timestamp. No universal data-center NodeIds are asserted."},
+    {"id":"brick-relationships","title":"Brick relationships","url":"https://docs.brickschema.org/brick/relationships.html","use":"Distinguish composition, location, feeds and points. Canonical graph relations are project terms, not a certified Brick graph."},
+    {"id":"doe-design","title":"DOE/FEMP Best Practices Guide for Energy-Efficient Data Center Design","url":"https://www.energy.gov/cmei/femp/articles/best-practices-guide-energy-efficient-data-center-design","version":"2024","use":"Engineering equipment/power/cooling boundary context only; not a mandatory SCADA point list."}
+  ],
+  "selected": [
+    {"name":"Redfish","role":"Primary IT hardware resource model; supported facility power/cooling resources where implemented","evidence":["dmtf-model-2026-1","dell-redfish","hpe-redfish"],"limitations":"Discover service links, resource versions and OEM extensions; do not assume all devices implement all schemas."},
+    {"name":"BACnet","role":"Primary building/HVAC object and property interface","evidence":["bacnet-scope","vertiv-protocols","bacnet-ua"],"limitations":"Object instance IDs and point-to-equipment meanings require PICS/discovery and commissioning."},
+    {"name":"SNMP MIBs","role":"Existing UPS, PDU, network and sensor monitoring","evidence":["rfc1628","rfc3433","vertiv-protocols"],"limitations":"Use standard MIBs when exposed; enterprise MIBs remain vendor-specific. SNMPv3 is a deployment consideration, not implemented network transport here."},
+    {"name":"Modbus","role":"Electrical meters, generator/PLC and HVAC register integration","evidence":["modbus-1-1b3","vertiv-protocols"],"limitations":"A transport/register specification, not a universal equipment semantic model; a supplied register map is mandatory."},
+    {"name":"OPC UA","role":"SCADA interchange and typed quality/timestamp envelope","evidence":["opcua-datavalue","bacnet-ua"],"limitations":"Supplementary integration layer; no data-center adoption ranking or generic native device NodeSet is claimed."},
+    {"name":"Brick","role":"Semantic relationship design reference","evidence":["brick-relationships"],"limitations":"No Brick RDF/SHACL conformance/export is claimed in this implementation."}
+  ]
+}
