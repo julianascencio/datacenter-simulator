@@ -20,6 +20,7 @@ small component examples before combining the models into a facility study.
    engineering
    gpu_lab
    grid_management
+   infrastructure
    ../methodology
    ../integration
 

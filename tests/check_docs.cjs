@@ -1,4 +1,4 @@
-// Exercise the generated documentation as a reader, including all fifteen tutorials.
+// Exercise the generated documentation as a reader, including all sixteen tutorials.
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
@@ -25,11 +25,11 @@ const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
     await page.waitForURL('**/gallery/index.html');
     const cards = page.locator('.sphx-glr-thumbcontainer');
     await cards.first().waitFor({ state: 'visible' });
-    assert.equal(await cards.count(), 15, 'The gallery should contain fifteen executable tutorials');
+    assert.equal(await cards.count(), 16, 'The gallery should contain sixteen executable tutorials');
     await page.screenshot({ path: path.join(screenshots, 'gallery-desktop.png'), fullPage: true });
     const examples = await cards.locator('a.reference.internal').evaluateAll(links =>
       [...new Set(links.map(link => link.href.split('#')[0]))]);
-    assert.equal(examples.length, 15);
+    assert.equal(examples.length, 16);
     for (const url of examples) {
       await page.goto(url);
       const text = await page.locator('article').innerText();
@@ -57,6 +57,8 @@ const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
       ['grid-guide', 'user_guide/grid_management.html'],
       ['grid-example', 'gallery/methods/plot_grid_management.html'],
       ['wyoming-example', 'gallery/analysis/plot_wyoming_recovery.html'],
+      ['infrastructure-guide', 'user_guide/infrastructure.html'],
+      ['infrastructure-example', 'gallery/analysis/plot_infrastructure_content.html'],
     ]) {
       await page.goto(pathToFileURL(path.join(root, relative)).href);
       assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth), false,
@@ -70,7 +72,7 @@ const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
     assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth), false);
     await page.screenshot({ path: path.join(screenshots, 'single-line-guide-mobile.png'), fullPage: true });
     assert.deepEqual(errors, []);
-    console.log('Documentation navigation, fifteen tutorials, figures, downloads and mobile layout passed.');
+    console.log('Documentation navigation, sixteen tutorials, figures, downloads and mobile layout passed.');
   } finally {
     await browser.close();
   }
