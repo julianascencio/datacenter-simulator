@@ -19,6 +19,7 @@ small component examples before combining the models into a facility study.
    dc_single_line
    engineering
    gpu_lab
+   grid_management
    ../methodology
    ../integration
 

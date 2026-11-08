@@ -71,6 +71,30 @@ python -m pip install -e '.[solar,benchmarks]'  # pvlib and independent PyPSA ch
 
 See the [installation guide](https://julianascencio.github.io/datacenter-simulator/user_guide/installation.html) for an isolated environment and development setup.
 
+## Campus grid management and Wyoming recovery
+
+The Wyoming case and all its methods live in this repository: generator and fuel-supply models,
+mixed-integer fleet/storage dispatch, commissioning and correlated outages, ramp constraints,
+critical/flexible load shedding, carbon accounting, N-1 screening, staged investment and power-cost
+sensitivities. The existing battery model is reused. Gallery scripts only orchestrate and plot
+installed package APIs.
+
+```bash
+python -m datacenter_simulator.analysis.wyoming --output outputs/wyoming
+# Or, after installing the updated package:
+datacenter-grid --output outputs/wyoming
+```
+
+Open `outputs/wyoming/wyoming-grid-management.html` for an offline interactive report. The directory
+also includes editable inputs, 15 source records and hourly/monthly CSVs. All company-outcome
+scenarios are illustrative: the acquisition is confirmed; operational success is not established.
+The grid manager is a common-bus scheduling model, not an AC transmission or transient solver.
+
+[Guide and equations](docs/user_guide/grid_management.rst) ·
+[API reference](docs/reference/grid_management.rst) ·
+[Grid example](examples/methods/plot_grid_management.py) ·
+[Recovery example](examples/analysis/plot_wyoming_recovery.py)
+
 ## Foundation stack
 
 - **NumPy + pandas + SciPy** — numerical arrays, timezone-aware profiles, nonlinear solvers and MILP optimization.
@@ -103,7 +127,7 @@ See the [installation guide](https://julianascencio.github.io/datacenter-simulat
 
 [User Guide](https://julianascencio.github.io/datacenter-simulator/user_guide/index.html) · [Example Gallery](https://julianascencio.github.io/datacenter-simulator/gallery/index.html) · [API Reference](https://julianascencio.github.io/datacenter-simulator/reference/index.html) · [Research](https://julianascencio.github.io/datacenter-simulator/research/index.html) · [Contributing](https://julianascencio.github.io/datacenter-simulator/contributing/index.html)
 
-The documentation uses Sphinx, PyData Sphinx Theme, and Sphinx-Gallery. All twelve gallery examples execute during the documentation build and call the installed `datacenter_simulator` API.
+The documentation uses Sphinx, PyData Sphinx Theme, and Sphinx-Gallery. All fifteen gallery examples execute during the documentation build and call the installed `datacenter_simulator` API.
 
 Build locally:
 

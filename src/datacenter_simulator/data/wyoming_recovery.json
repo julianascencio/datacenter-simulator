@@ -1,0 +1,38 @@
+{
+  "as_of": "2026-11-08",
+  "description": "Illustrative screening exercise; not an as-built model or forecast of either company's outcome.",
+  "start": "2028-01", "end": "2030-12",
+  "facility_target_mw": 1800, "pue": 1.2, "pod_it_mw": 100,
+  "delivery_factor": 0.95, "building_lead_months": 3,
+  "facility_capex_usd_per_it_mw": 8000000, "annual_carry_rate": 0.10,
+  "firm_addition_mw": 100, "firm_addition_date": "2030-01",
+  "gas_usd_per_mmbtu": 4.0, "gas_co2_kg_per_mmbtu": 52.91,
+  "heat_rate_hhv_mmbtu_per_mwh": {"fuel_cell": 6.5, "ccgt": 6.0, "black_hills": 9.0},
+  "capture_fraction": 0.90, "capture_availability": 0.95,
+  "fuel_cell_capture_energy_penalty": 0.05,
+  "fuel_cell_capex_usd": 4000000000, "fuel_cell_economic_life_years": 20,
+  "fuel_cell_capacity_factor": 0.95, "fuel_cell_om_usd_per_mwh": 15,
+  "capture_transport_storage_usd_per_tonne": 80,
+  "assets": [
+    {"id":"FC1","group":"fuel_cell","mw":117,"date":"2027-10"},
+    {"id":"FC2","group":"fuel_cell","mw":117,"date":"2027-10"},
+    {"id":"FC3","group":"fuel_cell","mw":117,"date":"2028-07"},
+    {"id":"FC4","group":"fuel_cell","mw":117,"date":"2028-07"},
+    {"id":"FC5","group":"fuel_cell","mw":117,"date":"2028-12"},
+    {"id":"FC6","group":"fuel_cell","mw":117,"date":"2028-12"},
+    {"id":"CCGT1","group":"ccgt","mw":575,"date":"2028-07"},
+    {"id":"CCGT2","group":"ccgt","mw":575,"date":"2029-07"},
+    {"id":"BKH1","group":"black_hills","mw":188,"date":"2027-12"},
+    {"id":"BKH2","group":"black_hills","mw":188,"date":"2028-12"},
+    {"id":"BKH3","group":"black_hills","mw":188,"date":"2029-12"},
+    {"id":"MARKET","group":"market","mw":26,"date":"2027-12"}
+  ],
+  "delayed_months": {"fuel_cell":12,"ccgt":12,"black_hills":6,"market":6},
+  "provenance": {
+    "reported": {"fuel_cell_total_mw":"S05: 702", "ccgt_total_mw":"S06: approximately 1150 site-ready", "black_hills_generation_mw":"S04: 564", "market_service_mw":"S04: 26", "fuel_cell_capex_usd":"S05: approximately $4 billion", "fuel_cell_economic_life_years":"20-year PPA S05, used as model recovery life", "gas_co2_kg_per_mmbtu":"S12"},
+    "assumptions": "All other numeric parameters, individual asset partitions, commissioning months, outage blocks, losses, capture rate, prices, financing, load target boundary, and costs are analyst-selected. The historical 1.8 GW announcement is interpreted solely for this exercise as facility load, not IT load or Google's confirmed final demand.",
+    "timing": "S04 says energy service late 2027 and peak load 2030; S05 says fuel cells fully operational by end 2028. Model tranche dates are illustrative, not disclosed contracts. No unknown 248 MW is credited.",
+    "capacity_boundary": "5% delivery haircut is a sensitivity allowance, not a measured site derating. Tallgrass 1150 MW already uses site-ready language. Group splits do not represent an actual electrical single-line diagram.",
+    "firm_addition": "Hypothetical 100 MW delivered firm AFTER its own contingency allowance; incremental contract cost is not estimated. Must be proven deliverable under modeled largest loss. Not an announced Google asset."
+  }
+}

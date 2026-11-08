@@ -25,9 +25,10 @@ gpu-benchmark = ["nvidia-ml-py>=12.560", "zeus>=0.16,<0.17", "torch>=2.5", "scik
 [project.scripts]
 datacenter-sim = "datacenter_simulator.cli:main"
 datacenter-gpu-lab = "datacenter_simulator.gpu_lab:main"
+datacenter-grid = "datacenter_simulator.analysis.wyoming:main"
 
 [tool.setuptools.package-data]
-datacenter_simulator = ["py.typed", "utilities/report.html", "utilities/engineering.html", "data/*.csv", "data/*.json"]
+datacenter_simulator = ["py.typed", "utilities/report.html", "utilities/engineering.html", "utilities/grid_management.html", "data/*.csv", "data/*.json"]
 
 [tool.ruff]
 line-length = 100

@@ -48,9 +48,10 @@ If you are new to Data Center Simulator:
 * Read the :doc:`user_guide/package_overview`.
 * Follow :doc:`user_guide/installation` to install the package and optional tools.
 * Run the :doc:`quickstart` to generate an offline simulation lab.
-* Explore thirteen worked examples in the :doc:`gallery/index`, from device basics
+* Explore fifteen worked examples in the :doc:`gallery/index`, from device basics
   to coupled electrical, cooling, energy and workload studies.
 * Follow :doc:`user_guide/engineering` for the eight advanced methods and linked lab.
+* Run :doc:`user_guide/grid_management` for fleet dispatch and the Wyoming recovery study.
 * Inspect the :doc:`user_guide/dc_single_line` with electrical ratings and SVG export.
 * Use the :doc:`reference/index` for classes, functions and source code.
 
@@ -58,6 +59,8 @@ If you are new to Data Center Simulator:
 
    <p><a class="btn btn-primary" href="_static/lab/reference-lab.html">Open the interactive 2D / 3D simulation lab →</a>
    <a class="btn btn-secondary" href="_static/lab/engineering-lab.html">Open linked engineering lab →</a></p>
+
+   <p><a class="btn btn-secondary" href="_static/lab/wyoming/wyoming-grid-management.html">Open Wyoming grid-management study →</a></p>
 
 Core modelling idea
 ---------------------------

@@ -6,6 +6,7 @@ from pathlib import Path
 from sphinx_gallery.sorting import ExplicitOrder
 
 from datacenter_simulator.analysis.engineering import export_engineering_study
+from datacenter_simulator.analysis.wyoming import export_wyoming_study
 from datacenter_simulator.cli import generate_reference
 
 project = "Data Center Simulator"
@@ -67,3 +68,4 @@ sphinx_gallery_conf = {
 generate_reference(Path(__file__).parent / "_static" / "lab")
 
 export_engineering_study(str(Path(__file__).parent / "_static" / "lab"))
+export_wyoming_study(Path(__file__).parent / "_static" / "lab" / "wyoming")

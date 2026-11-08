@@ -1,0 +1,18 @@
+<!doctype html><html lang="en"><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Wyoming grid management | Data Center Simulator</title>
+<style>body{font:16px/1.6 system-ui,sans-serif;color:#16364b;margin:0;background:#f2f6f8}
+main{max-width:1120px;margin:auto;padding:24px}section{background:white;padding:20px;margin:20px 0;border-radius:12px}
+.scroll{overflow:auto}table{border-collapse:collapse;font-size:12px}th,td{padding:8px;border-bottom:1px solid #ddd}
+code{overflow-wrap:anywhere;background:#edf2f5;padding:3px}h1{line-height:1.2}</style><main>
+<p>ASVA NEXTGEN / DATA CENTER SIMULATOR</p><h1>Wyoming: power, recovery and grid management</h1>
+<p>Evidence cutoff: 8 November 2026. Google acquired the site; operational success is not established.</p>
+<section><h2>Read these results correctly</h2><p>Monthly planning and hourly operation are separate models.
+Planning uses MW/MWh, PUE 1.20 and a hypothetical 100 MW firm addition. The operational benchmark uses
+kW/kWh at one facility bus, synthetic 2030 demand and known future outages. Its 1 GWh / 200 MW battery
+is hypothetical. The utility path includes Black Hills generation and market import. All modeled gas
+generation shares one stress-test fuel dependency. No results are measured operator performance.</p>
+<p>Economic dispatch includes generator ramps, capture auxiliaries, source-specific emissions, grid caps,
+finite storage, binary charge/discharge, terminal reserve and weighted critical/flexible shedding.
+It is not transmission power flow or transient islanding simulation. Flexible shedding is lost work.</p></section>
+<section>__OPERATIONS__</section><section>__DEPLOYMENT__</section><section><h2>Operational metrics</h2><p>Energy in kWh; carbon in kg; costs use supplied currency assumptions.</p><div class="scroll">__SUMMARY__</div></section><section><h2>Reproduce</h2><p><code>python -m datacenter_simulator.analysis.wyoming --output outputs/wyoming</code></p><p><a href="sources.json">Sources</a> · <a href="model_boundaries.json">Model boundaries</a> · <a href="recovery_inputs.json">Planning inputs</a> · <a href="grid_summary.csv">Operational CSV</a></p></section><footer>All methods and algorithms: datacenter_simulator.models / methods / analysis</footer></main></html>
