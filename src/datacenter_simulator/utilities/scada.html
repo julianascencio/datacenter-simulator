@@ -1,0 +1,37 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1"><title>Data center SCADA model</title>
+<style>body{margin:0;background:#f3f6f8;color:#15364c;font:16px/1.5 Arial,sans-serif}
+main{max-width:1250px;margin:auto;padding:24px}h1{font-size:clamp(26px,4vw,40px)}
+.notice{background:#fff4dc;padding:18px;border-left:4px solid #d58a24}.table{overflow:auto}
+table{border-collapse:collapse;width:100%;background:white;font-size:14px}td,th{padding:10px;
+border-bottom:1px solid #dae3e7;text-align:left;min-width:85px}td{max-width:450px}
+details{background:white;padding:16px;margin:12px 0;border-radius:10px}summary{cursor:pointer;font-weight:bold}
+small{display:block;font-weight:normal;color:#526a7a}input,select{padding:12px;max-width:100%;box-sizing:border-box}
+.filters{display:flex;gap:10px;flex-wrap:wrap;position:sticky;top:0;background:#f3f6f8;padding:12px 0}
+a{color:#086e87;overflow-wrap:anywhere}code{overflow-wrap:anywhere}.hidden{display:none}
+@media(max-width:600px){main{padding:12px}details{padding:10px}}</style></head><body><main>
+<p>ASVA Consulting · Canonical model v1.0.0</p><h1>Data center SCADA device dictionary</h1>
+<p class="notice">Engineering superset, not a certified native protocol schema. Discover installed
+capabilities before commissioning. Blank metadata means unknown. No live connection or control is performed.</p>
+<p>MODEL_COUNTS</p><h2>Selected standards and interfaces</h2><div class="table">STANDARDS_TABLE</div>
+<p>Selection uses official specifications and vendor support evidence, not measured market share.
+OPC UA is an additional SCADA interchange; Brick informs relationships without claiming RDF conformance.</p>
+<h2>Inspect every device</h2><p>Search matches field names as well as device names. Open a card for
+units, data types, states, alarm/control roles and suggested timing. Thresholds require site engineering.</p>
+<div class="filters"><input id="search" type="search" placeholder="Search device or point" aria-label="Search device or point">
+<select id="domain" aria-label="Equipment domain"><option value="">All domains</option>DOMAIN_OPTIONS</select>
+<span id="count" aria-live="polite"></span></div>DEVICE_SECTIONS
+<h2>Downloads and reproduction</h2><p>DOWNLOADS</p>
+<p>Run <code>python -m datacenter_simulator.analysis.scada --output outputs/scada</code>.</p>
+<p>UTC-aware timestamps, source protocol/status, canonical units and data quality accompany every
+observation. Equipment health and alarms are separate from signal quality. Parent/child power
+measurements overlap and must not be summed blindly. Controls are design-only records.</p>
+<h2>Primary references</h2><ul>SOURCE_LINKS</ul></main>
+<script>const cards=[...document.querySelectorAll('.profile')];
+function filter(){const q=document.getElementById('search').value.toLowerCase();
+const d=document.getElementById('domain').value;let n=0;
+for(const c of cards){const visible=(!d||c.dataset.domain===d)&&c.textContent.toLowerCase().includes(q);
+c.classList.toggle('hidden',!visible);n+=visible?1:0;}
+document.getElementById('count').textContent=n+' devices shown';}
+document.getElementById('search').addEventListener('input',filter);
+document.getElementById('domain').addEventListener('change',filter);filter();</script></body></html>
