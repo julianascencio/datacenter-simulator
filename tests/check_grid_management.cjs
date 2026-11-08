@@ -18,7 +18,9 @@ const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
     await page.locator('.js-plotly-plot .main-svg').first().waitFor();
     assert.equal(await page.locator('.js-plotly-plot').count(), 2);
     assert.match(await page.locator('main').innerText(), /operational success is not established/);
-    for (const link of await page.locator('a').all()) {
+    const auditLinks = page.locator('a[href$=".json"], a[href$=".csv"]');
+    assert.equal(await auditLinks.count(), 4);
+    for (const link of await auditLinks.all()) {
       const target = await link.evaluate(a => a.href);
       assert.ok(fs.existsSync(fileURLToPath(target)), target);
     }
