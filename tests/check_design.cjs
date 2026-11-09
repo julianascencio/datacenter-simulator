@@ -43,6 +43,13 @@ const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
       assert.equal(downloads.length, 11);
       for (const url of downloads) assert.ok(fs.existsSync(fileURLToPath(url)), url);
       assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth), false);
+      const clippedTitles = await page.locator('.plot .gtitle').evaluateAll(titles => titles
+        .filter(title => {
+          const bounds = title.getBoundingClientRect();
+          const panel = title.closest('.plot').getBoundingClientRect();
+          return bounds.left < panel.left || bounds.right > panel.right;
+        }).map(title => title.textContent));
+      assert.deepEqual(clippedTitles, [], 'Chart titles must fit narrow screens');
       await page.screenshot({ path: path.join(output, `${name}.png`), fullPage: true });
     }
     assert.deepEqual(errors, []);

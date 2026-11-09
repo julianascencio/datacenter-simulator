@@ -83,7 +83,7 @@ def design_capacity_chart(design: FacilityDesign) -> go.Figure:
     ):
         figure.add_bar(x=labels, y=frame[column].tolist(), name=name, marker_color=color)
     figure.update_layout(barmode="group", yaxis_title="kW (electrical or thermal as labelled)")
-    return _style(figure, "Capacity before and after the specified loss")
+    return _style(figure, "Duty and contingency capacity")
 
 
 def design_floor_plan(design: FacilityDesign, *, max_racks: int = 1000) -> go.Figure:
@@ -120,12 +120,15 @@ def design_floor_plan(design: FacilityDesign, *, max_racks: int = 1000) -> go.Fi
         hovertemplate="%{text}<extra></extra>",
         showlegend=False,
     )
-    figure.update_xaxes(title="Hall width (m)", range=[0, design.summary["hall_width_m"]])
+    figure.update_xaxes(
+        title="Hall width (m)", range=[0, design.summary["hall_width_m"]], constrain="domain"
+    )
     figure.update_yaxes(
         title="Hall depth (m)",
         range=[0, design.summary["hall_depth_m"]],
         scaleanchor="x",
         scaleratio=1,
+        constrain="domain",
     )
     return _style(figure, f"Rack plan · {len(racks)} of {len(design.racks)} racks · cyan = front")
 
@@ -187,6 +190,7 @@ def design_rack_scene(design: FacilityDesign, *, max_racks: int = 1000) -> go.Fi
             "yaxis": {"title": "Depth (m)", "range": [0, design.summary["hall_depth_m"]]},
             "zaxis": {"title": "Height (m)"},
             "aspectmode": "data",
+            "camera": {"eye": {"x": 2, "y": 2, "z": 1.6}},
         }
     )
     return _style(figure, f"3D rack envelopes · {len(racks)} of {len(design.racks)} racks")
@@ -211,7 +215,7 @@ def design_load_chart(study: "DesignStudy") -> go.Figure:
         annotation_position="top left",
     )
     figure.update_layout(xaxis_title="Design IT demand (%)", yaxis_title="Electrical power (kW)")
-    return _style(figure, "Load sensitivity at the design outdoor temperature")
+    return _style(figure, "Demand sensitivity at design ambient")
 
 
 def design_energy_chart(study: "DesignStudy") -> go.Figure:
