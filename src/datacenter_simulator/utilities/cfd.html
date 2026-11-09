@@ -77,7 +77,7 @@ function box(s){const x=s.x_m,y=s.y_m,z=s.z_m,w=s.width_m,d=s.depth_m,h=s.height
   const v=[[x,y,z],[x+w,y,z],[x+w,y+d,z],[x,y+d,z],[x,y,z+h],[x+w,y,z+h],[x+w,y+d,z+h],[x,y+d,z+h]];
   const edges=[[0,1],[1,2],[2,3],[3,0],[4,5],[5,6],[6,7],[7,4],[0,4],[1,5],[2,6],[3,7]];
   return lines(edges.flatMap(([a,b])=>[v[a],v[b],null]),'#314a60',s.name);}
-function axesLayout(title,x,y){return {title:{text:title,font:{size:16}},template:'plotly_white',xaxis:{title:x},yaxis:{title:y},margin:{l:55,r:45,t:55,b:65},height:420};}
+function axesLayout(title,x,y){return {title:{text:title,font:{size:16}},template:'plotly_white',xaxis:{title:{text:x}},yaxis:{title:{text:y}},margin:{l:55,r:45,t:55,b:65},height:420};}
 function configure(){const c=data.cases[$('scenario').value];$('time').max=c.frames.length-1;$('time').value=c.frames.length-1;
   $('height').max=c.z.length-1;$('height').value=Math.floor(c.z.length/2);
   $('section').max=c.y.length-1;$('section').value=Math.floor(c.y.length/2);}
@@ -97,15 +97,15 @@ async function render(){
     xyz[0].push(c.x[i]);xyz[1].push(c.y[y]);xyz[2].push(c.z[z]);}
   const volume={type:'isosurface',x:xyz[0],y:xyz[1],z:xyz[2],value:values,isomin:min+.08*(max-min),isomax:max,
     cmin:min,cmax:max,colorscale:scale,opacity:.3,surface:{count:5},caps:{x:{show:false},y:{show:false},z:{show:false}},
-    colorbar:{title:unit,thickness:14,len:.7},hovertemplate:`${label}: %{value:.2f} ${unit}<extra></extra>`};
+    colorbar:{title:{text:unit},thickness:14,len:.7},hovertemplate:`${label}: %{value:.2f} ${unit}<extra></extra>`};
   const traces=[volume,...c.inputs.sources.map(box)];
   traces.push(lines([[0,0,0],[0,g.width_m,0],[0,g.width_m,c.inputs.settings.inlet_height_m],[0,0,c.inputs.settings.inlet_height_m],[0,0,0]],'#25b9df','Supply slot'));
   traces.push(lines([[g.length_m,0,0],[g.length_m,g.width_m,0],[g.length_m,g.width_m,g.height_m],[g.length_m,0,g.height_m],[g.length_m,0,0]],'#29a77b','Pressure return'));
   if($('vectors').checked)traces.push(airflowArrows(c,f,stride));
-  const scene={xaxis:{title:'x (m)',range:[0,g.length_m]},yaxis:{title:'y (m)',range:[0,g.width_m]},zaxis:{title:'z (m)',range:[0,g.height_m]},aspectmode:'data',camera:{eye:{x:1.8,y:1.8,z:1.5}}};
+  const scene={xaxis:{title:{text:'x (m)'},range:[0,g.length_m]},yaxis:{title:{text:'y (m)'},range:[0,g.width_m]},zaxis:{title:{text:'z (m)'},range:[0,g.height_m]},aspectmode:'data',camera:{eye:innerWidth<800?{x:2.6,y:2.6,z:2.2}:{x:1.8,y:1.8,z:1.5}}};
   const plan=c.y.map((_,y)=>c.x.map((_,i)=>values[at(i,y,k)]));
   const vertical=c.z.map((_,z)=>c.x.map((_,i)=>values[at(i,j,z)]));
-  const heatmap=(x,y,z)=>({type:'heatmap',x,y,z,zmin:min,zmax:max,colorscale:scale,colorbar:{title:unit,thickness:12},hovertemplate:`x=%{x:.2f} m<br>position=%{y:.2f} m<br>%{z:.2f} ${unit}<extra></extra>`});
+  const heatmap=(x,y,z)=>({type:'heatmap',x,y,z,zmin:min,zmax:max,colorscale:scale,colorbar:{title:{text:unit},thickness:12},hovertemplate:`x=%{x:.2f} m<br>position=%{y:.2f} m<br>%{z:.2f} ${unit}<extra></extra>`});
   const planLayout=axesLayout(`Plan · z=${fmt(c.z[k])} m`,'x (m)','y (m)');
   planLayout.shapes=c.inputs.sources.filter(s=>c.z[k]>=s.z_m&&c.z[k]<=s.z_m+s.height_m).map(s=>({type:'rect',x0:s.x_m,x1:s.x_m+s.width_m,y0:s.y_m,y1:s.y_m+s.depth_m,line:{color:'#162e43',width:2}}));
   const verticalLayout=axesLayout(`Vertical · y=${fmt(c.y[j])} m`,'x (m)','z (m)');
