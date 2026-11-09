@@ -29,7 +29,7 @@ slice the room and inspect the heat around each rack.</p></header><main>
 <div class="card"><span>Energy balance error</span><strong id="balance"></strong><small>Relative cumulative run error</small></div></div>
 <p class="notice" id="conditions"></p>
 <section class="panel"><div class="row"><h2>Thermal volume and airflow</h2><span id="mesh-label"></span></div>
-<div id="volume" class="scene"></div><p>Colored surfaces are equal-field-value surfaces; arrows show calculated velocity.
+<div id="volume" class="scene"></div><p>Colored surfaces are equal-field-value surfaces; arrows show calculated velocity with a common length scale across scenarios and frames.
 Outlined boxes are permeable rack heat zones. Blue marks the supply slot and green the pressure return.
 Drag to rotate; scroll to zoom.</p></section>
 <div class="controls" style="margin-top:18px"><label>Plan height <input id="height" aria-label="Plan slice height" type="range" min="0" step="1"><output id="height-label"></output></label>
@@ -55,6 +55,23 @@ Open the VTK files in ParaView. Changing physical inputs requires rerunning Pyth
 const data=JSON.parse(document.getElementById('cfd-data').textContent), $=id=>document.getElementById(id);
 const config={responsive:true,displaylogo:false}, fmt=(v,d=2)=>Number(v).toFixed(d);
 let timer=null,queue=Promise.resolve();
+const thermalColors=[[0,'#30123b'],[.15,'#4662d7'],[.3,'#1bcfd4'],[.45,'#6ce65b'],[.6,'#d3e835'],[.75,'#fb9e3a'],[.9,'#d9342a'],[1,'#7a0403']];
+const pressureColors=[[0,'#2166ac'],[.5,'#f7f7f7'],[1,'#b2182b']];
+const velocityScale=Math.max(.001,...Object.values(data.cases).flatMap(c=>c.frames.map(f=>f.max_speed)));
+function airflowArrows(c,f,stride){
+  const g=c.inputs.grid,points=[];
+  const length=.65*Math.min(g.length_m*stride/g.nx,g.width_m*stride/g.ny,g.height_m*stride/g.nz);
+  for(let i=0;i<g.nx;i+=stride)for(let j=0;j<g.ny;j+=stride)for(let k=0;k<g.nz;k+=stride){
+    const index=(i*g.ny+j)*g.nz+k,u=[f.u[index],f.v[index],f.w[index]],speed=Math.hypot(...u);
+    if(speed<velocityScale*.015)continue;
+    const a=[c.x[i],c.y[j],c.z[k]],d=u.map(v=>length*v/velocityScale),b=a.map((v,n)=>v+d[n]);
+    const horizontal=Math.hypot(d[0],d[1]);
+    const normal=horizontal>1e-9?[-d[1]/horizontal,d[0]/horizontal,0]:[1,0,0];
+    const wing=.17*Math.hypot(...d);
+    points.push(a,b,null,b,b.map((v,n)=>v-.3*d[n]+wing*normal[n]),null,b,b.map((v,n)=>v-.3*d[n]-wing*normal[n]),null);
+  }
+  const trace=lines(points,'#18374b','Airflow (length proportional to speed)');trace.line.width=2;return trace;
+}
 function lines(points,color,name){return {type:'scatter3d',mode:'lines',x:points.map(p=>p&&p[0]),y:points.map(p=>p&&p[1]),z:points.map(p=>p&&p[2]),line:{color,width:3},name,hoverinfo:'name',showlegend:false};}
 function box(s){const x=s.x_m,y=s.y_m,z=s.z_m,w=s.width_m,d=s.depth_m,h=s.height_m;
   const v=[[x,y,z],[x+w,y,z],[x+w,y+d,z],[x,y+d,z],[x,y,z+h],[x+w,y,z+h],[x+w,y+d,z+h],[x,y+d,z+h]];
@@ -74,18 +91,17 @@ async function render(){
   if(key==='temperature'){min=data.temperature_min;max=data.temperature_max;}
   else if(key==='speed'){min=0;max=Math.max(.01,...c.frames.map(s=>s.max_speed));}
   else{max=Math.max(.001,...values.map(Math.abs));min=-max;}
-  const scale=key==='pressure'?'RdBu':'Turbo',xyz=[[],[],[]],cones={x:[],y:[],z:[],u:[],v:[],w:[]};
+  const scale=key==='pressure'?pressureColors:thermalColors,xyz=[[],[],[]];
   const stride=Math.max(2,Math.ceil(Math.cbrt(nx*ny*nz/180)));
   for(let i=0;i<nx;i++)for(let y=0;y<ny;y++)for(let z=0;z<nz;z++){
-    xyz[0].push(c.x[i]);xyz[1].push(c.y[y]);xyz[2].push(c.z[z]);
-    if(i%stride===0&&y%stride===0&&z%stride===0){const p=at(i,y,z);cones.x.push(c.x[i]);cones.y.push(c.y[y]);cones.z.push(c.z[z]);cones.u.push(f.u[p]);cones.v.push(f.v[p]);cones.w.push(f.w[p]);}}
+    xyz[0].push(c.x[i]);xyz[1].push(c.y[y]);xyz[2].push(c.z[z]);}
   const volume={type:'isosurface',x:xyz[0],y:xyz[1],z:xyz[2],value:values,isomin:min+.08*(max-min),isomax:max,
     cmin:min,cmax:max,colorscale:scale,opacity:.3,surface:{count:5},caps:{x:{show:false},y:{show:false},z:{show:false}},
     colorbar:{title:unit,thickness:14,len:.7},hovertemplate:`${label}: %{value:.2f} ${unit}<extra></extra>`};
   const traces=[volume,...c.inputs.sources.map(box)];
   traces.push(lines([[0,0,0],[0,g.width_m,0],[0,g.width_m,c.inputs.settings.inlet_height_m],[0,0,c.inputs.settings.inlet_height_m],[0,0,0]],'#25b9df','Supply slot'));
   traces.push(lines([[g.length_m,0,0],[g.length_m,g.width_m,0],[g.length_m,g.width_m,g.height_m],[g.length_m,0,g.height_m],[g.length_m,0,0]],'#29a77b','Pressure return'));
-  if($('vectors').checked)traces.push({type:'cone',...cones,colorscale:[[0,'#18374b'],[1,'#18374b']],showscale:false,sizemode:'absolute',sizeref:.35,anchor:'tail',name:'Airflow'});
+  if($('vectors').checked)traces.push(airflowArrows(c,f,stride));
   const scene={xaxis:{title:'x (m)',range:[0,g.length_m]},yaxis:{title:'y (m)',range:[0,g.width_m]},zaxis:{title:'z (m)',range:[0,g.height_m]},aspectmode:'data',camera:{eye:{x:1.8,y:1.8,z:1.5}}};
   const plan=c.y.map((_,y)=>c.x.map((_,i)=>values[at(i,y,k)]));
   const vertical=c.z.map((_,z)=>c.x.map((_,i)=>values[at(i,j,z)]));
