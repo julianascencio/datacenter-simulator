@@ -20,6 +20,8 @@ page links to the implementation and documents units and model boundaries.
    energy
    grid_management
    infrastructure
+   design
+   cfd
    scada
    connectors
    simulation

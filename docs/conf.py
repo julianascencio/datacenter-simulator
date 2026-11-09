@@ -5,6 +5,8 @@ from pathlib import Path
 
 from sphinx_gallery.sorting import ExplicitOrder
 
+from datacenter_simulator.analysis.cfd import export_cfd_study
+from datacenter_simulator.analysis.design import export_design_study
 from datacenter_simulator.analysis.engineering import export_engineering_study
 from datacenter_simulator.analysis.infrastructure import export_infrastructure_study
 from datacenter_simulator.analysis.scada import export_scada_model
@@ -75,3 +77,7 @@ export_wyoming_study(Path(__file__).parent / "_static" / "lab" / "wyoming")
 export_infrastructure_study(Path(__file__).parent / "_static" / "lab" / "infrastructure")
 
 export_scada_model(Path(__file__).parent / "_static" / "lab" / "scada")
+
+export_design_study(Path(__file__).parent / "_static" / "lab" / "design")
+
+export_cfd_study(Path(__file__).parent / "_static" / "lab" / "cfd", check_mesh=True)

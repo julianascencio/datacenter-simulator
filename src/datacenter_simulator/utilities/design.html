@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Facility design workbench</title>
+<style>
+:root{color-scheme:light;--ink:#203a50;--teal:#207c91}*{box-sizing:border-box}
+body{margin:0;background:#f0f4f6;color:var(--ink);font:15px/1.6 system-ui,sans-serif}
+header{background:#173247;color:white;padding:36px max(20px,calc((100vw - 1360px)/2))}
+.eyebrow{font-size:12px;letter-spacing:.15em;text-transform:uppercase;color:#87d0d8}
+h1{font-size:clamp(28px,4vw,44px);line-height:1.1;margin:14px 0}h2{font-size:21px}
+header p{max-width:780px;color:#d7e5ec}main{max-width:1400px;margin:auto;padding:22px}
+.controls{display:flex;gap:14px;align-items:center;flex-wrap:wrap;margin-bottom:18px}
+select{font:inherit;padding:10px;border:1px solid #a3b8c7;border-radius:7px;max-width:100%;background:white}
+.cards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+.card,.panel{background:white;border:1px solid #dce5eb;border-radius:12px;padding:18px;min-width:0}
+.card span{display:block;font-size:12px;text-transform:uppercase;letter-spacing:.06em}
+.card strong{display:block;font-size:28px;margin-top:8px}.card small{color:#597185}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;margin:20px 0}
+.plot{width:100%;height:430px;min-width:0}.panel{overflow:hidden}.notice{padding:12px 16px;border-left:4px solid var(--teal);background:#e4f1f2}
+#status{margin-top:18px}.warning{border-color:#bf6f21;background:#fff0d9}
+.table-wrap{overflow-x:auto}table{border-collapse:collapse;width:100%;font-size:13px}
+th,td{text-align:left;padding:10px;border-bottom:1px solid #dde5eb;white-space:nowrap}
+th{background:#eef4f7}.pass{color:#227347}.fail{color:#ad491d}a{color:#176c86}
+.audit{overflow-wrap:anywhere}pre{white-space:pre-wrap;overflow-wrap:anywhere;font-size:12px}
+details{margin-top:18px}summary{cursor:pointer;font-weight:600}footer{margin:24px 0;color:#5b6d7a;font-size:13px}
+@media(max-width:800px){.cards{grid-template-columns:repeat(2,minmax(0,1fr))}.grid{grid-template-columns:1fr}main{padding:12px}.panel{padding:7px}.card strong{font-size:23px}}
+</style><script>__PLOTLY__</script></head>
+<body><header><div class="eyebrow">ASVA Consulting · Data Center Simulator</div>
+<h1>Facility design workbench</h1><p>Turn an IT demand into equipment capacities, power and cooling requirements,
+backup energy and a spatial concept. Compare cooling and redundancy at the same future IT demand.</p></header>
+<main><div class="controls"><label for="scenario">Design scenario</label><select id="scenario">__OPTIONS__</select>
+<span>__COUNT__ precomputed alternatives · select to update results</span></div>
+<div class="cards">
+<div class="card"><span>Future IT / facility</span><strong id="power"></strong><small>MW at design conditions</small></div>
+<div class="card"><span>Annual energy PUE</span><strong id="pue"></strong><small>Energy-weighted across operating bins</small></div>
+<div class="card"><span>Total UPS battery</span><strong id="battery"></strong><small id="banks"></small></div>
+<div class="card"><span>Rack / area requirement</span><strong id="area"></strong><small id="racks"></small></div>
+</div><div class="notice" id="status" role="status" aria-live="polite"></div>
+<p class="notice">Concept sizing with illustrative defaults. The selector uses Python-calculated scenarios.
+Edit <code>inputs.json</code> and <code>bins.json</code>, then rerun the command below to calculate your own case.
+Capacity checks do not establish a reliability level or Tier classification.</p>
+<div class="grid"><section class="panel"><div class="plot" id="chart-0"></div></section>
+<section class="panel"><div class="plot" id="chart-1"></div></section></div>
+<section class="panel"><h2>Equipment schedule and contingency checks</h2>
+<p>Cooling duty includes the input margin. Other rows use electrical kW. 2N loses one full train;
+N and N+1 lose one module. Battery power and discharge performance still need vendor verification.</p>
+<div class="table-wrap"><table><thead><tr><th>Equipment</th><th>Duty</th><th>Modules</th><th>Loss tested</th>
+<th>Remaining capacity</th><th>Margin</th><th>Check</th></tr></thead><tbody id="equipment"></tbody></table></div>
+<p id="flows"></p><p id="annual"></p></section>
+<div class="grid"><section class="panel"><div class="plot" id="chart-2"></div></section>
+<section class="panel"><div class="plot" id="chart-3"></div></section>
+<section class="panel"><div class="plot" id="geometry-0"></div></section>
+<section class="panel"><div class="plot" id="geometry-1"></div></section></div>
+<p>Rack geometry is common to these alternatives because IT demand and rack rating are fixed.
+The cyan rack face borders the cold aisle. Support area is an allowance beyond the plotted hall.
+Large layouts preview the first 1,000 racks; the CSV retains every rack.</p>
+<section class="panel"><h2>Reproduce and inspect</h2>
+<pre>python -m datacenter_simulator.analysis.design --inputs inputs.json --bins bins.json --output outputs/my-design</pre>
+<p class="audit">Baseline inputs and audit files: __DOWNLOADS__</p>
+<p>CSV and summary downloads refer to the first, saved input case. <code>comparison.csv</code> and
+<code>scenarios.json</code> contain all alternatives. Annual energy is requested demand; any grid
+exceedance needs a supply or load-management study.</p>
+<details><summary>Equations, sources and model boundaries</summary><pre>__EVIDENCE__</pre></details></section>
+<footer>Cooling, electrical losses, modular sizing and battery energy reuse the installed simulator methods.
+Geometry is a concept layout; cooling is a lumped balance. Independent site and equipment validation remains necessary.</footer>
+</main><script type="application/json" id="design-data">__DATA__</script><script>
+const payload=JSON.parse(document.getElementById('design-data').textContent);
+const selector=document.getElementById('scenario');
+const fmt=(value,digits=1)=>Number(value).toLocaleString('en-GB',{maximumFractionDigits:digits,minimumFractionDigits:digits});
+const put=(id,text)=>{document.getElementById(id).textContent=text;};
+const config={responsive:true,displaylogo:false};
+let renderQueue=Promise.resolve();
+async function render(name){
+  const chosen=payload.scenarios[name],s=chosen.summary;
+  put('power',`${fmt(s.design_it_kw/1000,2)} / ${fmt(s.design_facility_kw/1000,2)}`);
+  put('pue',fmt(s.annual_energy_pue,3));put('battery',`${fmt(s.battery_total_kwh,0)} kWh`);
+  put('banks',`${s.battery_bank_count} bank(s), ${fmt(s.battery_per_bank_kwh,0)} kWh each; IT branch only`);
+  put('area',`${fmt(s.total_planning_area_m2,0)} m²`);
+  put('racks',`${s.rack_count} racks · ${fmt(s.white_space_m2,0)} m² white space`);
+  const bad=chosen.equipment.filter(e=>!e.contingency_pass).map(e=>e.equipment);
+  const problems=[];
+  if(s.grid_margin_kw<0)problems.push(`Design grid shortfall: ${fmt(-s.grid_margin_kw)} kW.`);
+  if(s.annual_grid_exceedance_kwh>0)problems.push(`Operating bins exceed the grid limit for ${fmt(s.annual_grid_exceedance_hours,0)} h.`);
+  if(bad.length)problems.push(`Contingency capacity fails: ${bad.join(', ')}.`);
+  put('status',problems.length?problems.join(' '):`Grid headroom: ${fmt(s.grid_margin_kw)} kW. All listed contingency capacity checks pass.`);
+  document.getElementById('status').className=problems.length?'notice warning':'notice';
+  const tbody=document.getElementById('equipment');tbody.replaceChildren();
+  for(const e of chosen.equipment){
+    const unit=e.domain==='thermal'?'kWth':'kWe',tr=document.createElement('tr');
+    const cells=[e.equipment,`${fmt(e.duty_kw)} ${unit}`,e.installed_modules,e.contingency,
+      `${fmt(e.remaining_kw)} ${unit}`,`${fmt(e.remaining_margin_kw)} ${unit}`,e.contingency_pass?'PASS':'FAIL'];
+    cells.forEach((value,index)=>{const td=document.createElement('td');td.textContent=value;
+      if(index===6)td.className=e.contingency_pass?'pass':'fail';tr.append(td);});tbody.append(tr);
+  }
+  put('flows',`Service: ${fmt(s.service_kva)} kVA / ${fmt(s.service_current_a)} A. Liquid flow: ${fmt(s.liquid_flow_kg_s)} kg/s. Airflow: ${fmt(s.air_flow_m3_s)} m³/s. Heat rejection: ${fmt(s.heat_rejection_kw)} kWth.`);
+  put('annual',`Estimated annual facility energy: ${fmt(s.annual_facility_kwh/1e6,2)} GWh; electricity: €${fmt(s.annual_electricity_eur,0)}; grid emissions: ${fmt(s.annual_grid_t_co2e,0)} tCO₂e. Grid capacity gap: ${fmt(s.annual_grid_exceedance_kwh/1000)} MWh (not outage energy).`);
+  await Promise.all(chosen.figures.map((figure,i)=>Plotly.react(`chart-${i}`,figure.data,figure.layout,config)));
+  document.body.dataset.scenario=name;
+}
+function queueRender(){const name=selector.value;renderQueue=renderQueue.then(()=>render(name));}
+selector.addEventListener('change',queueRender);
+Promise.all(payload.geometry.map((figure,i)=>Plotly.newPlot(`geometry-${i}`,figure.data,figure.layout,config))).then(queueRender);
+</script></body></html>

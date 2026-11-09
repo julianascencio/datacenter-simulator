@@ -1,4 +1,4 @@
-// Exercise the generated documentation as a reader, including all seventeen tutorials.
+// Exercise the generated documentation as a reader, including all nineteen tutorials.
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
@@ -25,11 +25,11 @@ const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
     await page.waitForURL('**/gallery/index.html');
     const cards = page.locator('.sphx-glr-thumbcontainer');
     await cards.first().waitFor({ state: 'visible' });
-    assert.equal(await cards.count(), 17, 'The gallery should contain seventeen executable tutorials');
+    assert.equal(await cards.count(), 19, 'The gallery should contain nineteen executable tutorials');
     await page.screenshot({ path: path.join(screenshots, 'gallery-desktop.png'), fullPage: true });
     const examples = await cards.locator('a.reference.internal').evaluateAll(links =>
       [...new Set(links.map(link => link.href.split('#')[0]))]);
-    assert.equal(examples.length, 17);
+    assert.equal(examples.length, 19);
     for (const url of examples) {
       await page.goto(url);
       const text = await page.locator('article').innerText();
@@ -61,6 +61,10 @@ const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
       ['scada-example', 'gallery/connectors/plot_scada_model.html'],
       ['infrastructure-guide', 'user_guide/infrastructure.html'],
       ['infrastructure-example', 'gallery/analysis/plot_infrastructure_content.html'],
+      ['design-guide', 'user_guide/design.html'],
+      ['design-example', 'gallery/methods/plot_facility_design.html'],
+      ['cfd-guide', 'user_guide/cfd.html'],
+      ['cfd-example', 'gallery/analysis/plot_cfd_heat_3d.html'],
     ]) {
       await page.goto(pathToFileURL(path.join(root, relative)).href);
       assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth), false,
@@ -74,7 +78,7 @@ const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
     assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth), false);
     await page.screenshot({ path: path.join(screenshots, 'single-line-guide-mobile.png'), fullPage: true });
     assert.deepEqual(errors, []);
-    console.log('Documentation navigation, seventeen tutorials, figures, downloads and mobile layout passed.');
+    console.log('Documentation navigation, nineteen tutorials, figures, downloads and mobile layout passed.');
   } finally {
     await browser.close();
   }

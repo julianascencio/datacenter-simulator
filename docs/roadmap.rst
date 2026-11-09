@@ -9,6 +9,8 @@ Implemented foundation
 * Offered-flow routing, five lumped cooling alternatives and a thermal zone model.
 * Facility-meter generation adapters, greedy storage/grid/backup energy balances.
 * Offline Plotly reports, OrbitalPV-style Sphinx guides and executable gallery.
+* Native 3D transient Boussinesq CFD: pressure projection, conservative heat
+  transport, rack heat/resistance zones, mesh sensitivity and interactive fields.
 
 Implemented engineering studies in 0.2
 --------------------------------------
@@ -39,8 +41,9 @@ Next: calibration and optional fidelity
    sensitivity with correlated inputs and measured uncertainty estimates.
 2. DC faults, grounding, protection/arc models and converter EMT as a separate
    optional fidelity tier, including explicit bipolar midpoint behavior.
-3. Modelica/EnergyPlus/FMU and CFD comparisons for transient/spatial cooling;
-   packet-level ns-3 comparisons for communications. These are not yet executed.
+3. Measured CFD validation, calibrated turbulence/porous fan models, conjugate
+   heat transfer and OpenFOAM comparisons beyond the native research solver.
+   Modelica/EnergyPlus/FMU and packet-level ns-3 comparisons remain unexecuted.
 4. Joint nonlinear electrical/thermal economic optimization, equipment sizing,
    degradation models, stochastic forecasts and calendar billing periods.
 

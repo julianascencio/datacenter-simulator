@@ -1,0 +1,139 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>3D airflow and heat simulator</title><style>
+*{box-sizing:border-box}body{margin:0;background:#eef3f7;color:#18374b;font:15px/1.55 system-ui,sans-serif}
+header{background:#132e43;color:white;padding:30px max(20px,calc((100vw - 1380px)/2))}
+header p{max-width:850px;color:#d2e4ee}h1{font-size:clamp(27px,4vw,42px);line-height:1.12;margin:10px 0}h2{font-size:20px}
+.eyebrow{color:#78d1df;letter-spacing:.12em;font-size:12px;text-transform:uppercase}main{max-width:1420px;margin:auto;padding:20px}
+.panel,.card,.controls{background:white;border:1px solid #dbe5ed;border-radius:12px;padding:18px;min-width:0}
+.controls{display:flex;gap:14px;flex-wrap:wrap;align-items:center}.controls label{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+select,button{font:inherit;border:1px solid #9eb5c5;border-radius:6px;background:white;color:#18374b;padding:8px;max-width:100%}
+button{background:#176c85;color:white;cursor:pointer}input[type=range]{width:160px;max-width:100%}
+.cards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin:18px 0}.card span{display:block;font-size:12px;text-transform:uppercase}
+.card strong{display:block;font-size:27px;margin-top:6px}.card small{color:#577487}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;margin:18px 0}
+.scene{width:100%;height:580px}.plot{height:420px;width:100%;min-width:0}.panel{overflow:hidden}.notice{background:#dff0f3;border-left:4px solid #22889b;padding:12px 16px;margin:16px 0}
+.table-wrap{overflow-x:auto}table{border-collapse:collapse;width:100%;font-size:13px}th,td{padding:9px;text-align:left;border-bottom:1px solid #dbe4ea;white-space:nowrap}th{background:#edf4f8}
+a{color:#176c85}.downloads,pre{overflow-wrap:anywhere}pre{white-space:pre-wrap;font-size:12px}details{margin-top:16px}summary{cursor:pointer;font-weight:600}
+footer{margin:20px 0;color:#557084;font-size:13px}.row{display:flex;gap:10px;justify-content:space-between;align-items:center;flex-wrap:wrap}
+@media(max-width:800px){main{padding:10px}.grid{grid-template-columns:1fr}.cards{grid-template-columns:repeat(2,minmax(0,1fr))}.panel{padding:8px}.scene{height:460px}.card{padding:13px}.card strong{font-size:23px}}
+</style><script>__PLOTLY__</script></head><body>
+<header><div class="eyebrow">ASVA Consulting · Native CFD research model</div><h1>3D airflow and heat simulator</h1>
+<p>Explore calculated air temperature, velocity and pressure through time. Compare ventilation scenarios,
+slice the room and inspect the heat around each rack.</p></header><main>
+<div class="controls"><label>Scenario <select id="scenario">__OPTIONS__</select></label>
+<label>Field <select id="field"><option value="temperature">Temperature</option><option value="speed">Air speed</option><option value="pressure">Pressure</option></select></label>
+<label>Time <input id="time" aria-label="Simulation time" type="range" min="0" step="1"><output id="time-label"></output></label>
+<button id="play" type="button">Play</button><label><input id="vectors" type="checkbox" checked> Airflow vectors</label></div>
+<div class="cards"><div class="card"><span>Peak room air</span><strong id="peak"></strong><small>Selected time, all cells</small></div>
+<div class="card"><span>Peak air speed</span><strong id="speed"></strong><small>Selected time, cell centres</small></div>
+<div class="card"><span>Heat / supply flow</span><strong id="load"></strong><small>kW to air / m³ per second</small></div>
+<div class="card"><span>Energy balance error</span><strong id="balance"></strong><small>Relative cumulative run error</small></div></div>
+<p class="notice" id="conditions"></p>
+<section class="panel"><div class="row"><h2>Thermal volume and airflow</h2><span id="mesh-label"></span></div>
+<div id="volume" class="scene"></div><p>Colored surfaces are equal-field-value surfaces; arrows show calculated velocity with a common length scale across scenarios and frames.
+Outlined boxes are permeable rack heat zones. Blue marks the supply slot and green the pressure return.
+Drag to rotate; scroll to zoom.</p></section>
+<div class="controls" style="margin-top:18px"><label>Plan height <input id="height" aria-label="Plan slice height" type="range" min="0" step="1"><output id="height-label"></output></label>
+<label>Section position <input id="section" aria-label="Vertical section position" type="range" min="0" step="1"><output id="section-label"></output></label></div>
+<div class="grid"><section class="panel"><div id="plan" class="plot"></div></section><section class="panel"><div id="vertical" class="plot"></div></section>
+<section class="panel"><div id="history" class="plot"></div></section><section class="panel"><h2>Rack-zone air temperature</h2>
+<p>These are air cells overlapping each rack envelope, not component or solid-surface temperatures.</p>
+<div class="table-wrap"><table><thead><tr><th>Rack</th><th>Mean °C</th><th>Peak °C</th></tr></thead><tbody id="rack-table"></tbody></table></div>
+<h2>Numerical checks</h2><p id="numerics"></p><p id="transient"></p></section></div>
+<section class="panel"><h2>Mesh sensitivity</h2><p>Identical physical inputs and end time on different grids. Differences indicate mesh sensitivity;
+this comparison alone does not establish mesh independence.</p><div class="table-wrap">__MESH__</div></section>
+<section class="panel" style="margin-top:18px"><h2>Model scope and reproducibility</h2><ul id="warnings"></ul>
+<p>Supply enters a low slot on x=0. The whole x=L wall is an open pressure return.
+Other walls are adiabatic and no slip. Rack heat and resistance are distributed by geometric overlap.
+Constant mixing coefficients are configurable assumptions. This is an incompressible Boussinesq research solver;
+it does not resolve server fans, conjugate solid heat transfer or calibrated turbulence.</p>
+<pre>python -m datacenter_simulator.analysis.cfd --inputs case-0-inputs.json --mesh-study --output outputs/my-cfd</pre>
+<p class="downloads">__LINKS__</p><p>case-0 is normal flow; case-1, when present, is half flow. NPZ files contain all saved 3D frames.
+Open the VTK files in ParaView. Changing physical inputs requires rerunning Python; the report explores completed simulations.</p>
+<details><summary>Equations and primary sources</summary><pre>__EVIDENCE__</pre></details></section>
+<footer>Numerical conservation and analytical verification do not establish measured data center accuracy.</footer>
+</main><script id="cfd-data" type="application/json">__DATA__</script><script>
+const data=JSON.parse(document.getElementById('cfd-data').textContent), $=id=>document.getElementById(id);
+const config={responsive:true,displaylogo:false}, fmt=(v,d=2)=>Number(v).toFixed(d);
+let timer=null,queue=Promise.resolve();
+const thermalColors=[[0,'#30123b'],[.15,'#4662d7'],[.3,'#1bcfd4'],[.45,'#6ce65b'],[.6,'#d3e835'],[.75,'#fb9e3a'],[.9,'#d9342a'],[1,'#7a0403']];
+const pressureColors=[[0,'#2166ac'],[.5,'#f7f7f7'],[1,'#b2182b']];
+const velocityScale=Math.max(.001,...Object.values(data.cases).flatMap(c=>c.frames.map(f=>f.max_speed)));
+function airflowArrows(c,f,stride){
+  const g=c.inputs.grid,points=[];
+  const length=.65*Math.min(g.length_m*stride/g.nx,g.width_m*stride/g.ny,g.height_m*stride/g.nz);
+  for(let i=0;i<g.nx;i+=stride)for(let j=0;j<g.ny;j+=stride)for(let k=0;k<g.nz;k+=stride){
+    const index=(i*g.ny+j)*g.nz+k,u=[f.u[index],f.v[index],f.w[index]],speed=Math.hypot(...u);
+    if(speed<velocityScale*.015)continue;
+    const a=[c.x[i],c.y[j],c.z[k]],d=u.map(v=>length*v/velocityScale),b=a.map((v,n)=>v+d[n]);
+    const horizontal=Math.hypot(d[0],d[1]);
+    const normal=horizontal>1e-9?[-d[1]/horizontal,d[0]/horizontal,0]:[1,0,0];
+    const wing=.17*Math.hypot(...d);
+    points.push(a,b,null,b,b.map((v,n)=>v-.3*d[n]+wing*normal[n]),null,b,b.map((v,n)=>v-.3*d[n]-wing*normal[n]),null);
+  }
+  const trace=lines(points,'#18374b','Airflow (length proportional to speed)');trace.line.width=2;return trace;
+}
+function lines(points,color,name){return {type:'scatter3d',mode:'lines',x:points.map(p=>p&&p[0]),y:points.map(p=>p&&p[1]),z:points.map(p=>p&&p[2]),line:{color,width:3},name,hoverinfo:'name',showlegend:false};}
+function box(s){const x=s.x_m,y=s.y_m,z=s.z_m,w=s.width_m,d=s.depth_m,h=s.height_m;
+  const v=[[x,y,z],[x+w,y,z],[x+w,y+d,z],[x,y+d,z],[x,y,z+h],[x+w,y,z+h],[x+w,y+d,z+h],[x,y+d,z+h]];
+  const edges=[[0,1],[1,2],[2,3],[3,0],[4,5],[5,6],[6,7],[7,4],[0,4],[1,5],[2,6],[3,7]];
+  return lines(edges.flatMap(([a,b])=>[v[a],v[b],null]),'#314a60',s.name);}
+function axesLayout(title,x,y){return {title:{text:title,font:{size:16}},template:'plotly_white',xaxis:{title:{text:x}},yaxis:{title:{text:y}},margin:{l:55,r:45,t:55,b:65},height:420};}
+function configure(){const c=data.cases[$('scenario').value];$('time').max=c.frames.length-1;$('time').value=c.frames.length-1;
+  $('height').max=c.z.length-1;$('height').value=Math.floor(c.z.length/2);
+  $('section').max=c.y.length-1;$('section').value=Math.floor(c.y.length/2);}
+async function render(){
+  const name=$('scenario').value,c=data.cases[name],frameIndex=Number($('time').value),f=c.frames[frameIndex];
+  const key=$('field').value,k=Number($('height').value),j=Number($('section').value),g=c.inputs.grid;
+  const [nx,ny,nz]=[g.nx,g.ny,g.nz],at=(i,j,k)=>(i*ny+j)*nz+k,values=f[key];
+  const unit=key==='temperature'?'°C':key==='speed'?'m/s':'Pa';
+  const label=key==='temperature'?'Air temperature':key==='speed'?'Air speed':'Gauge pressure';
+  let min,max;
+  if(key==='temperature'){min=data.temperature_min;max=data.temperature_max;}
+  else if(key==='speed'){min=0;max=Math.max(.01,...c.frames.map(s=>s.max_speed));}
+  else{max=Math.max(.001,...values.map(Math.abs));min=-max;}
+  const scale=key==='pressure'?pressureColors:thermalColors,xyz=[[],[],[]];
+  const stride=Math.max(2,Math.ceil(Math.cbrt(nx*ny*nz/180)));
+  for(let i=0;i<nx;i++)for(let y=0;y<ny;y++)for(let z=0;z<nz;z++){
+    xyz[0].push(c.x[i]);xyz[1].push(c.y[y]);xyz[2].push(c.z[z]);}
+  const volume={type:'isosurface',x:xyz[0],y:xyz[1],z:xyz[2],value:values,isomin:min+.08*(max-min),isomax:max,
+    cmin:min,cmax:max,colorscale:scale,opacity:.3,surface:{count:5},caps:{x:{show:false},y:{show:false},z:{show:false}},
+    colorbar:{title:{text:unit},thickness:14,len:.7},hovertemplate:`${label}: %{value:.2f} ${unit}<extra></extra>`};
+  const traces=[volume,...c.inputs.sources.map(box)];
+  traces.push(lines([[0,0,0],[0,g.width_m,0],[0,g.width_m,c.inputs.settings.inlet_height_m],[0,0,c.inputs.settings.inlet_height_m],[0,0,0]],'#25b9df','Supply slot'));
+  traces.push(lines([[g.length_m,0,0],[g.length_m,g.width_m,0],[g.length_m,g.width_m,g.height_m],[g.length_m,0,g.height_m],[g.length_m,0,0]],'#29a77b','Pressure return'));
+  if($('vectors').checked)traces.push(airflowArrows(c,f,stride));
+  const scene={xaxis:{title:{text:'x (m)'},range:[0,g.length_m]},yaxis:{title:{text:'y (m)'},range:[0,g.width_m]},zaxis:{title:{text:'z (m)'},range:[0,g.height_m]},aspectmode:'data',camera:{eye:innerWidth<800?{x:2.6,y:2.6,z:2.2}:{x:1.8,y:1.8,z:1.5}}};
+  const plan=c.y.map((_,y)=>c.x.map((_,i)=>values[at(i,y,k)]));
+  const vertical=c.z.map((_,z)=>c.x.map((_,i)=>values[at(i,j,z)]));
+  const heatmap=(x,y,z)=>({type:'heatmap',x,y,z,zmin:min,zmax:max,colorscale:scale,colorbar:{title:{text:unit},thickness:12},hovertemplate:`x=%{x:.2f} m<br>position=%{y:.2f} m<br>%{z:.2f} ${unit}<extra></extra>`});
+  const planLayout=axesLayout(`Plan · z=${fmt(c.z[k])} m`,'x (m)','y (m)');
+  planLayout.shapes=c.inputs.sources.filter(s=>c.z[k]>=s.z_m&&c.z[k]<=s.z_m+s.height_m).map(s=>({type:'rect',x0:s.x_m,x1:s.x_m+s.width_m,y0:s.y_m,y1:s.y_m+s.depth_m,line:{color:'#162e43',width:2}}));
+  const verticalLayout=axesLayout(`Vertical · y=${fmt(c.y[j])} m`,'x (m)','z (m)');
+  const history=Object.entries(data.cases).map(([n,r])=>({type:'scatter',mode:'lines',x:r.history.time_s,y:r.history.max_temperature_c,name:n}));
+  const historyLayout=axesLayout('Peak temperature through time','Time (s)','°C');historyLayout.legend={orientation:'h',y:-.25};
+  historyLayout.shapes=[{type:'line',x0:f.time,x1:f.time,y0:0,y1:1,yref:'paper',line:{dash:'dot',color:'#72889b'}}];
+  $('peak').textContent=`${fmt(f.max_temperature)} °C`;$('speed').textContent=`${fmt(f.max_speed)} m/s`;
+  $('load').textContent=`${fmt(c.summary.air_heat_kw,1)} / ${fmt(c.summary.supply_flow_m3_s,1)}`;
+  $('balance').textContent=c.summary.relative_energy_balance_error.toExponential(1);
+  $('time-label').textContent=`${fmt(f.time,1)} s`;$('height-label').textContent=`${fmt(c.z[k])} m`;$('section-label').textContent=`${fmt(c.y[j])} m`;
+  $('mesh-label').textContent=`${nx} × ${ny} × ${nz} cells`;
+  $('conditions').textContent=`${label} at ${fmt(f.time,1)} s. Supply ${fmt(c.inputs.settings.supply_temperature_c,1)} °C. Temperature colors share one scale across scenarios. The frames are transient simulation results.`;
+  $('numerics').textContent=`Run maximum divergence: ${c.summary.max_divergence_per_s.toExponential(2)} 1/s. Maximum volume-flow imbalance: ${c.summary.max_mass_balance_error_m3_s.toExponential(2)} m³/s.`;
+  $('transient').textContent=`Final largest local temperature change: ${fmt(c.summary.final_temperature_change_k_s,4)} K/s. No steady-state solution is claimed.`;
+  $('rack-table').replaceChildren();for(const r of f.racks){const tr=document.createElement('tr');[r.name,fmt(r.mean),fmt(r.max)].forEach(v=>{const td=document.createElement('td');td.textContent=v;tr.append(td);});$('rack-table').append(tr);}
+  $('warnings').replaceChildren();for(const w of c.summary.warnings){const li=document.createElement('li');li.textContent=w;$('warnings').append(li);}
+  await Promise.all([
+    Plotly.react('volume',traces,{scene,margin:{l:5,r:25,t:10,b:10},uirevision:'room-camera',height:innerWidth<800?460:580},config),
+    Plotly.react('plan',[heatmap(c.x,c.y,plan)],planLayout,config),
+    Plotly.react('vertical',[heatmap(c.x,c.z,vertical)],verticalLayout,config),
+    Plotly.react('history',history,historyLayout,config)]);
+  document.body.dataset.scenario=name;document.body.dataset.frame=String(frameIndex);document.body.dataset.field=key;document.body.dataset.height=String(k);
+}
+function schedule(){queue=queue.then(render).catch(error=>{console.error(error);$('conditions').textContent='Rendering failed: '+error.message;throw error;});}
+function stop(){clearInterval(timer);timer=null;$('play').textContent='Play';}
+$('play').addEventListener('click',()=>{if(timer){stop();return;}$('time').value=0;schedule();$('play').textContent='Pause';timer=setInterval(()=>{const n=Number($('time').value);if(n>=Number($('time').max)){stop();return;}$('time').value=n+1;schedule();},1000);});
+$('scenario').addEventListener('change',()=>{stop();configure();schedule();});
+for(const id of ['time','height','section'])$(id).addEventListener('input',()=>{stop();schedule();});
+for(const id of ['field','vectors'])$(id).addEventListener('change',schedule);
+configure();schedule();
+</script></body></html>

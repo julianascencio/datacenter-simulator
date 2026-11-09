@@ -19,10 +19,11 @@ grid imports without changing the demand-side PUE.
 Does the 3D hall simulate airflow?
 ------------------------------------------
 
-No. It visualizes device positions and dimensions. Cooling is a lumped energy
-model; support routing and server faces are illustrative. The advanced model
-solves steady CDU branch hydraulics; spatial airflow/CFD remains on the
-:doc:`../roadmap`.
+The original 3D hall shows device positions and dimensions and uses lumped cooling.
+The separate :doc:`cfd` simulator solves 3D velocity, pressure and air temperature
+through time, with buoyancy and permeable rack heat/resistance zones. Its native
+research solver has numerical verification and mesh sensitivity checks; measured
+data center validation and calibrated turbulence models remain outstanding.
 
 Can the examples run without Internet access?
 -----------------------------------------------------

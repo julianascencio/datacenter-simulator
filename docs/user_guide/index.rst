@@ -21,6 +21,8 @@ small component examples before combining the models into a facility study.
    gpu_lab
    grid_management
    infrastructure
+   design
+   cfd
    scada
    ../methodology
    ../integration
