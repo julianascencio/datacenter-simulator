@@ -71,6 +71,33 @@ python -m pip install -e '.[solar,benchmarks]'  # pvlib and independent PyPSA ch
 
 See the [installation guide](https://julianascencio.github.io/datacenter-simulator/user_guide/installation.html) for an isolated environment and development setup.
 
+## 3D airflow and heat CFD
+
+Solve **velocity, pressure and air temperature** through time with the native
+incompressible Boussinesq solver: staggered-grid pressure projection, upwind
+momentum transport, conservative heat fluxes, buoyancy and permeable rack heat /
+resistance zones. Connect rack geometry from the design workflow with an explicit
+room-air heat fraction.
+
+```bash
+python -m datacenter_simulator.analysis.cfd --mesh-study --output outputs/cfd
+# Open outputs/cfd/cfd-3d.html
+```
+
+The offline viewer includes rotatable 3D isosurfaces, airflow vectors, time
+playback, adjustable horizontal/vertical slices, pressure and speed views, rack
+air-temperature probes and normal/half-airflow comparisons. Export full transient
+NPZ arrays, VTK for ParaView, CSV fields, numerical budgets and editable JSON.
+
+This is a **research CFD model**, with analytical verification and mesh sensitivity;
+constant mixing coefficients and porous rack zones are uncalibrated. It is not
+a measured/validated facility model or a calibrated RANS/LES solver.
+
+[CFD guide and equations](docs/user_guide/cfd.rst) ·
+[Runnable CFD example](examples/analysis/plot_cfd_heat_3d.py) ·
+[CFD API](docs/reference/cfd.rst) ·
+[Interactive CFD viewer](https://julianascencio.github.io/datacenter-simulator/_static/lab/cfd/cfd-3d.html)
+
 ## Facility design methods and visualization
 
 Calculate future IT demand, rack counts and floor space, UPS/transformer/generator
@@ -172,7 +199,7 @@ scope, not a validated construction budget. All engineering ratings are assumpti
 
 [User Guide](https://julianascencio.github.io/datacenter-simulator/user_guide/index.html) · [Example Gallery](https://julianascencio.github.io/datacenter-simulator/gallery/index.html) · [API Reference](https://julianascencio.github.io/datacenter-simulator/reference/index.html) · [Research](https://julianascencio.github.io/datacenter-simulator/research/index.html) · [Contributing](https://julianascencio.github.io/datacenter-simulator/contributing/index.html)
 
-The documentation uses Sphinx, PyData Sphinx Theme, and Sphinx-Gallery. All eighteen gallery examples execute during the documentation build and call the installed `datacenter_simulator` API.
+The documentation uses Sphinx, PyData Sphinx Theme, and Sphinx-Gallery. All nineteen gallery examples execute during the documentation build and call the installed `datacenter_simulator` API.
 
 Build locally:
 
@@ -270,6 +297,7 @@ Open `outputs/reference-lab.html`. It includes the Plotly runtime and works offl
 | [13. GPU Energy & Performance Lab](https://julianascencio.github.io/datacenter-simulator/gallery/gpu_lab/plot_gpu_energy_lab.html) | Trace replay, quality-specific throughput, joint scheduling/storage and forecast errors | Advanced |
 | [16. Synthetic equipment-content study](https://julianascencio.github.io/datacenter-simulator/gallery/analysis/plot_infrastructure_content.html) | Cost boundaries, modular sizing, UPS autonomy and cooling | Advanced |
 | [18. Facility design workbench](https://julianascencio.github.io/datacenter-simulator/gallery/methods/plot_facility_design.html) | IT-to-facility sizing, N/N+1/2N, annual energy and 2D/3D rack layouts | Intermediate |
+| [19. 3D airflow and rack heat CFD](https://julianascencio.github.io/datacenter-simulator/gallery/analysis/plot_cfd_heat_3d.html) | Transient velocity/pressure/temperature, heat budgets and mesh sensitivity | Advanced |
 
 Each tutorial includes explained steps, plots, assumptions, and downloadable Python and Jupyter files. Original reference data are deterministic and synthetic; the new engineering examples also include attributed SPECpower measurements and three offline PVGIS weather/resource snapshots.
 
@@ -302,7 +330,7 @@ setting. See the guide for hardware identity checks, calibration limits and comm
 
 ## Roadmap and validation
 
-The [roadmap](docs/roadmap.rst) records delivered methods and the remaining vendor calibration, DC protection/EMT, live telemetry, CFD and editable workspace extensions.
+The [roadmap](docs/roadmap.rst) records delivered methods and the remaining vendor calibration, DC protection/EMT, live telemetry, measured CFD validation and editable workspace extensions.
 
 Electrical models are steady-state and resistive; workload networking uses fluid flows; cooling uses lumped balances and steady hydraulics. Numerical verification and the independent PyPSA comparison do not establish measured facility accuracy. The original facility API preserves requested demand; the new microgrid and contingency methods explicitly calculate served power. See [engineering boundaries](docs/user_guide/engineering.rst) and [evidence and validation](docs/research/engineering.rst).
 

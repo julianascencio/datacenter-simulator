@@ -95,8 +95,10 @@ cooling effects; reductions in internal server fan power are not credited.
 ``ThermalZone`` separately integrates a well-mixed thermal mass with a constant
 envelope conductance using an analytical exponential step. It is demonstrated
 for a cooling failure. The main steady-state simulation does not integrate room
-temperature. No CFD, rack hotspots, humidity, dewpoint control, condensation,
-hydraulic pressure drop or two-phase immersion physics is modeled.
+temperature. These lumped models exclude spatial airflow, rack hotspots,
+humidity, dewpoint control, condensation, hydraulic pressure drop and two-phase
+immersion physics. The separate :doc:`user_guide/cfd` solver advances 3D room-air
+velocity, pressure and temperature with its own explicit research boundaries.
 
 Facility, generation and storage boundary
 -------------------------------------------------

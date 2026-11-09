@@ -22,6 +22,7 @@ small component examples before combining the models into a facility study.
    grid_management
    infrastructure
    design
+   cfd
    scada
    ../methodology
    ../integration

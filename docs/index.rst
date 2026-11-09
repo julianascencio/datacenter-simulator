@@ -48,13 +48,14 @@ If you are new to Data Center Simulator:
 * Read the :doc:`user_guide/package_overview`.
 * Follow :doc:`user_guide/installation` to install the package and optional tools.
 * Run the :doc:`quickstart` to generate an offline simulation lab.
-* Explore eighteen worked examples in the :doc:`gallery/index`, from device basics
+* Explore nineteen worked examples in the :doc:`gallery/index`, from device basics
   to coupled electrical, cooling, energy and workload studies.
 * Follow :doc:`user_guide/engineering` for the eight advanced methods and linked lab.
 * Run :doc:`user_guide/grid_management` for fleet dispatch and the Wyoming recovery study.
 * Inspect the :doc:`user_guide/dc_single_line` with electrical ratings and SVG export.
 * Browse :doc:`user_guide/scada` for 50 device models and protocol mappings.
 * Calculate equipment, cooling and floor space with :doc:`user_guide/design`.
+* Simulate spatial airflow, pressure and heat with :doc:`user_guide/cfd`.
 * Use the :doc:`reference/index` for classes, functions and source code.
 
 .. raw:: html
@@ -65,6 +66,8 @@ If you are new to Data Center Simulator:
    <p><a class="btn btn-secondary" href="_static/lab/wyoming/wyoming-grid-management.html">Open Wyoming grid-management study →</a></p>
 
    <p><a class="btn btn-primary" href="_static/lab/design/design-workbench.html">Open facility design workbench →</a></p>
+
+   <p><a class="btn btn-primary" href="_static/lab/cfd/cfd-3d.html">Open 3D airflow and heat CFD →</a></p>
 
 Core modelling idea
 ---------------------------
