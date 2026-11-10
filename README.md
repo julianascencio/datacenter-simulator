@@ -199,7 +199,7 @@ scope, not a validated construction budget. All engineering ratings are assumpti
 
 [User Guide](https://julianascencio.github.io/datacenter-simulator/user_guide/index.html) · [Example Gallery](https://julianascencio.github.io/datacenter-simulator/gallery/index.html) · [API Reference](https://julianascencio.github.io/datacenter-simulator/reference/index.html) · [Research](https://julianascencio.github.io/datacenter-simulator/research/index.html) · [Contributing](https://julianascencio.github.io/datacenter-simulator/contributing/index.html)
 
-The documentation uses Sphinx, PyData Sphinx Theme, and Sphinx-Gallery. All nineteen gallery examples execute during the documentation build and call the installed `datacenter_simulator` API.
+The documentation uses Sphinx, PyData Sphinx Theme, and Sphinx-Gallery. All twenty-one gallery examples execute during the documentation build and call the installed `datacenter_simulator` API.
 
 Build locally:
 
@@ -298,6 +298,8 @@ Open `outputs/reference-lab.html`. It includes the Plotly runtime and works offl
 | [16. Synthetic equipment-content study](https://julianascencio.github.io/datacenter-simulator/gallery/analysis/plot_infrastructure_content.html) | Cost boundaries, modular sizing, UPS autonomy and cooling | Advanced |
 | [18. Facility design workbench](https://julianascencio.github.io/datacenter-simulator/gallery/methods/plot_facility_design.html) | IT-to-facility sizing, N/N+1/2N, annual energy and 2D/3D rack layouts | Intermediate |
 | [19. 3D airflow and rack heat CFD](https://julianascencio.github.io/datacenter-simulator/gallery/analysis/plot_cfd_heat_3d.html) | Transient velocity/pressure/temperature, heat budgets and mesh sensitivity | Advanced |
+| [20. CFD accuracy](https://julianascencio.github.io/datacenter-simulator/gallery/analysis/plot_cfd_accuracy.html) | Separate mesh, timestep and input sensitivity; conditional GCI | Advanced |
+| [21. 3D acoustic studio](https://julianascencio.github.io/datacenter-simulator/gallery/analysis/plot_noise_3d.html) | Octave-band propagation, receiver contributions and treatments | Advanced |
 
 Each tutorial includes explained steps, plots, assumptions, and downloadable Python and Jupyter files. Original reference data are deterministic and synthetic; the new engineering examples also include attributed SPECpower measurements and three offline PVGIS weather/resource snapshots.
 
@@ -370,3 +372,19 @@ relationship design reference. These are project-defined engineering profiles,
 not native-protocol conformance claims. Importers work on offline decoded records.
 Installed-device support and vendor-specific mappings require commissioning; no
 universal Modbus addresses or live control are assumed.
+
+### Acoustic studio and CFD accuracy
+
+Run `datacenter-noise --output outputs/noise` for octave-band 3D sound levels,
+receiver source rankings, source-treatment/absorption comparisons and declared
+input-uncertainty intervals. Open `outputs/noise/noise-3d.html`. The Python model
+uses sound-power spectra, direct propagation, atmospheric absorption and an
+optional diffuse room term. Source data are illustrative; this is not a wave
+solver or a complete outdoor compliance model.
+
+The CFD now supports MUSCL heat transport, configurable return openings,
+independent return-backflow temperature, distributed rack fan curves and
+quadratic resistance. Run `datacenter-cfd-accuracy` for separate mesh, timestep
+and input-sensitivity studies; both CFD and acoustics accept measured comparisons.
+See [acoustic methods](docs/user_guide/acoustics.rst) and
+[CFD verification](docs/user_guide/cfd.rst) for equations, assumptions and limits.

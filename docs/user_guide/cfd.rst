@@ -25,7 +25,7 @@ independent controls. Temperature colors share a common scale across scenarios.
 :doc:`API <../reference/cfd>`
 
 The example contains four permeable rack zones releasing 3 kW each to room air.
-It compares 2 and 1 m³/s supply for 120 seconds. Inputs, heat loads, airflow
+It compares 2 and 1 m³/s supply for 120 seconds with a high-level return opening. Inputs, heat loads, airflow
 resistance and effective mixing coefficients are illustrative. Simulating 120 s
 does not imply a steady-state solution; the final temperature-change rate is
 reported explicitly.
@@ -86,15 +86,17 @@ temperature :math:`T`, rack heat :math:`q` in W/m³ and resistance :math:`a` in 
 
 * **Staggered mesh:** pressure/temperature at cell centres, normal velocity at
   faces. This avoids collocated pressure/velocity checkerboarding.
-* **Momentum:** first-order explicit Euler, first-order upwind convective
+* **Momentum:** first-order explicit Euler, first-order upwind momentum convective
   derivatives, centred viscous diffusion, explicit Boussinesq force and
-  semi-implicit linear rack drag. Wall ghosts enforce tangential no slip.
+  semi-implicit linear/quadratic rack drag and optional distributed fan forcing. Wall ghosts enforce tangential no slip.
 * **Pressure projection:** solve :math:`\nabla^2\pi=\nabla\cdot\mathbf{u}^*/\Delta t`
   then :math:`\mathbf{u}=\mathbf{u}^*-\Delta t\nabla\pi`. The sparse operator
   uses the same gradient/divergence pair as the correction and is factorized
   once. The return boundary is half a cell from the final pressure centre.
-* **Heat:** conservative finite-volume face fluxes, upwind advection and centred
-  diffusion. Source-to-grid volume overlaps preserve every rack's total watts
+* **Heat:** conservative finite-volume face fluxes, monotonized-central MUSCL
+  reconstruction and SSP-RK2 thermal time integration; centred diffusion.
+  ``thermal_scheme="upwind"`` retains the legacy first-order option. The coupled
+  momentum/heat solver remains first-order overall. Source-to-grid volume overlaps preserve every rack's total watts
   even on coarse meshes. Subcell capture does not resolve the rack flow physics.
 * **Time:** adaptive advection/diffusion and acceleration limits, exact saved
   frame times, and an additional projected-flux thermal CFL check. Non-finite
@@ -114,19 +116,25 @@ Boundary conditions
        zero tangential velocity and prescribed temperature. Partial-height cell
        faces use their opening fraction.
    * - Return at x=L
-     - Entire wall at zero gauge pressure; predictor velocity is extrapolated
+     - Configurable rectangular opening at zero gauge pressure; closed faces are impermeable; predictor velocity is extrapolated
        with zero normal gradient, then pressure-corrected. Zero diffusive heat
-       flux. Any backflow enters at supply temperature and its volume is reported.
+       flux. Any backflow uses ``return_temperature_c`` (supply if omitted), and its volume is reported.
    * - Other walls
      - No penetration, no slip and zero heat flux. No wall conduction or radiation.
    * - Rack envelopes
      - Permeable fluid zones containing heat and isotropic linear drag. They are
-       not impermeable boxes, fan boundary conditions or conjugate solid domains.
+       not impermeable boxes or conjugate solid domains. Optional distributed fan pressure curves and quadratic resistance are available.
 
-The return is an idealized open wall, not a resolved CRAH intake or duct. Backflow
-can import cooling through the return and materially affect results. Examine
-``return_backflow_m3_s`` and the boundary assumptions before interpreting a case.
-The native model does not accept arbitrary supply/return-wall placement yet.
+The return opening is configured with ``return_y_m``, ``return_z_m``,
+``return_width_m`` and ``return_height_m``. Omitted dimensions span the entire
+wall for compatibility. Partial-face areas enter both the pressure matrix and
+velocity correction. The reference case uses a 3 × 0.6 m high-level opening.
+Refine its edge cells: area conservation does not resolve a subcell jet.
+The native model does not yet support arbitrary wall placements or duct meshes.
+
+Backflow can materially affect results. Inspect ``max_return_backflow_m3_s``
+and prescribe a defensible return-reservoir temperature instead of assuming that
+backflow always brings supply-temperature air.
 
 Verification, resolution and limits
 -----------------------------------
@@ -161,7 +169,7 @@ guard; cost and memory grow rapidly for 3D factorization. Start with the default
 
 Effective viscosity/diffusivity are constant, uncalibrated mixing assumptions.
 This is not a RANS/LES model or DNS at the default resolution. The solver omits
-server fan curves, individual servers, conjugate solid heat storage, humidity,
+resolved server blades, individual servers, conjugate solid heat storage, humidity,
 radiation, compressibility and turbulence transport equations. A temperature
 excursion giving :math:`\beta|T-T_s|>0.1` triggers a Boussinesq screening warning.
 Rack-zone values are air temperatures, not silicon or equipment-surface values.
@@ -192,3 +200,62 @@ Primary references
 * `NISTIR 8298: CFD verification, validation and uncertainty
   <https://www.nist.gov/publications/summary-industrial-verification-validation-and-uncertainty-quantification-procedures>`_:
   numerical verification, physical validation and uncertainty are separate tasks.
+
+Accuracy studies and measurements
+---------------------------------
+
+.. code-block:: bash
+
+   datacenter-cfd-accuracy --output outputs/cfd-accuracy
+   datacenter-cfd --inputs case-0-inputs.json --measurements temperature-probes.csv
+
+The accuracy command runs equal-ratio coarse/middle/fine meshes, separate
+halved timestep caps, and declared heat, airflow and effective-mixing sensitivity
+cases. Its default is a 20-second study; a user-supplied JSON retains its duration.
+The timestep report records actual timesteps and whether the requested caps were
+active. Adaptive CFL limits can make a requested cap change ineffective.
+
+The three-grid Richardson/GCI calculation rejects oscillatory, divergent,
+degenerate and implausible-order sequences. It reports absolute kelvin uncertainty
+on peak/mean temperature rise, not a misleading percentage of Celsius temperature.
+Eligibility is conditional on asymptotic convergence, not proof of it. GCI excludes
+boundary, turbulence, geometry and measurement errors.
+
+:doc:`Accuracy tutorial <../gallery/analysis/plot_cfd_accuracy>` demonstrates the
+workflow and its limits. The ordinary viewer's coarse/base/fine sensitivity uses
+its original unequal ratios and does not claim GCI from those runs.
+
+A probe CSV requires ``time_s,x_m,y_m,z_m,observed_c``; optional
+``standard_uncertainty_c`` adds normalized residuals. Four-dimensional linear
+interpolation evaluates saved fields at the observation position/time.
+Extrapolation beyond saved times or the cell-centre envelope is rejected.
+Increase snapshot frequency before comparing fast transients. Outputs are
+``measurement-comparison.csv`` and ``measurement-metrics.json``. Bias, MAE and
+RMSE describe the supplied observations; use independent held-out measurements
+with documented sensor and operating uncertainty after calibration.
+
+Rack fan and resistance inputs
+------------------------------
+
+Optional ``fan_pressure_pa`` is shutoff pressure, ``fan_free_speed_m_s`` is
+free-delivery axial velocity, ``fan_axis`` is 0/1/2 and ``fan_direction`` is ±1.
+The actuator curve is :math:`\Delta p=\Delta p_0\max(1-(u_+/u_0)^2,0)`.
+Distributed acceleration is pressure divided by air density and rack length
+along the fan axis. This actuator approximation needs a measured pressure/flow
+curve and adequate resolution; it does not resolve blades or enforce a fixed
+flow independent of resistance. ``inertial_drag_per_m`` adds a Forchheimer-like
+quadratic resistance to ``drag_per_s``. Fan work and viscous dissipation are not
+added to the thermal source; include equipment heat explicitly in ``heat_kw``.
+
+MUSCL verification advects an analytical temperature pulse and checks reduced
+error and absence of new extrema. Fan-force tests check integrated pressure force,
+shutoff at free speed, and quadratic resistance. Restricted-return tests check
+aperture area, impermeability, pressure projection and global mass/heat closure.
+These tests strengthen numerical evidence without claiming measured accuracy.
+
+* `NASA: spatial grid convergence
+  <https://www.grc.nasa.gov/www/wind/valid/tutorial/spatconv.html>`_:
+  Richardson extrapolation and GCI factor of safety.
+* `NASA: TVD reconstruction and limiters
+  <https://www.grc.nasa.gov/WWW/winddocs/user/keywords/tvd.html>`_:
+  limited higher-order advection methods.

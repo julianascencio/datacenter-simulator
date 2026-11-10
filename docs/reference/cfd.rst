@@ -15,3 +15,9 @@
 
 .. automodule:: datacenter_simulator.use_cases.cfd
    :members:
+
+.. automodule:: datacenter_simulator.methods.verification
+   :members:
+
+.. automodule:: datacenter_simulator.analysis.cfd_accuracy
+   :members:

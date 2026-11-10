@@ -27,10 +27,12 @@ datacenter-sim = "datacenter_simulator.cli:main"
 datacenter-gpu-lab = "datacenter_simulator.gpu_lab:main"
 datacenter-grid = "datacenter_simulator.analysis.wyoming:main"
 datacenter-design = "datacenter_simulator.analysis.design:main"
+datacenter-noise = "datacenter_simulator.analysis.acoustics:main"
+datacenter-cfd-accuracy = "datacenter_simulator.analysis.cfd_accuracy:main"
 datacenter-cfd = "datacenter_simulator.analysis.cfd:main"
 
 [tool.setuptools.package-data]
-datacenter_simulator = ["py.typed", "utilities/report.html", "utilities/engineering.html", "utilities/grid_management.html", "utilities/scada.html", "utilities/design.html", "utilities/cfd.html", "data/*.csv", "data/*.json"]
+datacenter_simulator = ["py.typed", "utilities/report.html", "utilities/engineering.html", "utilities/grid_management.html", "utilities/scada.html", "utilities/design.html", "utilities/cfd.html", "utilities/acoustics.html", "data/*.csv", "data/*.json"]
 
 [tool.ruff]
 line-length = 100

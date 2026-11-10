@@ -22,6 +22,7 @@ page links to the implementation and documents units and model boundaries.
    infrastructure
    design
    cfd
+   acoustics
    scada
    connectors
    simulation

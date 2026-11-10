@@ -1,0 +1,69 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Data center · 3D acoustic studio</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#f0f3f8;color:#182b43;font:15px/1.55 system-ui,sans-serif}
+header{padding:32px max(20px,calc((100vw - 1380px)/2));background:#15233e;color:white}header p{max-width:850px;color:#d2dced}
+h1{font-size:clamp(27px,4vw,42px);line-height:1.1;margin:10px 0}.eyebrow{text-transform:uppercase;color:#b8acf9;letter-spacing:.14em;font-size:12px}
+h2{font-size:20px}.subtle{color:#556982}main{max-width:1420px;margin:auto;padding:20px}.panel,.card,.controls{padding:18px;border:1px solid #d9e0ec;border-radius:12px;background:white;min-width:0}
+.controls{display:flex;align-items:center;gap:18px;flex-wrap:wrap}.controls label{display:flex;align-items:center;gap:8px;flex-wrap:wrap}select,input{max-width:100%}select{font:inherit;background:white;border:1px solid #9aaac1;border-radius:5px;padding:8px;color:inherit}
+.cards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin:18px 0}.card span{font-size:12px;text-transform:uppercase;display:block}.card strong{font-size:27px;display:block;margin:6px 0}.card small{color:#556982}#interval{font-size:clamp(17px,2vw,24px)}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;margin:18px 0}.scene{height:560px}.plot{height:420px}.panel{overflow:hidden}.notice{padding:14px;background:#e9e5fb;border-left:4px solid #7660c7;margin:18px 0}
+.table-wrap{overflow:auto}table{border-collapse:collapse;width:100%;font-size:13px}th,td{padding:9px;border-bottom:1px solid #dbe3ef;text-align:left;white-space:nowrap}th{background:#f0f3f8}a{color:#4a3a9d}.downloads,pre{overflow-wrap:anywhere}pre{white-space:pre-wrap;font-size:12px}.row{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}footer{font-size:13px;color:#566981;margin:20px 0}
+@media(max-width:800px){main{padding:10px}.grid{grid-template-columns:1fr}.cards{grid-template-columns:repeat(2,minmax(0,1fr))}.panel{padding:8px}.scene{height:440px}.card{padding:12px}.card strong{font-size:24px}}
+</style><script>__PLOTLY__</script></head><body>
+<header><div class="eyebrow">ASVA Consulting · Acoustic engineering studies</div><h1>3D acoustic studio</h1>
+<p>Locate noisy zones, rank equipment contributions and compare source treatments with room absorption. Every field comes from octave-band acoustic energy calculations.</p></header>
+<main><div class="controls"><label>Scenario <select id="scenario"></select></label><label>Field <select id="field"><option value="A">Equivalent A-weighted level</option></select></label><label>Receiver <select id="receiver"></select></label></div>
+<div class="cards"><div class="card"><span>Selected receiver</span><strong id="receiver-level"></strong><small>Equivalent level · dBA</small></div><div class="card"><span>Input uncertainty interval</span><strong id="interval"></strong><small>2.5–97.5 percentiles · dBA</small></div><div class="card"><span>Change from baseline</span><strong id="change"></strong><small>Reduction at selected receiver · dB</small></div><div class="card"><span>Planning target margin</span><strong id="margin"></strong><small>Target minus prediction · dB</small></div></div>
+<p class="notice" id="conditions"></p>
+<section class="panel"><div class="row"><h2>Sound field in three dimensions</h2><span id="mesh"></span></div><div id="volume" class="scene"></div>
+<p>Colored surfaces join equal sound levels. Cyan markers are equipment sources; dark diamonds are receiver locations. Source near fields are excluded. Drag to rotate; scroll to zoom.</p></section>
+<div class="controls" style="margin-top:18px"><label>Plan height <input id="height" aria-label="Noise plan height" type="range" min="0" step="1"><output id="height-label"></output></label><label>Section position <input id="section" aria-label="Noise vertical section" type="range" min="0" step="1"><output id="section-label"></output></label></div>
+<div class="grid"><section class="panel"><div id="plan" class="plot"></div></section><section class="panel"><div id="vertical" class="plot"></div></section><section class="panel"><div id="spectrum" class="plot"></div></section><section class="panel"><div id="ranking" class="plot"></div></section></div>
+<section class="panel"><h2>Receiver assessment</h2><p>Positive margin means below your planning target. The target is user-defined and is not a legal compliance assessment. Intervals reflect the input error assumptions, not total prediction accuracy.</p>
+<div class="table-wrap"><table><thead><tr><th>Receiver</th><th>LAeq dBA</th><th>Input P2.5</th><th>Input P97.5</th><th>Margin dB</th></tr></thead><tbody id="receivers"></tbody></table></div></section>
+<section class="panel" style="margin-top:18px"><h2>Room and source evidence</h2><div class="table-wrap"><table><thead><tr><th>Band Hz</th><th>Mean absorption</th><th>Eyring RT60 s</th><th>Room constant m²</th><th>Modal caution</th></tr></thead><tbody id="room"></tbody></table></div>
+<p id="source-evidence"></p><ul id="warnings"></ul><details><summary>Assumptions and reproducibility</summary><p>Unweighted sound-power spectra (dB re 1 pW) are propagated to sound-pressure levels (dB re 20 µPa). Sources add incoherently by energy. The indoor model combines direct spreading with a diffuse reverberant term. Source treatment reduces emitted power in every direction; it is not an obstacle diffraction model.</p><p>Gaussian source offsets are independent between sources and correlated across bands. A common propagation offset applies to all sources and receivers. Background is fixed. Intervals use a reproducible Monte Carlo sample.</p><p>This is a steady equivalent-level model. It does not calculate acoustic waveforms, tonal phase, transmission through walls, rack shielding, structureborne sound, ground interference or auralization. CFD pressure is not used as acoustic pressure.</p></details>
+<pre>datacenter-noise --inputs noise-0-inputs.json --output outputs/my-noise
+datacenter-noise --inputs noise-0-inputs.json --measurements receiver-measurements.csv</pre><p class="downloads">__DOWNLOADS__</p></section>
+<footer>Replace illustrative source spectra and absorption inputs with measured data. Numerical checks do not establish measured facility accuracy.</footer></main>
+<script id="noise-data" type="application/json">__DATA__</script><script>
+const payload=JSON.parse(document.getElementById('noise-data').textContent),cases=payload.cases,$=id=>document.getElementById(id);
+const config={responsive:true,displaylogo:false},fmt=(v,d=1)=>v==null?'—':Number(v).toFixed(d),colors=[[0,'#28205c'],[.25,'#286fa4'],[.5,'#37b8a0'],[.7,'#c3d85c'],[.85,'#f4b14b'],[1,'#bb344a']];
+let queue=Promise.resolve();
+for(const name of Object.keys(cases))$('scenario').add(new Option(name,name));
+for(const f of payload.frequencies)$('field').add(new Option(`${f} Hz · unweighted`,String(f)));
+for(const r of cases.Baseline.receivers)$('receiver').add(new Option(r.receiver,r.receiver));
+function configure(){const c=cases[$('scenario').value];$('height').max=c.coordinates[2].length-1;$('height').value=Math.round((c.coordinates[2].length-1)*.45);$('section').max=c.coordinates[1].length-1;$('section').value=Math.floor(c.coordinates[1].length/2);}
+function layout(title,x,y){return {title:{text:title,font:{size:16}},xaxis:{title:{text:x}},yaxis:{title:{text:y}},margin:{l:65,r:45,t:65,b:65},height:420,paper_bgcolor:'white',plot_bgcolor:'white'};}
+function rows(target,values){$(target).replaceChildren();for(const cells of values){const tr=document.createElement('tr');for(const value of cells){const td=document.createElement('td');td.textContent=value;tr.append(td);}$(target).append(tr);}}
+async function render(){
+ const name=$('scenario').value,c=cases[name],g=c.inputs.grid,key=$('field').value,[x,y,z]=c.coordinates,values=c.fields[key],k=+$('height').value,j=+$('section').value;
+ const at=(i,j,k)=>(i*g.ny+j)*g.nz+k,unit=key==='A'?'dBA':'dB',all=Object.values(cases).flatMap(v=>v.fields[key]).filter(Number.isFinite),lo=Math.floor(all.reduce((a,b)=>Math.min(a,b),Infinity)/5)*5,hi=Math.ceil(all.reduce((a,b)=>Math.max(a,b),-Infinity)/5)*5;
+ const xyz=[[],[],[]];for(let i=0;i<g.nx;i++)for(let j=0;j<g.ny;j++)for(let k=0;k<g.nz;k++){xyz[0].push(x[i]);xyz[1].push(y[j]);xyz[2].push(z[k]);}
+ const volume=[{type:'isosurface',x:xyz[0],y:xyz[1],z:xyz[2],value:values,isomin:lo+2,isomax:hi,cmin:lo,cmax:hi,colorscale:colors,opacity:.28,surface:{count:6},caps:{x:{show:false},y:{show:false},z:{show:false}},colorbar:{title:{text:unit},thickness:14,len:.7},hovertemplate:`%{value:.1f} ${unit}<extra></extra>`}];
+ for(const [items,symbol,color,label] of [[c.inputs.sources,'circle','#00bfd3','Source'],[c.inputs.receivers,'diamond','#192a45','Receiver']])volume.push({type:'scatter3d',mode:'markers+text',x:items.map(s=>s.x_m),y:items.map(s=>s.y_m),z:items.map(s=>s.z_m),text:items.map(s=>s.name),textposition:'top center',marker:{size:5,symbol,color},name:label,showlegend:false});
+ const r=c.receivers.find(r=>r.receiver===$('receiver').value),baseline=cases.Baseline.receivers.find(v=>v.receiver===r.receiver);
+ $('receiver-level').textContent=fmt(r.laeq_dba);$('interval').textContent=`${fmt(r.input_p025_dba)}–${fmt(r.input_p975_dba)}`;$('change').textContent=fmt(baseline.laeq_dba-r.laeq_dba);$('margin').textContent=fmt(r.margin_to_target_db);
+ $('conditions').textContent=`${c.inputs.settings.mode==='room'?'Direct + diffuse room':'Free-field spreading'} · ${key==='A'?'A-weighted equivalent level':key+' Hz sound-pressure level'} · Shared colors across scenarios · ${c.summary.excluded_cells} source near-field cells excluded.`;
+ $('mesh').textContent=`${g.nx} × ${g.ny} × ${g.nz} samples`;$('height-label').textContent=`${fmt(z[k],2)} m`;$('section-label').textContent=`${fmt(y[j],2)} m`;
+ const heatmap=(x,y,z)=>({type:'heatmap',x,y,z,zmin:lo,zmax:hi,colorscale:colors,colorbar:{title:{text:unit},thickness:12},hoverongaps:false});
+ const spectrum=Object.entries(cases).map(([name,v])=>({type:'scatter',mode:'lines+markers',name,x:payload.frequencies.map(String),y:payload.frequencies.map(f=>v.receivers.find(a=>a.receiver===r.receiver)[`lp_${f}_hz_db`])}));
+ const spectrumLayout=layout('Octave spectrum at selected receiver','Octave centre (Hz)','Unweighted Lp (dB)');spectrumLayout.xaxis.type='category';spectrumLayout.legend={orientation:'h',y:-.3};
+ const contributions=c.contributions.filter(v=>v.receiver===r.receiver).sort((a,b)=>a.energy_fraction-b.energy_fraction);
+ const rankLayout=layout('Source contribution to receiver energy','Energy share (%)','');rankLayout.margin.l=110;
+ rows('receivers',c.receivers.map(r=>[r.receiver,fmt(r.laeq_dba),fmt(r.input_p025_dba),fmt(r.input_p975_dba),fmt(r.margin_to_target_db)]));
+ rows('room',c.inputs.settings.mode==='room'?c.room.map(r=>[r.frequency_hz,fmt(r.mean_absorption,2),fmt(r.eyring_rt60_s,2),fmt(r.room_constant_m2),r.below_schroeder?'Below estimated transition':'—']):[]);
+ $('source-evidence').textContent=c.inputs.sources.map(s=>`${s.name}: ${s.provenance}`).join(' · ');
+ $('warnings').replaceChildren();for(const w of c.summary.warnings){const li=document.createElement('li');li.textContent=w;$('warnings').append(li);}
+ await Promise.all([
+ Plotly.react('volume',volume,{height:innerWidth<800?440:560,margin:{l:5,r:25,t:5,b:5},uirevision:'noise-camera',scene:{aspectmode:'data',camera:{eye:innerWidth<800?{x:2.7,y:2.7,z:2.3}:{x:1.7,y:1.7,z:1.4}},xaxis:{title:{text:'x (m)'},range:[0,g.length_m]},yaxis:{title:{text:'y (m)'},range:[0,g.width_m]},zaxis:{title:{text:'z (m)'},range:[0,g.height_m]}}},config),
+ Plotly.react('plan',[heatmap(x,y,y.map((_,j)=>x.map((_,i)=>values[at(i,j,k)])))],layout(`Plan · z=${fmt(z[k],2)} m`,'x (m)','y (m)'),config),
+ Plotly.react('vertical',[heatmap(x,z,z.map((_,k)=>x.map((_,i)=>values[at(i,j,k)])))],layout(`Section · y=${fmt(y[j],2)} m`,'x (m)','z (m)'),config),
+ Plotly.react('spectrum',spectrum,spectrumLayout,config),
+ Plotly.react('ranking',[{type:'bar',orientation:'h',x:contributions.map(s=>s.energy_fraction*100),y:contributions.map(s=>s.source),marker:{color:'#7660c7'}}],rankLayout,config)]);
+ document.body.dataset.scenario=name;document.body.dataset.field=key;document.body.dataset.height=String(k);document.body.dataset.receiver=r.receiver;
+}
+function schedule(){queue=queue.then(render).catch(e=>{$('conditions').textContent='Rendering failed: '+e.message;throw e;});}
+$('scenario').addEventListener('change',()=>{configure();schedule();});for(const id of ['field','receiver'])$(id).addEventListener('change',schedule);for(const id of ['height','section'])$(id).addEventListener('input',schedule);configure();schedule();
+</script></body></html>

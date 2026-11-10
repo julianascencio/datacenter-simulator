@@ -23,6 +23,7 @@ small component examples before combining the models into a facility study.
    infrastructure
    design
    cfd
+   acoustics
    scada
    ../methodology
    ../integration

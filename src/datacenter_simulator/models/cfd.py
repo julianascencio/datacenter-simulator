@@ -58,11 +58,29 @@ class CFDSource:
     height_m: float
     heat_kw: float
     drag_per_s: float = 0.5
+    inertial_drag_per_m: float = 0
+    fan_pressure_pa: float = 0
+    fan_free_speed_m_s: float = 1
+    fan_axis: int = 0
+    fan_direction: int = 1
 
     def __post_init__(self) -> None:
+        finite("fan_free_speed_m_s", self.fan_free_speed_m_s, strict=True)
+        if type(self.fan_axis) is not int or self.fan_axis not in (0, 1, 2):
+            raise ValueError("fan_axis must be 0, 1 or 2")
+        if type(self.fan_direction) is not int or self.fan_direction not in (-1, 1):
+            raise ValueError("fan_direction must be -1 or 1")
         if not self.name:
             raise ValueError("CFD source requires a name")
-        for name in ("x_m", "y_m", "z_m", "heat_kw", "drag_per_s"):
+        for name in (
+            "x_m",
+            "y_m",
+            "z_m",
+            "heat_kw",
+            "drag_per_s",
+            "inertial_drag_per_m",
+            "fan_pressure_pa",
+        ):
             finite(name, getattr(self, name))
         for name in ("width_m", "depth_m", "height_m"):
             finite(name, getattr(self, name), strict=True)
@@ -72,9 +90,9 @@ class CFDSource:
 class CFDSettings:
     """Fluid properties, boundary conditions and explicit integration controls.
 
-    Supply enters a full-width low slot on x=0; the entire x=L wall is a
+    Supply enters a full-width low slot on x=0; a rectangular opening on x=L is a
     zero-gauge-pressure return. Other walls have no penetration, no slip and
-    zero heat flux. Backflow at the return enters at supply temperature.
+    zero heat flux. Return backflow temperature is configurable; it defaults to supply temperature.
     Effective viscosity/diffusivity are declared mixing assumptions, not a
     calibrated RANS/LES turbulence closure. Set molecular values for laminar tests.
     """
@@ -93,6 +111,12 @@ class CFDSettings:
     cfl: float = 0.45
     snapshot_interval_s: float = 20
     max_steps: int = 20000
+    thermal_scheme: str = "muscl"
+    return_temperature_c: float | None = None
+    return_width_m: float | None = None
+    return_height_m: float | None = None
+    return_y_m: float = 0
+    return_z_m: float = 0
 
     def __post_init__(self) -> None:
         for name in (
@@ -113,6 +137,15 @@ class CFDSettings:
         ):
             finite(name, getattr(self, name), strict=True)
         finite("supply_temperature_c", self.supply_temperature_c, -273.15, strict=True)
+        for name in ("return_y_m", "return_z_m"):
+            finite(name, getattr(self, name))
+        for name in ("return_width_m", "return_height_m"):
+            if getattr(self, name) is not None:
+                finite(name, getattr(self, name), strict=True)
+        if self.thermal_scheme not in ("upwind", "muscl"):
+            raise ValueError("thermal_scheme must be upwind or muscl")
+        if self.return_temperature_c is not None:
+            finite("return_temperature_c", self.return_temperature_c, -273.15, strict=True)
         fraction("cfl", self.cfl, positive=True)
         if self.cfl > 0.5:
             raise ValueError("cfl must be <= 0.5 for the explicit coupled update")
@@ -127,6 +160,13 @@ class CFDCase:
     sources: tuple[CFDSource, ...] = ()
 
     def __post_init__(self) -> None:
+        width = self.settings.return_width_m or self.grid.width_m
+        height = self.settings.return_height_m or self.grid.height_m
+        if (
+            self.settings.return_y_m + width > self.grid.width_m + 1e-10
+            or self.settings.return_z_m + height > self.grid.height_m + 1e-10
+        ):
+            raise ValueError("return opening exceeds room boundaries")
         if self.settings.inlet_height_m > self.grid.height_m:
             raise ValueError("inlet height exceeds room height")
         if len({s.name for s in self.sources}) != len(self.sources):
@@ -138,7 +178,7 @@ class CFDCase:
                 (self.grid.length_m, self.grid.width_m, self.grid.height_m),
                 strict=True,
             ):
-                if start + size > limit + 1e-10:
+                if start >= limit or start + size > limit + 1e-10:
                     raise ValueError(f"source {source.name} exceeds room boundaries")
         for i, a in enumerate(self.sources):
             for b in self.sources[i + 1 :]:

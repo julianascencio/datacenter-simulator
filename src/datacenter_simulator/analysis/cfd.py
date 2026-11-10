@@ -9,6 +9,7 @@ import numpy as np
 import pandas as pd
 
 from datacenter_simulator.methods.cfd import CFDResult, cell_coordinates, simulate_cfd
+from datacenter_simulator.methods.verification import validate_temperature_probes
 from datacenter_simulator.models.cfd import CFDCase, CFDGrid, CFDSettings, CFDSource
 from datacenter_simulator.use_cases.cfd import airflow_scenarios, cfd_evidence, reference_cfd_case
 
@@ -167,6 +168,7 @@ def main() -> None:
     parser.add_argument(
         "--mesh-study", action="store_true", help="Run coarse/base/fine sensitivity"
     )
+    parser.add_argument("--measurements", type=Path, help="Independent temperature probe CSV")
     parser.add_argument("--single", action="store_true", help="Skip half-airflow comparison")
     args = parser.parse_args()
     try:
@@ -184,6 +186,13 @@ def main() -> None:
         )
     except (TypeError, ValueError, RuntimeError) as error:
         parser.error(str(error))
+    if args.measurements:
+        table, metrics = validate_temperature_probes(
+            results["Normal airflow"], pd.read_csv(args.measurements)
+        )
+        table.to_csv(args.output / "measurement-comparison.csv", index=False)
+        (args.output / "measurement-metrics.json").write_text(json.dumps(metrics, indent=2))
+        print("Measurement comparison: " + json.dumps(metrics))
     print(json.dumps({name: r.summary for name, r in results.items()}, indent=2))
     print(f"Report: {args.output / 'cfd-3d.html'}")
 
