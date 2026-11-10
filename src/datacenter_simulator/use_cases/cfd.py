@@ -17,7 +17,11 @@ def reference_cfd_case() -> CFDCase:
         CFDSource(f"Rack {i + 1}", x, y, 0, 0.8, 1.0, 2.1, 3)
         for i, (x, y) in enumerate(((2.4, 1.5), (2.4, 3.5), (4.4, 1.5), (4.4, 3.5)))
     )
-    return CFDCase(CFDGrid(), CFDSettings(), sources)
+    return CFDCase(
+        CFDGrid(),
+        CFDSettings(return_width_m=3, return_height_m=0.6, return_y_m=1.5, return_z_m=2.4),
+        sources,
+    )
 
 
 def cfd_from_design(
@@ -90,7 +94,9 @@ def cfd_evidence() -> dict[str, object]:
         "equations": {
             "mass": "div(u)=0",
             "momentum": "du/dt + u.grad(u) = -grad(p)/rho + nu_eff*laplacian(u) "
-            "+ g*beta*(T-T_supply)*e_z - drag*u",
+            "+ g*beta*(T-T_supply)*e_z - drag*u - inertial_drag*abs(u)*u + fan_force",
+            "thermal_discretization": "MUSCL MC limiter + SSP-RK2 (or legacy upwind Euler); "
+            "first-order coupled momentum",
             "heat": "dT/dt + div(u*T) = alpha_eff*laplacian(T) + q/(rho*cp)",
             "projection": "laplacian(p_kinematic) = div(u_star)/dt; "
             "u = u_star-dt*grad(p_kinematic)",
@@ -98,11 +104,12 @@ def cfd_evidence() -> dict[str, object]:
         },
         "boundaries": [
             "Supply: full-width low slot on x=0, prescribed volume flow and temperature.",
-            "Return: entire opposite x=L wall, zero gauge pressure, zero diffusive heat flux.",
-            "Return backflow uses supply temperature and is reported explicitly.",
+            "Return: rectangular opening on opposite x=L wall, "
+            "zero gauge pressure, zero diffusive heat flux.",
+            "Return backflow uses independently specified temperature (supply if omitted).",
             "Other walls: no slip, no penetration and adiabatic; no wall conduction or radiation.",
             "Racks are permeable heat/resistance zones; "
-            "no resolved server fans or solid heat capacity.",
+            "optional distributed quadratic fan curve and resistance; no solid heat capacity.",
             "Constant effective viscosity/diffusivity are assumptions, not a RANS/LES closure.",
             "Fields are finite-time transient results; "
             "numerical verification is not facility validation.",

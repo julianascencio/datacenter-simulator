@@ -1,5 +1,5 @@
 Data Center Simulator
-=============================
+=====================
 
 .. raw:: html
 
@@ -41,14 +41,14 @@ literature and independently verify results when higher confidence is needed.
 See :doc:`methodology` for the implemented boundaries and validation evidence.
 
 Start here
-------------------
+----------
 
 If you are new to Data Center Simulator:
 
 * Read the :doc:`user_guide/package_overview`.
 * Follow :doc:`user_guide/installation` to install the package and optional tools.
 * Run the :doc:`quickstart` to generate an offline simulation lab.
-* Explore nineteen worked examples in the :doc:`gallery/index`, from device basics
+* Explore twenty-one worked examples in the :doc:`gallery/index`, from device basics
   to coupled electrical, cooling, energy and workload studies.
 * Follow :doc:`user_guide/engineering` for the eight advanced methods and linked lab.
 * Run :doc:`user_guide/grid_management` for fleet dispatch and the Wyoming recovery study.
@@ -70,7 +70,7 @@ If you are new to Data Center Simulator:
    <p><a class="btn btn-primary" href="_static/lab/cfd/cfd-3d.html">Open 3D airflow and heat CFD →</a></p>
 
 Core modelling idea
----------------------------
+-------------------
 
 Device utilization determines IT terminal demand. The DC network adds
 distribution losses. The heat balance determines cooling electricity, and
@@ -97,7 +97,7 @@ the facility demand then feeds generation, battery and grid dispatch.
      - Imports, storage state, curtailment, unserved energy
 
 Documentation structure
--------------------------------
+-----------------------
 
 The documentation is split into a User Guide, an executable Example Gallery,
 and a generated API Reference. Research records the references and roadmap;
@@ -121,3 +121,13 @@ for noncommercial use only. Internal business use, paid services, and commercial
 products require separate written permission. Third-party materials keep their
 own terms. Read the `full license <https://github.com/julianascencio/datacenter-simulator/blob/main/LICENSE>`_
 and `licensing scope <https://github.com/julianascencio/datacenter-simulator/blob/main/LICENSING.md>`_.
+
+3D acoustic studio and CFD verification
+---------------------------------------
+
+Explore octave-band noise, receiver contributions, mitigation scenarios and
+conditional input-uncertainty intervals in the :doc:`acoustic studio <user_guide/acoustics>`.
+The :doc:`CFD workflow <user_guide/cfd>` adds limited heat reconstruction, configurable
+returns, rack fan actuators and independent numerical/measurement checks.
+
+`Open the acoustic studio <_static/lab/noise/noise-3d.html>`_

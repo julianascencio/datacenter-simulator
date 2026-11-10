@@ -4,6 +4,8 @@
 
 Level: Advanced
 
+The reference uses limited heat reconstruction and a high-level return opening.
+
 Solve incompressible momentum, pressure and temperature on a staggered 3D grid.
 This is a transient research CFD model with declared effective mixing and porous
 rack approximations. Numerical verification is separate from site validation.

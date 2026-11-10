@@ -1,7 +1,8 @@
 """3D staggered-grid pressure projection coupled to conservative thermal transport.
 
 The native solver advances incompressible momentum and temperature, not a fitted
-heat map. It is first-order in time and upwind advection, with centred diffusion.
+heat map. Momentum is first-order; heat supports MUSCL reconstruction and SSP-RK2 time
+integration, with centred diffusion.
 Rack envelopes are permeable heat/resistance zones. See the CFD guide for the
 equations, numerical verification and the distinction from measured validation.
 """
@@ -88,8 +89,21 @@ class PressureProjection:
     pair constructs the matrix and corrects face velocities.
     """
 
-    def __init__(self, grid: CFDGrid):
+    def __init__(self, grid: CFDGrid, return_fraction: Field | None = None):
         self.grid = grid
+        self.return_fraction = (
+            np.ones((grid.ny, grid.nz))
+            if return_fraction is None
+            else np.asarray(return_fraction, dtype=float)
+        )
+        if (
+            self.return_fraction.shape != (grid.ny, grid.nz)
+            or not np.isfinite(self.return_fraction).all()
+            or np.any(self.return_fraction < 0)
+            or np.any(self.return_fraction > 1)
+            or not np.any(self.return_fraction > 0)
+        ):
+            raise ValueError("return fractions require a nonempty opening in [0, 1]")
         count = int(np.prod(grid.shape))
         ids = np.arange(count).reshape(grid.shape)
         diagonal = np.zeros(count)
@@ -106,7 +120,7 @@ class PressureProjection:
             rows.extend(left.tolist() + right.tolist())
             columns.extend(right.tolist() + left.tolist())
             values.extend([-coefficient] * (2 * len(left)))
-        diagonal[ids[-1].ravel()] += 2 / grid.spacing[0] ** 2
+        diagonal[ids[-1].ravel()] += 2 * self.return_fraction.ravel() / grid.spacing[0] ** 2
         rows.extend(range(count))
         columns.extend(range(count))
         values.extend(diagonal.tolist())
@@ -124,10 +138,25 @@ class PressureProjection:
         u, v, w = (a.copy() for a in velocity)
         dx, dy, dz = self.grid.spacing
         u[1:-1] -= dt_s * np.diff(p, axis=0) / dx
-        u[-1] += 2 * dt_s * p[-1] / dx
+        u[-1] += 2 * dt_s * p[-1] * self.return_fraction / dx
         v[:, 1:-1] -= dt_s * np.diff(p, axis=1) / dy
         w[:, :, 1:-1] -= dt_s * np.diff(p, axis=2) / dz
         return (u, v, w), p, residual
+
+
+def return_open_fraction(case: CFDCase) -> Field:
+    """Conservative rectangular aperture fraction on the x=L boundary faces."""
+    g, s = case.grid, case.settings
+    intervals = []
+    for n, h, start, size in (
+        (g.ny, g.spacing[1], s.return_y_m, s.return_width_m or g.width_m),
+        (g.nz, g.spacing[2], s.return_z_m, s.return_height_m or g.height_m),
+    ):
+        low = np.arange(n) * h
+        intervals.append(
+            np.maximum(0, np.minimum(low + h, start + size) - np.maximum(low, start)) / h
+        )
+    return np.clip(intervals[0][:, None] * intervals[1][None, :], 0, 1)
 
 
 def _supply(case: CFDCase) -> Field:
@@ -145,13 +174,18 @@ def _boundary(velocity: Velocity, case: CFDCase, *, predict: bool) -> None:
     u, v, w = velocity
     u[0] = _supply(case)
     if predict:
-        u[-1] = u[-2]  # predictor zero normal gradient, corrected by return pressure
+        u[-1] = u[-2] * return_open_fraction(case)  # closed boundary faces remain impermeable
     v[:, 0] = v[:, -1] = 0
     w[:, :, 0] = w[:, :, -1] = 0
 
 
 def _momentum_rhs(
-    field: Field, advectors: Velocity, axis: int, grid: CFDGrid, viscosity: float
+    field: Field,
+    advectors: Velocity,
+    axis: int,
+    grid: CFDGrid,
+    viscosity: float,
+    return_fraction: Field | None = None,
 ) -> Field:
     rhs = np.zeros_like(field)
     for direction, h in enumerate(grid.spacing):
@@ -167,6 +201,10 @@ def _momentum_rhs(
             padded[tuple(low)] *= -1
             if direction != 0:
                 padded[tuple(high)] *= -1
+            elif return_fraction is not None:
+                # Tangential face grids need aperture fractions interpolated in y/z.
+                aperture = _faces(return_fraction[None, :, :], axis)[0]
+                padded[tuple(high)] *= 2 * aperture - 1
         lo, hi = [slice(None)] * 3, [slice(None)] * 3
         lo[direction], hi[direction] = slice(None, -2), slice(2, None)
         left, right = padded[tuple(lo)], padded[tuple(hi)]
@@ -176,7 +214,51 @@ def _momentum_rhs(
     return rhs
 
 
-def thermal_step(
+def limited_slopes(field: Field, axis: int) -> Field:
+    """Monotonized-central limiter; zero reconstruction slope at boundary cells."""
+    slopes = np.zeros_like(field)
+    low, middle, high = [slice(None)] * 3, [slice(None)] * 3, [slice(None)] * 3
+    low[axis], middle[axis], high[axis] = slice(None, -2), slice(1, -1), slice(2, None)
+    backward = field[tuple(middle)] - field[tuple(low)]
+    forward = field[tuple(high)] - field[tuple(middle)]
+    slopes[tuple(middle)] = np.where(
+        backward * forward > 0,
+        np.sign(backward)
+        * np.minimum(
+            np.abs((backward + forward) / 2), np.minimum(2 * np.abs(backward), 2 * np.abs(forward))
+        ),
+        0,
+    )
+    return slopes
+
+
+def rack_momentum_terms(case: CFDCase, velocity: Velocity) -> tuple[Velocity, Field]:
+    """Distributed quadratic fan pressure curve and isotropic Forchheimer drag.
+
+    Delta-p = p_shutoff * max(1 - (positive axial speed/free speed)^2, 0).
+    This is a declared actuator model; calibrate its pressure/flow curve and
+    both resistance coefficients against equipment data.
+    """
+    _, _, weights = source_fields(case)
+    force = [np.zeros(case.grid.shape) for _ in range(3)]
+    resistance = np.zeros(case.grid.shape)
+    speed = np.sqrt(sum(v * v for v in velocity))
+    for source, weight in zip(case.sources, weights, strict=True):
+        volume = source.width_m * source.depth_m * source.height_m
+        fraction = weight * volume / case.grid.cell_volume_m3
+        resistance += fraction * source.inertial_drag_per_m * speed
+        axial = np.maximum(0, source.fan_direction * velocity[source.fan_axis])
+        pressure = source.fan_pressure_pa * np.maximum(
+            0, 1 - (axial / source.fan_free_speed_m_s) ** 2
+        )
+        depth = (source.width_m, source.depth_m, source.height_m)[source.fan_axis]
+        force[source.fan_axis] += (
+            source.fan_direction * fraction * pressure / (case.settings.density_kg_m3 * depth)
+        )
+    return (force[0], force[1], force[2]), resistance
+
+
+def _thermal_euler(
     temperature_c: Field, velocity: Velocity, heat_w_m3: Field, case: CFDCase, dt_s: float
 ) -> tuple[Field, float]:
     """Conservative upwind advection + centred diffusion; returns net outward W.
@@ -193,7 +275,12 @@ def thermal_step(
         lo, hi, mid = [slice(None)] * 3, [slice(None)] * 3, [slice(None)] * 3
         lo[axis], hi[axis], mid[axis] = slice(None, -1), slice(1, None), slice(1, -1)
         left, right, speed = theta[tuple(lo)], theta[tuple(hi)], velocity[axis][tuple(mid)]
-        flux[tuple(mid)] = speed * np.where(speed >= 0, left, right)
+        left_face, right_face = left, right
+        if settings.thermal_scheme == "muscl":
+            slope = limited_slopes(theta, axis)
+            left_face = left + slope[tuple(lo)] / 2
+            right_face = right - slope[tuple(hi)] / 2
+        flux[tuple(mid)] = speed * np.where(speed >= 0, left_face, right_face)
         flux[tuple(mid)] -= settings.diffusivity_m2_s * (right - left) / h
         if axis == 0:
             u = velocity[0]
@@ -204,7 +291,12 @@ def thermal_step(
             )
             flux[0] = u[0] * np.where(u[0] >= 0, 0, theta[0])
             flux[0] -= 2 * settings.diffusivity_m2_s * fractions[None, :] * theta[0] / h
-            flux[-1] = u[-1] * np.where(u[-1] >= 0, theta[-1], 0)
+            return_theta = (
+                settings.supply_temperature_c
+                if settings.return_temperature_c is None
+                else settings.return_temperature_c
+            ) - settings.supply_temperature_c
+            flux[-1] = u[-1] * np.where(u[-1] >= 0, theta[-1], return_theta)
         fluxes.append(flux)
     rho_cp = settings.density_kg_m3 * settings.cp_j_kg_k
     tendency = np.subtract(heat_w_m3 / rho_cp, divergence(tuple(fluxes), grid))  # type: ignore[arg-type]
@@ -213,6 +305,24 @@ def thermal_step(
         (fluxes[0][-1].sum() - fluxes[0][0].sum()) * grid.spacing[1] * grid.spacing[2] * rho_cp
     )
     return updated, net_out
+
+
+def thermal_step(
+    temperature_c: Field, velocity: Velocity, heat_w_m3: Field, case: CFDCase, dt_s: float
+) -> tuple[Field, float]:
+    """Conservative thermal update; MUSCL uses SSP-RK2 at fixed projected velocity.
+
+    Returns the same time-weighted boundary heat flux used in the update, so
+    the discrete global energy budget closes for either scheme. Momentum and
+    momentum/heat coupling remain first-order, not a second-order coupled solver.
+    """
+    if not np.isfinite(dt_s) or dt_s <= 0:
+        raise ValueError("thermal time step must be positive and finite")
+    first, flux = _thermal_euler(temperature_c, velocity, heat_w_m3, case, dt_s)
+    if case.settings.thermal_scheme == "upwind":
+        return first, flux
+    second, second_flux = _thermal_euler(first, velocity, heat_w_m3, case, dt_s)
+    return (temperature_c + second) / 2, (flux + second_flux) / 2
 
 
 @dataclass
@@ -247,7 +357,8 @@ def simulate_cfd(case: CFDCase) -> CFDResult:
         (grid.nx, grid.ny, grid.nz + 1),
     ]
     velocity: Velocity = tuple(np.zeros(s) for s in shapes)  # type: ignore[assignment]
-    projector = PressureProjection(grid)
+    aperture = return_open_fraction(case)
+    projector = PressureProjection(grid, aperture)
     _boundary(velocity, case, predict=True)
     velocity, p, _ = projector.project(velocity, 1.0)
     temperature = np.full(grid.shape, settings.supply_temperature_c, dtype=float)
@@ -269,13 +380,17 @@ def simulate_cfd(case: CFDCase) -> CFDResult:
         rhs = []
         for axis, field in enumerate(velocity):
             adv = tuple(field if j == axis else _faces(cc[j], axis) for j in range(3))
-            rhs.append(_momentum_rhs(field, adv, axis, grid, settings.viscosity_m2_s))  # type: ignore[arg-type]
+            rhs.append(_momentum_rhs(field, adv, axis, grid, settings.viscosity_m2_s, aperture))  # type: ignore[arg-type]
         buoyancy = (
             settings.gravity_m_s2
             * settings.expansion_per_k
             * (temperature - settings.supply_temperature_c)
         )
         rhs[2] += _faces(buoyancy, 2)
+        fan, nonlinear_drag = rack_momentum_terms(case, cc)
+        for axis in range(3):
+            rhs[axis] += _faces(fan[axis], axis)
+        effective_drag = tuple(d + _faces(nonlinear_drag, i) for i, d in enumerate(drag_faces))
         inverse_dt = sum(
             float(np.max(np.abs(a))) / h for a, h in zip(velocity, grid.spacing, strict=True)
         )
@@ -295,7 +410,8 @@ def simulate_cfd(case: CFDCase) -> CFDResult:
             next_snapshot - time,
         )
         predicted: Velocity = tuple(
-            (a + dt * b) / (1 + dt * d) for a, b, d in zip(velocity, rhs, drag_faces, strict=True)
+            (a + dt * b) / (1 + dt * d)
+            for a, b, d in zip(velocity, rhs, effective_drag, strict=True)
         )  # type: ignore[assignment]
         _boundary(predicted, case, predict=True)
         corrected, p, linear_residual = projector.project(predicted, dt)
@@ -382,9 +498,17 @@ def simulate_cfd(case: CFDCase) -> CFDResult:
         )
     if table.return_backflow_m3_s.max() > 1e-8:
         warnings.append(
-            "Return backflow occurred; its prescribed temperature equals the supply temperature."
+            "Return backflow occurred; inspect the specified return temperature and imported heat."
         )
     summary: dict[str, Any] = {
+        "thermal_scheme": settings.thermal_scheme,
+        "return_area_m2": float(aperture.sum() * grid.spacing[1] * grid.spacing[2]),
+        "max_return_backflow_m3_s": float(table.return_backflow_m3_s.max()),
+        "return_temperature_c": (
+            settings.supply_temperature_c
+            if settings.return_temperature_c is None
+            else settings.return_temperature_c
+        ),
         "solver": "3D incompressible Boussinesq staggered-grid pressure projection",
         "cells": int(np.prod(grid.shape)),
         "steps": len(history),

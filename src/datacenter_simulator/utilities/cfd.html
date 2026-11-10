@@ -42,10 +42,10 @@ Drag to rotate; scroll to zoom.</p></section>
 <section class="panel"><h2>Mesh sensitivity</h2><p>Identical physical inputs and end time on different grids. Differences indicate mesh sensitivity;
 this comparison alone does not establish mesh independence.</p><div class="table-wrap">__MESH__</div></section>
 <section class="panel" style="margin-top:18px"><h2>Model scope and reproducibility</h2><ul id="warnings"></ul>
-<p>Supply enters a low slot on x=0. The whole x=L wall is an open pressure return.
+<p>Supply enters a low slot on x=0. A configurable rectangular opening on x=L is the pressure return.
 Other walls are adiabatic and no slip. Rack heat and resistance are distributed by geometric overlap.
 Constant mixing coefficients are configurable assumptions. This is an incompressible Boussinesq research solver;
-it does not resolve server fans, conjugate solid heat transfer or calibrated turbulence.</p>
+rack fans can use a distributed pressure curve; individual server blades, conjugate solid heat transfer and calibrated turbulence are not resolved.</p>
 <pre>python -m datacenter_simulator.analysis.cfd --inputs case-0-inputs.json --mesh-study --output outputs/my-cfd</pre>
 <p class="downloads">__LINKS__</p><p>case-0 is normal flow; case-1, when present, is half flow. NPZ files contain all saved 3D frames.
 Open the VTK files in ParaView. Changing physical inputs requires rerunning Python; the report explores completed simulations.</p>
@@ -100,7 +100,8 @@ async function render(){
     colorbar:{title:{text:unit},thickness:14,len:.7},hovertemplate:`${label}: %{value:.2f} ${unit}<extra></extra>`};
   const traces=[volume,...c.inputs.sources.map(box)];
   traces.push(lines([[0,0,0],[0,g.width_m,0],[0,g.width_m,c.inputs.settings.inlet_height_m],[0,0,c.inputs.settings.inlet_height_m],[0,0,0]],'#25b9df','Supply slot'));
-  traces.push(lines([[g.length_m,0,0],[g.length_m,g.width_m,0],[g.length_m,g.width_m,g.height_m],[g.length_m,0,g.height_m],[g.length_m,0,0]],'#29a77b','Pressure return'));
+  const ry=c.inputs.settings.return_y_m||0,rz=c.inputs.settings.return_z_m||0,rw=c.inputs.settings.return_width_m||g.width_m,rh=c.inputs.settings.return_height_m||g.height_m;
+  traces.push(lines([[g.length_m,ry,rz],[g.length_m,ry+rw,rz],[g.length_m,ry+rw,rz+rh],[g.length_m,ry,rz+rh],[g.length_m,ry,rz]],'#29a77b','Pressure return'));
   if($('vectors').checked)traces.push(airflowArrows(c,f,stride));
   const scene={xaxis:{title:{text:'x (m)'},range:[0,g.length_m]},yaxis:{title:{text:'y (m)'},range:[0,g.width_m]},zaxis:{title:{text:'z (m)'},range:[0,g.height_m]},aspectmode:'data',camera:{eye:innerWidth<800?{x:2.6,y:2.6,z:2.2}:{x:1.8,y:1.8,z:1.5}}};
   const plan=c.y.map((_,y)=>c.x.map((_,i)=>values[at(i,y,k)]));
@@ -118,7 +119,7 @@ async function render(){
   $('time-label').textContent=`${fmt(f.time,1)} s`;$('height-label').textContent=`${fmt(c.z[k])} m`;$('section-label').textContent=`${fmt(c.y[j])} m`;
   $('mesh-label').textContent=`${nx} × ${ny} × ${nz} cells`;
   $('conditions').textContent=`${label} at ${fmt(f.time,1)} s. Supply ${fmt(c.inputs.settings.supply_temperature_c,1)} °C. Temperature colors share one scale across scenarios. The frames are transient simulation results.`;
-  $('numerics').textContent=`Run maximum divergence: ${c.summary.max_divergence_per_s.toExponential(2)} 1/s. Maximum volume-flow imbalance: ${c.summary.max_mass_balance_error_m3_s.toExponential(2)} m³/s.`;
+  $('numerics').textContent=`Heat scheme: ${c.summary.thermal_scheme}. Return area: ${fmt(c.summary.return_area_m2)} m². Maximum return backflow: ${fmt(c.summary.max_return_backflow_m3_s,4)} m³/s. Run maximum divergence: ${c.summary.max_divergence_per_s.toExponential(2)} 1/s. Maximum volume-flow imbalance: ${c.summary.max_mass_balance_error_m3_s.toExponential(2)} m³/s.`;
   $('transient').textContent=`Final largest local temperature change: ${fmt(c.summary.final_temperature_change_k_s,4)} K/s. No steady-state solution is claimed.`;
   $('rack-table').replaceChildren();for(const r of f.racks){const tr=document.createElement('tr');[r.name,fmt(r.mean),fmt(r.max)].forEach(v=>{const td=document.createElement('td');td.textContent=v;tr.append(td);});$('rack-table').append(tr);}
   $('warnings').replaceChildren();for(const w of c.summary.warnings){const li=document.createElement('li');li.textContent=w;$('warnings').append(li);}
