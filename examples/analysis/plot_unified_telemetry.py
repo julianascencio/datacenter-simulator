@@ -1,6 +1,6 @@
 """
 23. Reconstruct incidents across BMS, EPMS and DCIM
-=================================================
+===================================================
 
 **Level:** Advanced | **Subject:** operational telemetry, device context and business cases
 
@@ -23,7 +23,7 @@ from datacenter_simulator.models.telemetry import StreamBudget
 
 # %%
 # Step 1: compose the existing power, cooling and thermal models
-# ------------------------------------------------------------
+# --------------------------------------------------------------
 # A 60 kW rack is supported by a synthetic 120 kW cooling plant. From second
 # 60 to 120, available cooling drops to 20 kW. A mixed thermal capacitance of
 # 500 kJ/K provides a transparent energy balance, not a rack-hotspot prediction.
@@ -41,7 +41,7 @@ axes[1].legend()
 
 # %%
 # Step 2: join observations to time-valid asset ownership
-# -----------------------------------------------------
+# -------------------------------------------------------
 # Source and receive timestamps are distinct. EPMS samples power every second;
 # BMS samples temperature/flow every five seconds; the synthetic DCIM warning
 # feed reports server inlet temperature every fifteen seconds. Ownership joins
@@ -53,7 +53,7 @@ print(observations[["asset_id", "point_key", "source_system", "owner"]].drop_dup
 
 # %%
 # Step 3: inspect temporal evidence and dependency exposure
-# -------------------------------------------------------
+# ---------------------------------------------------------
 # The pump signal crosses its threshold before the thermal symptom. This is
 # useful evidence for investigation, not proof of causation. Topology traversal
 # lists dependent assets, but does not claim that their customers lost service.
@@ -62,7 +62,7 @@ print("Potentially exposed assets:", study["potentially_affected"])
 
 # %%
 # Step 4: test whether sampling can see a short workload pulse
-# ---------------------------------------------------------
+# ------------------------------------------------------------
 # A ten-second pulse at seconds 11–20 is observed at 1, 5 and 15 second sampling
 # but missed at 30 and 60 seconds for this phase. Faster sampling alone does not
 # synchronize clocks. Rollups preserve extrema only if a source captured them.
@@ -79,7 +79,7 @@ ax.legend()
 
 # %%
 # Step 5: estimate retention and outage buffering
-# --------------------------------------------
+# -----------------------------------------------
 # The budget is scalar observations, not Telegraf multi-field metrics. Assumed
 # byte sizes require measurement in deployment. Raw and aggregate tiers coexist.
 budget = StreamBudget(10000, 5, 100, 7, 60, 365, 160, 2)
@@ -87,7 +87,7 @@ print(capacity_plan([budget], outage_s=600, buffer_observations=100000))
 
 # %%
 # Step 6: compare business assumptions, including negative outcomes
-# ---------------------------------------------------------------
+# -----------------------------------------------------------------
 # Reduced investigation time is a labor scenario. Only an explicit realization
 # fraction converts it into hypothetical avoided downtime. Zero is the default.
 # The nine combinations expose sensitivity; no product prices or measured ROI
@@ -116,7 +116,7 @@ print(
 
 # %%
 # Step 7: export and replay the evidence package
-# -------------------------------------------
+# ----------------------------------------------
 # Run ``python -m datacenter_simulator.analysis.telemetry --output outputs/telemetry``.
 # Open ``outputs/telemetry/telemetry.html`` for the interactive report. The export
 # includes all three incidents, eight device instances, schemas for the existing

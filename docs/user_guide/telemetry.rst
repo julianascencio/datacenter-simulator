@@ -17,7 +17,7 @@ incidents and a nine-case investment sensitivity. The executable
 `Open the bundled interactive report <../_static/lab/telemetry/telemetry.html>`_.
 
 Source scope and implementation coverage
----------------------------------------
+----------------------------------------
 
 The supplied InfluxData PDF, *Unified Telemetry Strategy for Data Centers*, has
 **four pages only**. Its table of contents lists sections through page 16, but
@@ -84,7 +84,7 @@ point. Exported JSON Schemas cover all 50 existing device profiles and exclude
 commands/setpoints from the telemetry record contract.
 
 History, quality and time semantics
-----------------------------------
+-----------------------------------
 
 * Identity is site + asset + point + source system + source ID + event time.
   Exact duplicates are idempotent; conflicting duplicate payloads raise.
@@ -115,7 +115,7 @@ store's conflict policy does not automatically enforce uniqueness in a database.
 No live database write or query compatibility test is claimed.
 
 Operational cases and physical boundaries
-----------------------------------------
+-----------------------------------------
 
 .. list-table:: Executable incidents
    :header-rows: 1
@@ -151,7 +151,7 @@ contractual ownership and service dependencies require further analysis before
 declaring an outage, SLA breach or root cause.
 
 Sampling, retention and buffering
---------------------------------
+---------------------------------
 
 ``sampling_comparison`` demonstrates a ten-second pulse missed by 30/60 second
 sampling for a fixed phase. Faster sampling is useful only when the physical
@@ -207,7 +207,7 @@ then compare a limited deployment against the baseline. They are not market
 prices or a vendor ROI claim.
 
 Deployment options and supplier integration
-------------------------------------------
+-------------------------------------------
 
 The following are project design options, not details from the missing PDF pages:
 

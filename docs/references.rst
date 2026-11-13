@@ -67,10 +67,10 @@ Unified facility telemetry
   `Official article <https://www.influxdata.com/blog/data-center-telemetry/>`_.
 * InfluxData, **InfluxDB 3 Enterprise line protocol reference**.
   Typed serialization, escaping, point identity and duplicate-write limitations.
-  `Official documentation <https://docs.influxdata.com/influxdb3/enterprise/reference/line-protocol/>`_.
+  `InfluxDB line protocol documentation <https://docs.influxdata.com/influxdb3/enterprise/reference/line-protocol/>`_.
 * InfluxData, **The Telegraf data pipeline**. Context for buffering and delivery;
   scalar-observation sizing here is not a Telegraf metric-throughput benchmark.
-  `Official documentation <https://docs.influxdata.com/telegraf/v1/concepts/data-pipeline/>`_.
+  `Telegraf pipeline documentation <https://docs.influxdata.com/telegraf/v1/concepts/data-pipeline/>`_.
 
 Sources reviewed 13 November 2026. The :doc:`telemetry guide <user_guide/telemetry>`
 documents independent engineering extensions, equations, financial assumptions
