@@ -23,7 +23,10 @@ const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
     assert.equal(await page.locator('.plotly-graph-div').count(), 4);
     assert.equal(await page.locator('.main-svg').count() >= 4, true);
     assert.match(await page.locator('body').innerText(), /four pages only/);
-    for (const href of await page.locator('a').evaluateAll(links => links.map(a => a.href))) {
+    // Plotly also inserts toolbar anchors; validate the report's sixteen data downloads.
+    const downloads = page.locator('a[href$=".csv"], a[href$=".json"], a[href$=".jsonl"], a[href$=".lp"]');
+    assert.equal(await downloads.count(), 16);
+    for (const href of await downloads.evaluateAll(links => links.map(a => a.href))) {
       assert.ok(fs.existsSync(fileURLToPath(href)), `Missing local download: ${href}`);
     }
     // Plotly legend interaction must change trace visibility.
