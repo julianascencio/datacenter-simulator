@@ -148,6 +148,10 @@ def test_export_and_replay(tmp_path: Path) -> None:
     study = export_faraday_study(tmp_path, FaradayInputs(hours=48))
     assert (tmp_path / "faraday-storage.html").is_file()
     assert json.loads((tmp_path / "evidence.json").read_text())["sources"]
+    metadata = json.loads((tmp_path / "project_metadata.json").read_text())
+    assert metadata["project_name"] == "Faraday BESS"
+    assert metadata["actual_data_center_facility_mw"] is None
+    assert metadata["commercial_operation_date"] == "2026-09-18"
     raw = pd.read_csv(tmp_path / "profiles.csv")
     raw.index = pd.DatetimeIndex(pd.to_datetime(raw.pop("timestamp"), utc=True))
     replay = faraday_study(FaradayInputs(hours=48), raw)
@@ -155,6 +159,26 @@ def test_export_and_replay(tmp_path: Path) -> None:
         study.comparison.select_dtypes("number"),
         replay.comparison.select_dtypes("number"),
         atol=1e-7,
+    )
+
+
+def test_scenario_overrides_preserve_reported_metadata() -> None:
+    study = faraday_study(FaradayInputs(hours=24, it_mw=80, pue=1.1, solar_ac_peak_mw=400))
+    metadata = study.project_metadata
+    assert metadata.adjacent_solar_reported_mw == 525
+    assert metadata.actual_data_center_facility_mw is None
+    assert metadata.actual_data_center_it_mw is None
+    assert metadata.actual_data_center_pue is None
+    assert metadata.actual_poi_export_limit_mw is None
+    assert metadata.actual_battery_round_trip_efficiency is None
+    assert metadata.solar_capacity_ac_dc_basis is None
+    assert study.profiles.demand_kw.max() == pytest.approx(88000)
+    assert study.profiles.solar_kw.max() <= 400000
+    ratings = study.comparison.set_index("scenario")
+    assert ratings.loc["phase1_600mwh", "battery_power_mw"] == metadata.battery_power_mw
+    assert ratings.loc["phase1_600mwh", "deliverable_energy_mwh"] == metadata.contracted_storage_mwh
+    assert ratings.loc["proposed_combined_2100mwh", "deliverable_energy_mwh"] == (
+        metadata.contracted_storage_mwh + metadata.proposed_phase2_max_mwh
     )
 
 

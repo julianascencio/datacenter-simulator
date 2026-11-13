@@ -1,9 +1,9 @@
-"""Reproducible Faraday-inspired profiles; no operational telemetry is implied."""
+"""Synthetic operating profiles for the reported Faraday / Eagle Mountain project."""
 
 import numpy as np
 import pandas as pd
 
-from datacenter_simulator.models.utility_storage import FaradayInputs
+from datacenter_simulator.models.utility_storage import REPORTED_FARADAY, FaradayInputs
 
 
 def faraday_profiles(inputs: FaradayInputs | None = None) -> pd.DataFrame:
@@ -14,7 +14,8 @@ def faraday_profiles(inputs: FaradayInputs | None = None) -> pd.DataFrame:
     Use America/Denver for local daylight; timestamps remain unambiguous at DST.
     """
     p = inputs or FaradayInputs()
-    index = pd.date_range("2026-09-19", periods=p.hours, freq="h", tz="America/Denver")
+    start = pd.Timestamp(REPORTED_FARADAY.commercial_operation_date) + pd.Timedelta(days=1)
+    index = pd.date_range(start, periods=p.hours, freq="h", tz="America/Denver")
     day = index.day_of_year.to_numpy(dtype=float)
     hour = index.hour.to_numpy(dtype=float) + 0.5
     daylight = 12 + 3 * np.sin(2 * np.pi * (day - 80) / 365.25)

@@ -88,7 +88,9 @@ python -m datacenter_simulator.analysis.faraday \
 ```
 
 Open `outputs/faraday/faraday-storage.html` for the offline interactive report.
-The default 200 MW facility load and solar profile are synthetic. Full solar
+`project_metadata.json` preserves the news's real project identity, participants,
+location, ratings, dates and development status. Actual undisclosed load/PUE stay
+null; the default 200 MW facility load and hourly solar profile are synthetic. Full solar
 allocation, POI capacity and efficiency are declared assumptions. The utility
 still supplies the full facility load: remote hourly matching does not establish
 on-site backup, bill savings or certified clean-energy procurement.

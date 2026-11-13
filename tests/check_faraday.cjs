@@ -24,6 +24,8 @@ const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
     await page.goto(pathToFileURL(report).href);
     await page.waitForFunction(() => document.querySelectorAll('.js-plotly-plot').length === 3);
     assert.match(await page.locator('body').innerText(), /Two separate meters/);
+    assert.match(await page.locator('body').innerText(), /Reported project metadata/);
+    assert.match(await page.locator('body').innerText(), /Lydian Energy/);
     const chart = page.locator('.js-plotly-plot').nth(1);
     assert.equal(await chart.evaluate(el => el.data.filter(trace => trace.visible).length), 7);
     await chart.locator('.updatemenu-header').click();
@@ -32,7 +34,7 @@ const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
     assert.equal(await chart.evaluate(el => el.data[14].visible), false);
     const downloads = await page.locator('a[href$=".json"], a[href$=".csv"]')
       .evaluateAll(links => links.map(a => a.href));
-    assert.equal(downloads.length, 6);
+    assert.equal(downloads.length, 7);
     for (const href of downloads) {
       assert.ok(fs.existsSync(fileURLToPath(href)), `Missing export: ${href}`);
     }

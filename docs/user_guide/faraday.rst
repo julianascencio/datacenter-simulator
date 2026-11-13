@@ -1,9 +1,17 @@
 Faraday utility-linked storage
 ==================================
 
-This case asks how a remote solar/storage portfolio can improve hourly energy
-matching for a continuously supplied data center. It uses reported Faraday asset
-ratings and clearly separate synthetic operating assumptions.
+This is the Faraday / Meta Eagle Mountain project from the news, with its reported
+metadata preserved. Only the unavailable operational inputs and hourly profiles
+are synthetic. The 200 MW default demand is a scenario, not a reported Meta rating.
+
+``FaradayStudy.project_metadata`` retains Lydian Energy, PacifiCorp, Schedule 34,
+Utah County, LFP, the 150 MW / 600 MWh operating asset, its September 18, 2026 COD,
+the 525 MW solar neighbor and the proposed 375 MW / 1,500 MWh addition. It also
+retains the reported approximate area/construction duration, projected lifetime
+tax and multi-project financing scope. Unknown actual load, PUE, efficiency,
+POI limit and solar AC/DC basis stay ``null`` in ``project_metadata.json``.
+Scenario overrides in ``inputs.json`` never overwrite those unknown facts.
 
 Run and replay
 ------------------
@@ -28,7 +36,8 @@ The Python matching API also accepts a declared subhourly step.
 
    <p><a class="reference external" href="../_static/lab/faraday/faraday-storage.html">Open the interactive Faraday report</a></p>
 
-Download :download:`comparison CSV </_static/lab/faraday/comparison.csv>`,
+Download :download:`reported project metadata </_static/lab/faraday/project_metadata.json>`,
+:download:`comparison CSV </_static/lab/faraday/comparison.csv>`,
 :download:`hourly profiles </_static/lab/faraday/profiles.csv>`,
 :download:`replay inputs </_static/lab/faraday/inputs.json>`,
 :download:`source ledger </_static/lab/faraday/evidence.json>` and

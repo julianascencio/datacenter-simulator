@@ -10,7 +10,12 @@ import pandas as pd
 
 from datacenter_simulator.connectors.generation import generation_from_csv
 from datacenter_simulator.methods.utility_storage import UtilityStorageResult, match_utility_storage
-from datacenter_simulator.models.utility_storage import FaradayInputs, contracted_storage
+from datacenter_simulator.models.utility_storage import (
+    REPORTED_FARADAY,
+    FaradayInputs,
+    FaradayProjectMetadata,
+    contracted_storage,
+)
 from datacenter_simulator.use_cases.faraday import faraday_profiles
 
 SCOPE = {
@@ -21,7 +26,7 @@ SCOPE = {
     "default_synthetic_assumptions": [
         "160 MW IT x constant 1.25 PUE = 200 MW facility; actual Meta load undisclosed",
         "525 MW treated as AC solar peak; source does not resolve AC/DC basis",
-        "all modeled solar and storage allocated to one illustrative customer",
+        "full modeled solar/storage allocation to Eagle Mountain is a scenario assumption",
         "525 MW shared POI export limit; actual interconnection rating undisclosed",
         "90% round-trip efficiency; no auxiliary, transmission or standby losses",
         "600 MWh interpreted as AC deliverable usable window, not cell nameplate",
@@ -51,6 +56,7 @@ class FaradayStudy:
     results: dict[str, UtilityStorageResult]
     comparison: pd.DataFrame
     sensitivity: pd.DataFrame
+    project_metadata: FaradayProjectMetadata = REPORTED_FARADAY
 
 
 def faraday_study(
@@ -63,13 +69,21 @@ def faraday_study(
         raise ValueError("profiles require demand_kw and solar_kw")
     results = {}
     rows = []
+    project = REPORTED_FARADAY
+    power = project.battery_power_mw
+    energy = project.contracted_storage_mwh
     scenarios = (
         ("grid_only", 0, 0, 0.0),
         ("solar_only", 0, 0, 1.0),
-        ("phase1_600mwh", 150, 600, 1.0),
-        ("energy_sensitivity_733mwh", 150, 733, 1.0),
-        ("proposed_combined_2100mwh", 525, 2100, 1.0),
-        ("low_solar_phase1", 150, 600, 0.25),
+        ("phase1_600mwh", power, energy, 1.0),
+        ("energy_sensitivity_733mwh", power, project.earlier_reported_phase1_mwh, 1.0),
+        (
+            "proposed_combined_2100mwh",
+            power + project.proposed_phase2_max_mw,
+            energy + project.proposed_phase2_max_mwh,
+            1.0,
+        ),
+        ("low_solar_phase1", power, energy, 0.25),
     )
     for name, power, energy, solar_scale in scenarios:
         battery = contracted_storage(power, energy, p.round_trip_efficiency) if power else None
@@ -95,7 +109,11 @@ def faraday_study(
             result = match_utility_storage(
                 frame.demand_kw * demand_scale,
                 frame.solar_kw,
-                battery=contracted_storage(150, 600, p.round_trip_efficiency),
+                battery=contracted_storage(
+                    project.battery_power_mw,
+                    project.contracted_storage_mwh,
+                    p.round_trip_efficiency,
+                ),
                 poi_export_limit_kw=p.poi_export_mw * poi_scale * 1000,
             )
             sensitivities.append(
@@ -130,8 +148,14 @@ def export_faraday_study(
         "active_inputs": asdict(study.inputs),
         "profile_hours": len(study.profiles),
         "profile_note": "profiles.csv overrides synthetic demand/solar when replayed",
+        "project_metadata_file": "project_metadata.json",
+        "metadata_note": "Reported project facts; unknown actual operating values remain null",
     }
-    for name, value in (("inputs", asdict(study.inputs)), ("scope", scope)):
+    for name, value in (
+        ("project_metadata", asdict(study.project_metadata)),
+        ("inputs", asdict(study.inputs)),
+        ("scope", scope),
+    ):
         (out / f"{name}.json").write_text(
             json.dumps(value, indent=2, allow_nan=False) + "\n", encoding="utf-8"
         )

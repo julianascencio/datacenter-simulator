@@ -1,5 +1,6 @@
 """Offline interactive views of the two-meter storage study."""
 
+from html import escape
 from pathlib import Path
 from typing import TYPE_CHECKING
 
@@ -100,6 +101,32 @@ def write_faraday_report(study: "FaradayStudy", path: str | Path) -> None:
         height=450,
     )
     p = study.inputs
+    m = study.project_metadata
+    facts = (
+        ("Storage project", m.project_name),
+        ("Owner / operator", m.owner_operator),
+        ("Battery location", m.battery_location),
+        ("Customer / data center", f"{m.customer} / {m.data_center}"),
+        ("Utility contract", f"{m.utility_counterparty}, Schedule {m.tariff_schedule}"),
+        ("Operating BESS", f"{m.battery_power_mw:g} MW / {m.contracted_storage_mwh:g} MWh"),
+        ("Chemistry / duration", f"{m.chemistry} / {m.reported_duration_hours:g} hours"),
+        ("Commercial operation", m.commercial_operation_date),
+        ("Adjacent solar", f"{m.adjacent_solar_reported_mw:g} MW; AC/DC basis undisclosed"),
+        ("Grid connection", "Shared substation and interconnection"),
+        (
+            "Proposed phase 2",
+            f"Up to {m.proposed_phase2_max_mw:g} MW / {m.proposed_phase2_max_mwh:g} MWh; "
+            f"{m.proposed_phase2_target}; {m.proposed_phase2_status}",
+        ),
+        ("Actual Meta load / PUE", "Not disclosed in the source material"),
+    )
+    facts_table = (
+        "<table><tbody>"
+        + "".join(
+            f"<tr><th>{escape(label)}</th><td>{escape(value)}</td></tr>" for label, value in facts
+        )
+        + "</tbody></table>"
+    )
     description = f"""<!doctype html><html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Faraday | Utility storage case</title><style>
@@ -110,13 +137,16 @@ section{{background:white;border-radius:14px;padding:18px;margin:20px 0;overflow
 .scroll{{overflow-x:auto}}table{{border-collapse:collapse;font-size:14px}}
 td,th{{padding:8px;border-bottom:1px solid #ddd;text-align:right}}a{{color:#006e76}}
 </style></head><body><main><p>ASVA CONSULTING · REPRODUCIBLE RESEARCH</p>
-<h1>Faraday: storage through the utility</h1>
-<p>Operating phase: 150 MW / 600 MWh. Proposed addition: up to 375 MW / 1,500 MWh,
-targeting Q4 2028. The combined 525 MW / 2,100 MWh case is hypothetical.</p>
+<h1>Faraday / Eagle Mountain</h1>
+<p>Real project metadata from the news; simulated hourly operation.</p>
+<section><h2>Reported project metadata</h2><div class="scroll">{facts_table}</div>
+<p>The combined expansion is a hypothetical addition of the reported operating
+and proposed ratings. The project metadata does not assign the synthetic
+200 MW default load to Meta as an actual facility rating.</p></section>
 <p class="note">Two separate meters: solar + battery export to the utility;
 the data center imports its full demand from the utility. Hourly matched energy
 does not establish a private wire, on-site backup, bill savings or certified clean energy.</p>
-<section><h2>Active inputs</h2><p>Profile facility demand:
+<section><h2>Simulation assumptions and profiles</h2><p>Modeled facility demand:
 {study.profiles.demand_kw.mean() / 1000:g} MW mean,
 {study.profiles.demand_kw.max() / 1000:g} MW peak.
 Synthetic generator settings (overridden by supplied CSV): {p.it_mw:g} MW IT × {p.pue:g} PUE;
@@ -145,7 +175,8 @@ excluded from matched energy. The low-solar case scales solar to 25% throughout.
     html += """</section><section><h2>Replay and inspect</h2><p>
 <a href="inputs.json">Inputs</a> · <a href="profiles.csv">Hourly profiles</a> ·
 <a href="comparison.csv">Comparison</a> · <a href="sensitivity.csv">Sensitivity</a> ·
-<a href="evidence.json">Source ledger</a> · <a href="scope.json">Model boundaries</a></p>
+<a href="evidence.json">Source ledger</a> · <a href="scope.json">Model boundaries</a> ·
+<a href="project_metadata.json">Reported project metadata</a></p>
 <p>Schedule 34 has customer-specific approved terms. No contract price is public
 in the source material used here. The $689 million portfolio financing is not
 the battery's construction cost. This report does not calculate a tariff bill.</p>
