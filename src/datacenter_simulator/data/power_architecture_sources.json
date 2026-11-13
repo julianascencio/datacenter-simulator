@@ -1,0 +1,57 @@
+{
+  "checked_on": "2026-11-13",
+  "parameter_status": "All numerical presets are illustrative, not manufacturer-calibrated or measured site data.",
+  "motivation": "User-supplied Michael Job article, Nvidia's 800-Volt Data Center Is Waiting on a Circuit Breaker, 2026-11-12. Used as a research question, not measurement data. No article text or photographs redistributed.",
+  "sources": [
+    {
+      "id": "nvidia-architecture-2025",
+      "url": "https://developer.nvidia.com/blog/nvidia-800-v-hvdc-architecture-will-power-the-next-generation-of-ai-factories/",
+      "publisher": "NVIDIA",
+      "published": "2025-05-20",
+      "supports": "54 V rack distribution, proposed 800 V delivery, MW-scale racks and retained rack DC/DC conversion.",
+      "evidence_type": "manufacturer architecture and forward-looking claims",
+      "model_use": "Topology context only. No hardcoded 5% saving, copper percentage or TCO benefit."
+    },
+    {
+      "id": "nvidia-migration-2026",
+      "url": "https://blogs.nvidia.com/blog/800-vdc-power-architecture-ai-factory/",
+      "publisher": "NVIDIA",
+      "published": "2026-08-11",
+      "supports": "Migration through power racks, row power centers and facility DC power blocks.",
+      "evidence_type": "manufacturer roadmap",
+      "model_use": "Scenario labels, not deployment predictions. Row preset retaining AC UPS is a study assumption."
+    },
+    {
+      "id": "siemens-nvidia-protection",
+      "url": "https://assets.new.siemens.com/siemens/assets/api/uuid:cacbc29b-5d0d-4b12-9053-696eb0b43e74/Protections-for-Data-Centers-Powered-by-Direct-Current-Technical-Paper_original.pdf",
+      "publisher": "Siemens and NVIDIA",
+      "supports": "Sections 2-3: isolation, grounding, mechanical protection, fuses, SSCBs and capacitor backfeed.",
+      "evidence_type": "technical paper with simulated examples",
+      "model_use": "Motivates separate isolation times and stored-energy accounting. This implementation does not reproduce the paper's transient network or its peak-current results."
+    },
+    {
+      "id": "schneider-arc-flash-2026",
+      "url": "https://www.se.com/ww/en/insights/ai-and-technology/artificial-intelligence/800-vdc-safety-in-ai-data-centers-understanding-the-real-arc-flash-risk/",
+      "document_url": "https://www.se.com/us/en/download/document/SPD_WP219_EN/",
+      "publisher": "Schneider Electric",
+      "supports": "Architecture, stored energy, reverse blocking and protection timing affect the studied fault cases; system-specific assessment is required.",
+      "evidence_type": "publisher summary of WP219 and document metadata; not an independent validation",
+      "model_use": "Research context. No incident-energy threshold, PPE classification or safety pass/fail is implemented."
+    },
+    {
+      "id": "ul-489i-catalog",
+      "url": "https://www.shopulstandards.com/ProductDetail.aspx?UniqueKey=47564",
+      "publisher": "UL Standards & Engagement",
+      "supports": "Catalog identifies an Outline of Investigation; scope includes semiconductor switching and integral galvanic isolation for SSCB/SSHCB devices.",
+      "evidence_type": "official public catalog scope, not full certification requirements",
+      "model_use": "No claim that an outline prohibits certification or that any named device is certified."
+    }
+  ],
+  "unverified_or_excluded": [
+    "Ulanqab capacity, topology, measured efficiency and protection arrangement are not independently established here; the 5 MW example is synthetic.",
+    "No certification deadline, country-wide deployment ban or approval prediction is inferred.",
+    "No battery-chemistry safety or commercial-readiness claim from social-media comments is used.",
+    "Removing a standalone AC UPS does not eliminate backup energy or rectification inside an SST.",
+    "A semiconductor switch alone does not establish protection coordination, galvanic isolation or certification."
+  ]
+}
