@@ -1,6 +1,6 @@
 """
 Faraday: utility-linked storage for a data center
-================================================
+=====================================================
 
 **Level:** Advanced | **Subject:** Off-site storage and hourly supply matching
 
@@ -16,7 +16,7 @@ from datacenter_simulator.analysis.faraday import faraday_study
 
 # %%
 # Step 1: establish separate generation and customer meters
-# --------------------------------------------------------
+# -------------------------------------------------------------
 # Assume 160 MW IT and PUE 1.25: 200 MW facility demand. Solar is a synthetic
 # 525 MW AC peak profile; its actual AC/DC basis and allocation are not verified.
 # The assumed 525 MW shared POI constrains combined solar and battery export.
@@ -34,7 +34,7 @@ ax.text(0.01, 0.95, "*Sensitivity / proposed expansion / stress", transform=ax.t
 
 # %%
 # Step 2: inspect solar-only charging and the energy inventory
-# ----------------------------------------------------------
+# ----------------------------------------------------------------
 # Treat 600 MWh as the AC deliverable window. The existing Battery model stores
 # internal energy, so its window is 600 / eta_discharge MWh. It can deliver
 # 150 MW for four hours when full. This is not inferred installed cell capacity.
@@ -55,7 +55,7 @@ fig.autofmt_xdate()
 
 # %%
 # Step 3: examine load and shared connection sensitivities
-# -------------------------------------------------------
+# ------------------------------------------------------------
 # The 733 MWh report is retained as an alternative energy assumption, not a
 # proven nameplate-to-contract conversion. The combined expansion adds the
 # proposed 375 MW / 1,500 MWh to the operating phase. Neither is the baseline.
@@ -67,7 +67,7 @@ print(
 
 # %%
 # Step 4: reproduce the interactive report or replace the profiles
-# --------------------------------------------------------------
+# --------------------------------------------------------------------
 #
 # .. code-block:: bash
 #

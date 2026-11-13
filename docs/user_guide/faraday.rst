@@ -1,12 +1,12 @@
 Faraday utility-linked storage
-==============================
+==================================
 
 This case asks how a remote solar/storage portfolio can improve hourly energy
 matching for a continuously supplied data center. It uses reported Faraday asset
 ratings and clearly separate synthetic operating assumptions.
 
 Run and replay
---------------
+------------------
 
 .. code-block:: bash
 
@@ -36,7 +36,7 @@ Download :download:`comparison CSV </_static/lab/faraday/comparison.csv>`,
 See the :doc:`runnable tutorial <../gallery/analysis/plot_faraday_storage>`.
 
 Reported facts and unknowns
---------------------------
+-------------------------------
 
 The `November 10 issuer announcement <https://www.businesswire.com/news/home/20261110822031/en/>`_
 reports an operating 150 MW / 600 MWh LFP resource and a proposed addition of up
@@ -62,7 +62,7 @@ serves the customer under approved contract terms. This study does not infer
 a private wire or calculate a customer-specific tariff bill.
 
 Two electrical boundaries
--------------------------
+-----------------------------
 
 At the generation site, solar can charge the battery or export through a shared
 POI. At the remote data center, the utility supplies the entire facility load.
@@ -102,7 +102,7 @@ exported as inventory and never credited as delivered matching. Reserve energy,
 if represented by a nonzero minimum SOC in the Python API, cannot be discharged.
 
 What the outputs mean
----------------------
+-------------------------
 
 * ``hourly_matched_fraction`` is sum(matched kWh) / sum(load kWh). It caps
   matching by load every hour; annual surplus cannot offset an unmatched night.
@@ -120,7 +120,7 @@ last case changes resource conditions. The nine additional sensitivities change
 demand and the POI while retaining the 150 MW / 600 MWh battery.
 
 Limits and validation
----------------------
+-------------------------
 
 The default 200 MW demand, full allocation of a 525 MW AC solar profile,
 525 MW POI and 90% round-trip efficiency are assumptions. Solar is a
