@@ -30,7 +30,10 @@ const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
     await chart.locator('.updatemenu-dropdown-button').filter({ hasText: 'solar_only' }).click();
     assert.equal(await chart.evaluate(el => el.data[7].visible), true);
     assert.equal(await chart.evaluate(el => el.data[14].visible), false);
-    for (const href of await page.locator('a').evaluateAll(links => links.map(a => a.href))) {
+    const downloads = await page.locator('a[href$=".json"], a[href$=".csv"]')
+      .evaluateAll(links => links.map(a => a.href));
+    assert.equal(downloads.length, 6);
+    for (const href of downloads) {
       assert.ok(fs.existsSync(fileURLToPath(href)), `Missing export: ${href}`);
     }
     await page.screenshot({ path: path.join(screenshots, 'desktop.png'), fullPage: true });
