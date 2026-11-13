@@ -22,6 +22,7 @@ small component examples before combining the models into a facility study.
    gpu_lab
    grid_management
    infrastructure
+   development
    design
    cfd
    acoustics
@@ -35,3 +36,4 @@ small component examples before combining the models into a facility study.
 
    nomenclature
    faq
+
