@@ -44,6 +44,7 @@ jobs:
           node tests/check_grid_management.cjs docs/_build/html/_static/lab/wyoming/wyoming-grid-management.html
           node tests/check_infrastructure.cjs docs/_build/html/_static/lab/infrastructure/infrastructure-study.html
           node tests/check_scada.cjs docs/_build/html/_static/lab/scada/scada-model.html
+          node tests/check_telemetry.cjs docs/_build/html/_static/lab/telemetry/telemetry.html
           node tests/check_design.cjs docs/_build/html/_static/lab/design/design-workbench.html
           node tests/check_cfd.cjs docs/_build/html/_static/lab/cfd/cfd-3d.html
           node tests/check_noise.cjs docs/_build/html/_static/lab/noise/noise-3d.html
@@ -57,6 +58,7 @@ jobs:
             outputs/engineering-browser
             outputs/infrastructure-browser
             outputs/scada-browser
+            outputs/telemetry-browser
             outputs/design-browser
             outputs/cfd-browser
             outputs/noise-browser

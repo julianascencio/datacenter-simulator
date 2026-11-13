@@ -25,6 +25,7 @@ page links to the implementation and documents units and model boundaries.
    cfd
    acoustics
    scada
+   telemetry
    connectors
    simulation
    visualization

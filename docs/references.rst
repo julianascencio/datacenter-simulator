@@ -52,3 +52,27 @@ unverified image rates supplied by the user. The linked post was inaccessible;
 no market-price verification or vendor-performance calibration is asserted.
 The packaged evidence JSON records the source limitations, assumed denominator,
 unpriced scope and primary DOE/FEMP/Eaton engineering context.
+
+Unified facility telemetry
+--------------------------
+
+* InfluxData, **Unified Telemetry Strategy for Data Centers**, supplied four-page
+  PDF excerpt. Page 3 motivates a shared time-series layer and the operator/supplier
+  audiences; page 4 describes BMS, EPMS and DCIM responsibilities. The later
+  contents entries are not available evidence. Filename, SHA-256 and page-level
+  claims are in ``data/telemetry_evidence.json``; the PDF is not redistributed.
+* InfluxData, **Data Center Telemetry in the AI Era**, 23 October 2026.
+  Supplemental cross-layer and sampling motivation; vendor performance claims
+  are not treated as calibration.
+  `Official article <https://www.influxdata.com/blog/data-center-telemetry/>`_.
+* InfluxData, **InfluxDB 3 Enterprise line protocol reference**.
+  Typed serialization, escaping, point identity and duplicate-write limitations.
+  `Official documentation <https://docs.influxdata.com/influxdb3/enterprise/reference/line-protocol/>`_.
+* InfluxData, **The Telegraf data pipeline**. Context for buffering and delivery;
+  scalar-observation sizing here is not a Telegraf metric-throughput benchmark.
+  `Official documentation <https://docs.influxdata.com/telegraf/v1/concepts/data-pipeline/>`_.
+
+Sources reviewed 13 November 2026. The :doc:`telemetry guide <user_guide/telemetry>`
+documents independent engineering extensions, equations, financial assumptions
+and missing source material. No vendor-specific device specifications, measured
+savings or product prices are inferred from the excerpt.
