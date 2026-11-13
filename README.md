@@ -71,6 +71,31 @@ python -m pip install -e '.[solar,benchmarks]'  # pvlib and independent PyPSA ch
 
 See the [installation guide](https://julianascencio.github.io/datacenter-simulator/user_guide/installation.html) for an isolated environment and development setup.
 
+## 800 VDC power architecture and migration
+
+Compare **conventional AC, 800 V sidecar, row-level DC and central SST** at the
+same IT terminal. Export stage losses, annual energy-cost differences, an SST
+efficiency sensitivity, DC conductor current/losses, backup power/energy minima,
+and a fault-energy sensitivity with explicit capacitor backfeed and isolation.
+
+```bash
+python -m datacenter_simulator.analysis.power_architecture --output outputs/power
+# Edit inputs.json and replay:
+python -m datacenter_simulator.analysis.power_architecture \
+  --inputs outputs/power/inputs.json --output outputs/power-replay
+```
+
+Open `outputs/power/power-architecture.html` for the offline interactive charts.
+The synthetic 5 MW example retains the upstream transformer and UPS in sidecar
+and row scenarios, and keeps DC backup explicit for the central SST. Savings
+depend on the stated efficiencies; the sensitivity includes cases worse than AC.
+Conversion totals exclude cable/cooling losses. The separate fault screen is
+**not arc-flash analysis, protection coordination or certification**.
+
+[Guide, equations and sources](docs/user_guide/power_architecture.rst) ·
+[Runnable gallery example](examples/analysis/plot_800vdc_architecture.py) ·
+[API](docs/reference/power_architecture.rst)
+
 ## 3D airflow and heat CFD
 
 Solve **velocity, pressure and air temperature** through time with the native

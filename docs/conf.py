@@ -10,6 +10,7 @@ from datacenter_simulator.analysis.cfd import export_cfd_study
 from datacenter_simulator.analysis.design import export_design_study
 from datacenter_simulator.analysis.engineering import export_engineering_study
 from datacenter_simulator.analysis.infrastructure import export_infrastructure_study
+from datacenter_simulator.analysis.power_architecture import export_power_architecture_study
 from datacenter_simulator.analysis.scada import export_scada_model
 from datacenter_simulator.analysis.wyoming import export_wyoming_study
 from datacenter_simulator.cli import generate_reference
@@ -84,3 +85,5 @@ export_design_study(Path(__file__).parent / "_static" / "lab" / "design")
 export_cfd_study(Path(__file__).parent / "_static" / "lab" / "cfd", check_mesh=True)
 
 export_noise_study(Path(__file__).parent / "_static" / "lab" / "noise")
+
+export_power_architecture_study(Path(__file__).parent / "_static" / "lab" / "power")

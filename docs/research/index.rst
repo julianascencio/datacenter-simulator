@@ -23,6 +23,7 @@ References and roadmap
 
    ../references
    engineering
+   ../user_guide/power_architecture
    ../roadmap
 
 References distinguish published engineering context from the illustrative

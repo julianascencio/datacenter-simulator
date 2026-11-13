@@ -17,6 +17,7 @@ small component examples before combining the models into a facility study.
    :maxdepth: 2
 
    dc_single_line
+   power_architecture
    engineering
    gpu_lab
    grid_management
