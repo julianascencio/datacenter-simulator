@@ -14,6 +14,7 @@ Level: Intermediate
 # Step 1: compare a cost-minimizing BESS with one preserving an 80% SOC reserve.
 from pathlib import Path
 
+import matplotlib.dates as mdates
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -48,6 +49,9 @@ for name, rows in study.outage_sweep.groupby("policy"):
 axes[1].axhline(3000, color="gray", linestyle="--", label="No BESS: 3,000 kWh unserved")
 axes[1].set(ylabel="Critical unserved energy (kWh)", xlabel="Outage start (UTC)")
 axes[1].legend()
+locator = mdates.AutoDateLocator(minticks=3, maxticks=5)
+axes[1].xaxis.set_major_locator(locator)
+axes[1].xaxis.set_major_formatter(mdates.ConciseDateFormatter(locator))
 
 # %%
 # Step 3: examine rapid AI load changes separately at one-second resolution.
