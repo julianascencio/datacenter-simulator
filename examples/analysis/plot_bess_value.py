@@ -1,6 +1,6 @@
 """
 BESS for data centers: power, resilience and renewables
-======================================================
+=================================================================
 
 Inspired by the attached RENMAD/ATA webinar post. This mainland-Spain screening
 uses an Energy Data Insights PVGIS snapshot and hypothetical facility/tariff

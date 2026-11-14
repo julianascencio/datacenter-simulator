@@ -1,8 +1,8 @@
 BESS value and resilience
-========================
+===================================
 
 Use case and evidence
----------------------
+-------------------------------
 
 The attached post about RENMAD/ATA Insights' **BESS for data centers: power,
 resilience & renewables** motivates three separate questions: operating cost,
@@ -14,7 +14,7 @@ to reproduce the webinar, validate its participants' systems or establish that
 Spanish data centers make BESS profitable without support.
 
 Energy Data Insights integration
---------------------------------
+------------------------------------------
 
 The solar inputs were actually retrieved with the published
 ``energy-data-retrieval==0.1.0`` package's
@@ -55,7 +55,7 @@ refresh on Python 3.12+, install ``.[edi]`` and call
 separately; it never silently replaces the reviewed offline snapshot.
 
 Model and accounting
---------------------
+------------------------------
 
 * A synthetic 2.5–4 MW facility demand already includes cooling and auxiliaries;
   PUE must not be applied a second time. PV is assumed at 6 MWp.
@@ -81,7 +81,7 @@ Model and accounting
   savings are an optimistic benchmark before forecast error and operating limits.
 
 Resilience and rapid fluctuations
---------------------------------
+-------------------------------------------
 
 Each two-hour outage begins with the corresponding pre-step SOC from normal
 operation. The 167 complete starts are tested for each policy, with assumed
@@ -100,7 +100,7 @@ thermal limits or protection. Hourly energy scheduling cannot validate any of
 those fast phenomena.
 
 Commercial interpretation
--------------------------
+-----------------------------------
 
 The example week gives approximately EUR 8,519 economic-policy operating saving
 versus EUR 1,967 with the 80% reserve, after the assumed variable wear charge.
@@ -116,7 +116,7 @@ load/PV/prices, a vendor quotation and degradation/replacement model, actual
 contract/network charges, and validated control/backup requirements.
 
 API
----
+-------------
 
 .. automodule:: datacenter_simulator.models.bess_value
    :members:
