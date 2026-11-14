@@ -55,6 +55,8 @@ const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
       ['gpu-lab', 'user_guide/gpu_lab.html'],
       ['gpu-tutorial', 'gallery/gpu_lab/plot_gpu_energy_lab.html'],
       ['grid-guide', 'user_guide/grid_management.html'],
+      ['faraday-guide', 'user_guide/faraday.html'],
+      ['faraday-example', 'gallery/analysis/plot_faraday_storage.html'],
       ['grid-example', 'gallery/methods/plot_grid_management.html'],
       ['wyoming-example', 'gallery/analysis/plot_wyoming_recovery.html'],
       ['telemetry-guide', 'user_guide/telemetry.html'],

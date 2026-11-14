@@ -48,6 +48,7 @@ jobs:
           node tests/check_design.cjs docs/_build/html/_static/lab/design/design-workbench.html
           node tests/check_cfd.cjs docs/_build/html/_static/lab/cfd/cfd-3d.html
           node tests/check_noise.cjs docs/_build/html/_static/lab/noise/noise-3d.html
+          node tests/check_faraday.cjs docs/_build/html/_static/lab/faraday/faraday-storage.html
       - uses: actions/upload-artifact@v4
         with:
           name: documentation-and-interactive-lab
@@ -62,6 +63,7 @@ jobs:
             outputs/design-browser
             outputs/cfd-browser
             outputs/noise-browser
+            outputs/faraday-browser
       - name: Check whether Pages is configured for Actions
         id: pages-status
         if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'

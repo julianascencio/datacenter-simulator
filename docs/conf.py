@@ -9,6 +9,7 @@ from datacenter_simulator.analysis.acoustics import export_noise_study
 from datacenter_simulator.analysis.cfd import export_cfd_study
 from datacenter_simulator.analysis.design import export_design_study
 from datacenter_simulator.analysis.engineering import export_engineering_study
+from datacenter_simulator.analysis.faraday import export_faraday_study
 from datacenter_simulator.analysis.infrastructure import export_infrastructure_study
 from datacenter_simulator.analysis.power_architecture import export_power_architecture_study
 from datacenter_simulator.analysis.scada import export_scada_model
@@ -90,3 +91,5 @@ export_cfd_study(Path(__file__).parent / "_static" / "lab" / "cfd", check_mesh=T
 export_noise_study(Path(__file__).parent / "_static" / "lab" / "noise")
 
 export_power_architecture_study(Path(__file__).parent / "_static" / "lab" / "power")
+
+export_faraday_study(Path(__file__).parent / "_static" / "lab" / "faraday")
