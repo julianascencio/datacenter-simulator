@@ -25,7 +25,7 @@ def _inputs(demand: pd.Series, solar: pd.Series, dt_hours: float) -> tuple[np.nd
         raise ValueError("demand needs a timezone-aware DatetimeIndex")
     validate_timeline(demand.index)
     if len(demand) > 1 and not np.allclose(
-        np.diff(demand.index.asi8) / 3.6e12, dt_hours, rtol=0, atol=1e-9
+        (demand.index[1:] - demand.index[:-1]).total_seconds() / 3600, dt_hours, rtol=0, atol=1e-9
     ):
         raise ValueError("timeline spacing must equal dt_hours")
     return (
@@ -244,8 +244,8 @@ def ramp_buffer_requirement(
     residual = values - grid
     inventory = np.r_[0, np.cumsum(-residual * dt_seconds / 3600)]
     return {
-        "required_discharge_kw": float(max(0, residual.max())),
-        "required_charge_kw": float(max(0, -residual.min())),
+        "required_discharge_kw": max(0.0, max(float(value) for value in residual)),
+        "required_charge_kw": max(0.0, -min(float(value) for value in residual)),
         "minimum_lossless_energy_swing_kwh": float(np.ptp(inventory)),
         "initial_energy_above_minimum_kwh": float(-inventory.min()),
         "terminal_energy_change_kwh": float(inventory[-1]),

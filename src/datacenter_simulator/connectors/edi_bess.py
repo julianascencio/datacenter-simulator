@@ -37,7 +37,7 @@ def load_edi_solar_snapshot(
     index = pd.DatetimeIndex(pd.to_datetime(stamps, utc=True))
     power = pd.Series(frame.pv_kw_per_kwp.to_numpy() * dc_rating_kwp, index=index, name="solar_kw")
     power = generation_from_series(power, index)
-    if len(index) < 2 or not np.all(np.diff(index.asi8) == 3_600_000_000_000):
+    if len(index) < 2 or not np.all((index[1:] - index[:-1]).total_seconds() == 3600):
         raise ValueError("EDI snapshot must have complete hourly spacing")
     return power, metadata
 

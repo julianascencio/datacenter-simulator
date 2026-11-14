@@ -126,3 +126,19 @@ def test_case_study_outage_tradeoff_and_finance_boundaries() -> None:
     assert break_even_installed_cost(100, years=2, discount_rate=0, annual_fixed_om_eur=10) == 180
     assert break_even_installed_cost(100, years=1, discount_rate=0.1) == pytest.approx(100 / 1.1)
     assert break_even_installed_cost(0, years=2, discount_rate=0, annual_fixed_om_eur=10) == -20
+
+
+@pytest.mark.parametrize("unit", ["s", "ms", "us", "ns"])
+def test_timestamp_storage_resolution_independent(unit: str) -> None:
+    load = series([10, 20, 10])
+    load.index = pd.DatetimeIndex(load.index).as_unit(unit)
+    result = optimize_bess_value(
+        load, load * 0, load * 0 + 0.1, Battery(100, 10, 10), BESSValuePolicy(100)
+    )
+    assert abs(result.timeseries.balance_error_kw).max() < 1e-6
+    fast = series([100, 200, 200], freq="s")
+    fast.index = pd.DatetimeIndex(fast.index).as_unit(unit)
+    assert (
+        ramp_buffer_requirement(fast, grid_ramp_kw_per_s=50, dt_seconds=1)["required_discharge_kw"]
+        == 50
+    )
