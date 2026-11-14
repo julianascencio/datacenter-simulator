@@ -1,6 +1,6 @@
 """
 Local opposition and development economics
-=========================================
+==========================================
 
 Intermediate, offline, synthetic business case inspired by the user-supplied
 Heatmap article dated October 6, 2026. Aggregate reported canceled investment

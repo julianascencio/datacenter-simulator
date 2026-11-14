@@ -1,5 +1,5 @@
 Development risk: opposition, delay and cancellation
-===================================================
+====================================================
 
 This screening layer complements power, cooling, water and acoustic studies:
 engineering feasibility alone does not establish development feasibility.
