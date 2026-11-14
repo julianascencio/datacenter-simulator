@@ -1,0 +1,68 @@
+{
+  "case": "Faraday utility storage / Eagle Mountain",
+  "checked_on": "2026-11-13",
+  "sources": [
+    {
+      "id": "lydian_cod_2026_11_10",
+      "kind": "primary issuer press release, syndicated by Business Wire",
+      "url": "https://www.businesswire.com/news/home/20261110822031/en/",
+      "accessed_mirror": "https://www.streetinsider.com/Business%2BWire/Lydian%2BEnergy%2BBrings%2B150%2BMW%2BFaraday%2BBattery%2BStorage%2BProject%2BOnline%2Bin%2BUtah%2BUnder%2BLong-term%2BAgreement%2Bwith%2BPacifiCorp/27317978.html",
+      "published": "2026-11-10",
+      "claims": {
+        "operating_bess_mw": 150,
+        "contracted_storage_mwh": 600,
+        "commercial_operation_date": "2026-09-18",
+        "chemistry": "LFP",
+        "adjacent_solar_reported_mw": 525,
+        "shared_substation_and_interconnection": true,
+        "approximate_battery_area_acres": 8,
+        "approximate_mobilization_to_operation_months": 10,
+        "projected_lifetime_property_tax_usd": 9000000,
+        "contract_counterparty": "PacifiCorp",
+        "customer_link": "Schedule 34 support for Meta Eagle Mountain",
+        "phase2_max_mw": 375,
+        "phase2_max_mwh": 1500,
+        "phase2_target": "Q4 2028",
+        "phase2_status": "in development"
+      },
+      "limitations": "No load trace, dispatch rights, POI rating, efficiency, AC/DC solar basis or private-wire topology disclosed. Original Business Wire URL could not be retrieved; issuer text read at the syndicated mirror."
+    },
+    {
+      "id": "lydian_financing_2026_02_17",
+      "kind": "primary issuer release",
+      "url": "https://lydianenergy.com/news/lydian-energy-announces-689-million-financing-for-solar-and-battery-storage-projects/",
+      "published": "2026-02-17",
+      "claims": {"earlier_phase1_mw": 150, "earlier_phase1_mwh": 733, "portfolio_financing_usd": 689000000},
+      "limitations": "Financing covers Faraday plus two solar projects; not BESS-only CAPEX. No verified explanation reconciles 733 and 600 MWh."
+    },
+    {
+      "id": "rmp_schedule34",
+      "kind": "primary utility tariff",
+      "url": "https://www.rockymountainpower.net/content/dam/pcorp/documents/en/rockymountainpower/rates-regulation/utah/rates/034_Clean_Energy_Purchases_for_Qualified_Customers_5000kW_and_Over.pdf",
+      "effective": "2025-04-25",
+      "claims": {
+        "current_title": "Clean Energy Purchases for Qualified Customers - 5,000 kW and Over",
+        "minimum_aggregated_peak_kw": 5000,
+        "contract_terms_require_commission_approval": true,
+        "utility_takes_resource_output_and_serves_customer": true
+      },
+      "limitations": "The supplied news uses the older Renewable Energy title. General tariff guidelines do not disclose the Faraday-specific contract or establish hourly matching/backup rights."
+    },
+    {
+      "id": "meta_eagle_mountain_2026_09_14",
+      "kind": "primary customer announcement",
+      "url": "https://datacenters.atmeta.com/2026/09/deepening-our-investment-in-eagle-mountain-utah/",
+      "published": "2026-09-14",
+      "claims": {"supports_faraday_mw": 150, "owner_operator": "Lydian Energy"},
+      "limitations": "Does not disclose site MW load or prove hourly clean-energy supply. Utah portfolio figures are not assigned to this single battery."
+    },
+    {
+      "id": "user_supplied_news",
+      "kind": "secondary news; case trigger",
+      "url": "https://pv-magazine-usa.com/2026/11/12/utility-tariff-links-600-mwh-utah-battery-to-meta-data-center/",
+      "published": "2026-11-12",
+      "title": "Utility tariff links 600 MWh Utah battery to Meta data center",
+      "limitations": "Article text and images are not reproduced; modeling uses primary-source facts and declared synthetic assumptions."
+    }
+  ]
+}

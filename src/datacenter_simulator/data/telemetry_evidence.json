@@ -1,0 +1,60 @@
+{
+  "schema_version": "1.0.0",
+  "reviewed_on": "2026-11-13",
+  "sources": [
+    {
+      "id": "influxdata-supplied-excerpt",
+      "title": "Unified Telemetry Strategy for Data Centers",
+      "publisher": "InfluxData",
+      "source_kind": "user_supplied_pdf_excerpt",
+      "filename": "1794609853581.pdf",
+      "sha256": "0f674b039d5a14d17f9ca379072e573fe84ae7536d45054fdef926afc98fd5e3",
+      "available_pages": [1, 2, 3, 4],
+      "not_available": "Pages 5–16 named in the contents are absent. Their technical content was not reviewed or inferred.",
+      "supported_claims": [
+        {"page": 3, "claim": "A shared time-series layer can sit beside existing facility systems and support historical incident investigation."},
+        {"page": 3, "claim": "The proposed vendor stack uses Telegraf and InfluxDB 3 Enterprise and addresses both operators and equipment/software suppliers."},
+        {"page": 4, "claim": "BMS supplies cooling/environment context, EPMS electrical context and DCIM inventory/rack/ownership context."}
+      ]
+    },
+    {
+      "id": "influxdata-telemetry-blog",
+      "url": "https://www.influxdata.com/blog/data-center-telemetry/",
+      "title": "Data Center Telemetry in the AI Era",
+      "source_kind": "vendor_technical_explainer",
+      "use": "Supplementary motivation for cross-layer observations, clock alignment and sampling-resolution comparisons. Vendor performance and outage claims are not model calibration."
+    },
+    {
+      "id": "influxdb3-line-protocol",
+      "url": "https://docs.influxdata.com/influxdb3/enterprise/reference/line-protocol/",
+      "source_kind": "official_documentation",
+      "use": "Line-protocol escaping, typed fields, timestamp precision and identity. Duplicate overwrite order must not be relied upon."
+    },
+    {
+      "id": "telegraf-pipeline",
+      "url": "https://docs.influxdata.com/telegraf/v1/concepts/data-pipeline/",
+      "source_kind": "official_documentation",
+      "use": "Motivation for bounded-buffer loss and recovery planning. Capacity calculations count scalar observations and are not a benchmark of Telegraf's multi-field metric buffering."
+    }
+  ],
+  "implementation_extensions": [
+    "Canonical history envelopes, strict conflict policy and time-valid context",
+    "Composed terminal-power, cooling and thermal-zone scenarios",
+    "Synthetic sampling, quality, clock and topology analysis",
+    "Storage, buffer, triage labor and discounted cash-flow sensitivities"
+  ],
+  "assumptions": {
+    "source_of_all_numerical_defaults": "Project-selected synthetic engineering assumptions; not figures extracted from the PDF.",
+    "rack_power": "20 kW idle, 100 kW peak, 800 V DC terminal; baseline utilization 0.5",
+    "cooling": "120 kW thermal capacity, 20 kW during failure, COP 5, 500 kJ/K mixed thermal capacitance; no CFD or pump hydraulic calibration",
+    "utility_sag": "230 to 195 V RMS L1-N for 60 seconds, ideal UPS protection assumed",
+    "economic_currency": "EUR; no product pricing, taxes, financing, escalation or measured avoided downtime",
+    "storage": "100 bytes per observation and 160 per aggregate are placeholders requiring deployment measurement"
+  },
+  "limitations": [
+    "Offline reference implementation; no live BMS, EPMS, DCIM or InfluxDB integration is claimed.",
+    "Event ordering does not establish root cause; possible topology exposure does not establish customer impact.",
+    "No standards compliance, predictive maintenance accuracy or availability guarantee.",
+    "The supplied PDF is not redistributed."
+  ]
+}

@@ -20,12 +20,14 @@ page links to the implementation and documents units and model boundaries.
    cooling
    energy
    grid_management
+   utility_storage
    infrastructure
    development
    design
    cfd
    acoustics
    scada
+   telemetry
    connectors
    simulation
    visualization

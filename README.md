@@ -71,6 +71,53 @@ python -m pip install -e '.[solar,benchmarks]'  # pvlib and independent PyPSA ch
 
 See the [installation guide](https://julianascencio.github.io/datacenter-simulator/user_guide/installation.html) for an isolated environment and development setup.
 
+## Unified BMS, EPMS and DCIM telemetry
+
+Reconstruct cooling failures, workload steps and utility disturbances with
+time-valid asset ownership and quality-aware history. Reuse the 50 SCADA device
+profiles, compare sampling/retention/buffering, and evaluate nine configurable
+business-case sensitivities, including negative NPV outcomes.
+
+```bash
+python -m datacenter_simulator.analysis.telemetry --output outputs/telemetry
+```
+
+Open `outputs/telemetry/telemetry.html`. The export includes eight connected device
+instances, device history schemas, CSV/JSONL replay data, InfluxDB line protocol,
+model inputs, incident timelines and a page-specific source ledger. It runs offline.
+The supplied InfluxData excerpt contains four pages; model parameters and financial
+inputs are explicitly synthetic extensions. See the
+[telemetry guide](docs/user_guide/telemetry.rst) and
+[runnable example](examples/analysis/plot_unified_telemetry.py).
+
+## Faraday: utility-linked solar and storage for a data center
+
+Reproduce the November 2026 Faraday case with separate generation-site and
+customer meters. Compare solar-only supply, **150 MW / 600 MWh** storage,
+the unresolved **733 MWh** sensitivity, and a hypothetical combined
+**525 MW / 2,100 MWh** expansion. Track hourly matching, storage losses,
+curtailment, shared-POI constraints and load/resource sensitivities.
+
+```bash
+python -m datacenter_simulator.analysis.faraday --output outputs/faraday
+# Replay or replace the exported timezone-aware hourly profiles:
+python -m datacenter_simulator.analysis.faraday \
+  --inputs outputs/faraday/inputs.json --profiles outputs/faraday/profiles.csv \
+  --output outputs/faraday-replay
+```
+
+Open `outputs/faraday/faraday-storage.html` for the offline interactive report.
+`project_metadata.json` preserves the news's real project identity, participants,
+location, ratings, dates and development status. Actual undisclosed load/PUE stay
+null; the default 200 MW facility load and hourly solar profile are synthetic. Full solar
+allocation, POI capacity and efficiency are declared assumptions. The utility
+still supplies the full facility load: remote hourly matching does not establish
+on-site backup, bill savings or certified clean-energy procurement.
+
+[Case, equations and sources](docs/user_guide/faraday.rst) ·
+[Runnable gallery example](examples/analysis/plot_faraday_storage.py) ·
+[API](docs/reference/utility_storage.rst)
+
 ## 800 VDC power architecture and migration
 
 Compare **conventional AC, 800 V sidecar, row-level DC and central SST** at the
@@ -224,7 +271,7 @@ scope, not a validated construction budget. All engineering ratings are assumpti
 
 [User Guide](https://julianascencio.github.io/datacenter-simulator/user_guide/index.html) · [Example Gallery](https://julianascencio.github.io/datacenter-simulator/gallery/index.html) · [API Reference](https://julianascencio.github.io/datacenter-simulator/reference/index.html) · [Research](https://julianascencio.github.io/datacenter-simulator/research/index.html) · [Contributing](https://julianascencio.github.io/datacenter-simulator/contributing/index.html)
 
-The documentation uses Sphinx, PyData Sphinx Theme, and Sphinx-Gallery. All twenty-one gallery examples execute during the documentation build and call the installed `datacenter_simulator` API.
+The documentation uses Sphinx, PyData Sphinx Theme, and Sphinx-Gallery. All gallery examples execute during the documentation build and call the installed `datacenter_simulator` API.
 
 Build locally:
 
@@ -307,6 +354,7 @@ Open `outputs/reference-lab.html`. It includes the Plotly runtime and works offl
 
 | Example | Subject | Complexity |
 |---|---|---|
+| [Faraday utility storage](https://julianascencio.github.io/datacenter-simulator/gallery/analysis/plot_faraday_storage.html) | Separate meters, hourly matching, losses, shared POI and expansion scenarios | Advanced |
 | [01. Device models and spatial layouts](https://julianascencio.github.io/datacenter-simulator/gallery/methods/plot_device_models.html) | Power curves, ports, and dimensioned 2D/3D placement | Beginner |
 | [02. Connect generation from Series and CSV](https://julianascencio.github.io/datacenter-simulator/gallery/connectors/plot_generation_adapter.html) | Units, timestamps, conversion losses, and grid imports | Beginner |
 | [03. Compare 380, 400 and 800 V distribution](https://julianascencio.github.io/datacenter-simulator/gallery/methods/plot_dc_voltage.html) | Feeder current, losses, rack voltage, and single-line export | Intermediate |
