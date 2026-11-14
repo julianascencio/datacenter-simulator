@@ -20,7 +20,7 @@ from datacenter_simulator.use_cases.development import development_scenarios
 
 # %%
 # Step 1: compare explicit development alternatives
-# ------------------------------------------------
+# -------------------------------------------------
 # Risk reductions are assumptions; mitigation spending alone guarantees no benefit.
 scenarios = development_scenarios()
 values = [evaluate_development(s).expected_npv_usd / 1e6 for s in scenarios]
@@ -33,7 +33,7 @@ plt.show()
 
 # %%
 # Step 2: test cancellation-probability sensitivity
-# ------------------------------------------------
+# -------------------------------------------------
 # Hold each alternative's cash flows and timing fixed. Sweep a hypothetical
 # probability instead of deriving site risk from aggregate investment headlines.
 probabilities = [i / 20 for i in range(21)]
