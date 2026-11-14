@@ -485,3 +485,12 @@ equipment quantities under `outputs/site-feasibility/`. It reuses electrical and
 cooling sizing and reports explicit shell-cost/structural-carbon allowances.
 See [scope and evidence](docs/reference/design.rst): this is early screening,
 with synthetic rates, not structural design or a native Autodesk integration.
+
+## BESS power, resilience and renewables
+
+Run `python examples/analysis/plot_bess_value.py` for a mainland-Spain screening
+using a hashed PVGIS solar snapshot retrieved through Energy Data Insights.
+Compare economic dispatch and outage reserves, test one-second load buffering,
+and inspect explicit no-subsidy capital-cost sensitivities. Load/tariffs are
+synthetic; the example does not claim annual profitability or UPS certification.
+See [methods, evidence and limitations](docs/reference/bess_value.rst).

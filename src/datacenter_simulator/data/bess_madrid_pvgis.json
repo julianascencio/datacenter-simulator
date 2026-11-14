@@ -1,0 +1,182 @@
+{
+  "evidence_class": "PVGIS_modelled_PV_not_meter_measurements",
+  "edi_package": "energy-data-retrieval",
+  "edi_version": "0.1.0",
+  "edi_connector": "energy_data_retrieval.sources.pvgis.PVGISClient.hourly",
+  "retrieved_at": "2026-11-14",
+  "csv_sha256": "61254bbd06835d814a106cc19626c796e0df0cd1e7588e9dde4fa075b506bc10",
+  "raw_response_sha256": "2a24608d4bdf54089d96c9bf2ae46ed799f10ea7ee92a63c5dba1798bfd41049",
+  "request_provenance": {
+    "version": "5.3",
+    "content_type": "application/json",
+    "request_id": null,
+    "request": {
+      "endpoint": "https://re.jrc.ec.europa.eu/api/v5_3/seriescalc",
+      "parameters": {
+        "method": "GET",
+        "query:lat": "40.4168",
+        "query:lon": "-3.7038",
+        "query:startyear": "2023",
+        "query:endyear": "2023",
+        "query:pvcalculation": "1",
+        "query:peakpower": "1",
+        "query:loss": "14",
+        "query:angle": "30",
+        "query:aspect": "0",
+        "query:outputformat": "json"
+      },
+      "retrieved_at_utc": "2026-11-14T21:59:12.757140+00:00",
+      "sha256": "2a24608d4bdf54089d96c9bf2ae46ed799f10ea7ee92a63c5dba1798bfd41049",
+      "size_bytes": 826171,
+      "cache_hit": false
+    },
+    "reference_ids": [
+      "pvgis_5_api",
+      "pvgis_6_api"
+    ]
+  },
+  "provider_inputs": {
+    "location": {
+      "latitude": 40.4168,
+      "longitude": -3.7038,
+      "elevation": 665.0
+    },
+    "meteo_data": {
+      "radiation_db": "PVGIS-SARAH3",
+      "meteo_db": "ERA5",
+      "year_min": 2023,
+      "year_max": 2023,
+      "use_horizon": true,
+      "horizon_db": null,
+      "horizon_data": "DEM-calculated"
+    },
+    "mounting_system": {
+      "fixed": {
+        "slope": {
+          "value": 30,
+          "optimal": false
+        },
+        "azimuth": {
+          "value": 0,
+          "optimal": false
+        },
+        "type": "free-standing"
+      }
+    },
+    "pv_module": {
+      "technology": "c-Si",
+      "peak_power": 1.0,
+      "system_loss": 14.0
+    }
+  },
+  "provider_meta": {
+    "inputs": {
+      "location": {
+        "description": "Selected location",
+        "variables": {
+          "latitude": {
+            "description": "Latitude",
+            "units": "decimal degree"
+          },
+          "longitude": {
+            "description": "Longitude",
+            "units": "decimal degree"
+          },
+          "elevation": {
+            "description": "Elevation",
+            "units": "m"
+          }
+        }
+      },
+      "meteo_data": {
+        "description": "Sources of meteorological data",
+        "variables": {
+          "radiation_db": {
+            "description": "Solar radiation database"
+          },
+          "meteo_db": {
+            "description": "Database used for meteorological variables other than solar radiation"
+          },
+          "year_min": {
+            "description": "First year of the calculations"
+          },
+          "year_max": {
+            "description": "Last year of the calculations"
+          },
+          "use_horizon": {
+            "description": "Include horizon shadows"
+          },
+          "horizon_db": {
+            "description": "Source of horizon data"
+          }
+        }
+      },
+      "mounting_system": {
+        "description": "Mounting system",
+        "choices": "fixed, vertical_axis, inclined_axis, two_axis",
+        "fields": {
+          "slope": {
+            "description": "Inclination angle from the horizontal plane",
+            "units": "degree"
+          },
+          "azimuth": {
+            "description": "Orientation (azimuth) angle of the (fixed) PV system (0 = S, 90 = W, -90 = E)",
+            "units": "degree"
+          }
+        }
+      },
+      "pv_module": {
+        "description": "PV module parameters",
+        "variables": {
+          "technology": {
+            "description": "PV technology"
+          },
+          "peak_power": {
+            "description": "Nominal (peak) power of the PV module",
+            "units": "kW"
+          },
+          "system_loss": {
+            "description": "Sum of system losses",
+            "units": "%"
+          }
+        }
+      }
+    },
+    "outputs": {
+      "hourly": {
+        "type": "time series",
+        "timestamp": "hourly averages",
+        "variables": {
+          "P": {
+            "description": "PV system power",
+            "units": "W"
+          },
+          "G(i)": {
+            "description": "Global irradiance on the inclined plane (plane of the array)",
+            "units": "W/m2"
+          },
+          "H_sun": {
+            "description": "Sun height",
+            "units": "degree"
+          },
+          "T2m": {
+            "description": "2-m air temperature",
+            "units": "degree Celsius"
+          },
+          "WS10m": {
+            "description": "10-m total wind speed",
+            "units": "m/s"
+          },
+          "Int": {
+            "description": "1 means solar radiation values are reconstructed"
+          }
+        }
+      }
+    }
+  },
+  "processing": "Select 15\u201321 June 2023 UTC; P W for 1 kWp divided by 1000; preserve :10 timestamps. Treat each value as representative power over the following one-hour model step, not measured interval energy. Scale linearly by assumed kWp; no clipping beyond provider model.",
+  "rights": "European Commission JRC PVGIS; retain attribution and provider terms.",
+  "source_url": "https://re.jrc.ec.europa.eu/api/v5_3/seriescalc",
+  "webinar_url": "https://my.atainsights.com/en/webinar/webinar-bess-for-data-centers-power-resilience-renewables/",
+  "scenario": "Fictional mainland-Spain data center; not a webinar participant facility or a measured site. Tariffs, IT/facility load, installed PV/BESS, efficiencies, reserve, wear and outages are synthetic."
+}
