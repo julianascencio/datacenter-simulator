@@ -71,6 +71,25 @@ python -m pip install -e '.[solar,benchmarks]'  # pvlib and independent PyPSA ch
 
 See the [installation guide](https://julianascencio.github.io/datacenter-simulator/user_guide/installation.html) for an isolated environment and development setup.
 
+## Unified BMS, EPMS and DCIM telemetry
+
+Reconstruct cooling failures, workload steps and utility disturbances with
+time-valid asset ownership and quality-aware history. Reuse the 50 SCADA device
+profiles, compare sampling/retention/buffering, and evaluate nine configurable
+business-case sensitivities, including negative NPV outcomes.
+
+```bash
+python -m datacenter_simulator.analysis.telemetry --output outputs/telemetry
+```
+
+Open `outputs/telemetry/telemetry.html`. The export includes eight connected device
+instances, device history schemas, CSV/JSONL replay data, InfluxDB line protocol,
+model inputs, incident timelines and a page-specific source ledger. It runs offline.
+The supplied InfluxData excerpt contains four pages; model parameters and financial
+inputs are explicitly synthetic extensions. See the
+[telemetry guide](docs/user_guide/telemetry.rst) and
+[runnable example](examples/analysis/plot_unified_telemetry.py).
+
 ## Faraday: utility-linked solar and storage for a data center
 
 Reproduce the November 2026 Faraday case with separate generation-site and

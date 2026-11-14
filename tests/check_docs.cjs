@@ -1,4 +1,4 @@
-// Exercise the generated documentation as a reader, including all twenty-three tutorials.
+// Exercise the generated documentation as a reader, including every source tutorial.
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
@@ -7,6 +7,11 @@ const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
 
 (async () => {
   const root = path.resolve(process.argv[2] || 'docs/_build/html');
+  const sourceRoot = path.resolve(__dirname, '../examples');
+  const expectedExamples = fs.readdirSync(sourceRoot, { recursive: true })
+    .filter(name => path.basename(name).startsWith('plot_') && name.endsWith('.py'))
+    .map(name => name.replaceAll(path.sep, '/').replace(/\.py$/, '.html')).sort();
+  assert.ok(expectedExamples.length > 0, 'Source tutorials must exist');
   const screenshots = path.resolve('outputs/docs-browser');
   fs.mkdirSync(screenshots, { recursive: true });
   const browser = await chromium.launch({ headless: true });
@@ -25,11 +30,13 @@ const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
     await page.waitForURL('**/gallery/index.html');
     const cards = page.locator('.sphx-glr-thumbcontainer');
     await cards.first().waitFor({ state: 'visible' });
-    assert.equal(await cards.count(), 23, 'The gallery should contain twenty-three executable tutorials');
+    assert.equal(await cards.count(), expectedExamples.length, 'Every source tutorial must have a gallery card');
     await page.screenshot({ path: path.join(screenshots, 'gallery-desktop.png'), fullPage: true });
     const examples = await cards.locator('a.reference.internal').evaluateAll(links =>
       [...new Set(links.map(link => link.href.split('#')[0]))]);
-    assert.equal(examples.length, 23);
+    assert.deepEqual(examples.map(url => path.relative(path.join(root, 'gallery'),
+      fileURLToPath(url)).split(path.sep).join('/')).sort(), expectedExamples,
+      'Gallery links must match the complete source tutorial set');
     for (const url of examples) {
       await page.goto(url);
       const text = await page.locator('article').innerText();
@@ -59,6 +66,8 @@ const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
       ['faraday-example', 'gallery/analysis/plot_faraday_storage.html'],
       ['grid-example', 'gallery/methods/plot_grid_management.html'],
       ['wyoming-example', 'gallery/analysis/plot_wyoming_recovery.html'],
+      ['telemetry-guide', 'user_guide/telemetry.html'],
+      ['telemetry-example', 'gallery/analysis/plot_unified_telemetry.html'],
       ['scada-guide', 'user_guide/scada.html'],
       ['scada-example', 'gallery/connectors/plot_scada_model.html'],
       ['infrastructure-guide', 'user_guide/infrastructure.html'],
@@ -85,7 +94,7 @@ const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
     assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth), false);
     await page.screenshot({ path: path.join(screenshots, 'single-line-guide-mobile.png'), fullPage: true });
     assert.deepEqual(errors, []);
-    console.log('Documentation navigation, twenty-three tutorials, figures, downloads and mobile layout passed.');
+    console.log('Documentation navigation, all source tutorials, figures, downloads and mobile layout passed.');
   } finally {
     await browser.close();
   }

@@ -30,6 +30,7 @@ datacenter-design = "datacenter_simulator.analysis.design:main"
 datacenter-noise = "datacenter_simulator.analysis.acoustics:main"
 datacenter-cfd-accuracy = "datacenter_simulator.analysis.cfd_accuracy:main"
 datacenter-cfd = "datacenter_simulator.analysis.cfd:main"
+datacenter-telemetry = "datacenter_simulator.analysis.telemetry:main"
 
 [tool.setuptools.package-data]
 datacenter_simulator = ["py.typed", "utilities/report.html", "utilities/engineering.html", "utilities/grid_management.html", "utilities/scada.html", "utilities/design.html", "utilities/cfd.html", "utilities/acoustics.html", "data/*.csv", "data/*.json"]

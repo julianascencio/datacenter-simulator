@@ -13,6 +13,7 @@ from datacenter_simulator.analysis.faraday import export_faraday_study
 from datacenter_simulator.analysis.infrastructure import export_infrastructure_study
 from datacenter_simulator.analysis.power_architecture import export_power_architecture_study
 from datacenter_simulator.analysis.scada import export_scada_model
+from datacenter_simulator.analysis.telemetry import export_telemetry_study
 from datacenter_simulator.analysis.wyoming import export_wyoming_study
 from datacenter_simulator.cli import generate_reference
 
@@ -80,6 +81,8 @@ export_wyoming_study(Path(__file__).parent / "_static" / "lab" / "wyoming")
 export_infrastructure_study(Path(__file__).parent / "_static" / "lab" / "infrastructure")
 
 export_scada_model(Path(__file__).parent / "_static" / "lab" / "scada")
+
+export_telemetry_study(Path(__file__).parent / "_static" / "lab" / "telemetry")
 
 export_design_study(Path(__file__).parent / "_static" / "lab" / "design")
 

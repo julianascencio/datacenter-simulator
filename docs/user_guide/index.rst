@@ -27,6 +27,7 @@ small component examples before combining the models into a facility study.
    cfd
    acoustics
    scada
+   telemetry
    ../methodology
    ../integration
 
