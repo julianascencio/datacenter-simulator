@@ -461,3 +461,12 @@ quadratic resistance. Run `datacenter-cfd-accuracy` for separate mesh, timestep
 and input-sensitivity studies; both CFD and acoustics accept measured comparisons.
 See [acoustic methods](docs/user_guide/acoustics.rst) and
 [CFD verification](docs/user_guide/cfd.rst) for equations, assumptions and limits.
+
+
+## Local opposition and development risk
+
+Compare synthetic cancellation, permitting delay, mitigation and relocation economics.
+Run `python -m datacenter_simulator.analysis.development --output outputs/development`
+for an offline sensitivity heatmap and replayable inputs. Reported canceled planned
+investment is kept separate from cash losses and site-level probability assumptions.
+[Guide](docs/user_guide/development.rst) · [Gallery](examples/analysis/plot_development_risk.py)

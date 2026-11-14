@@ -23,6 +23,7 @@ small component examples before combining the models into a facility study.
    grid_management
    faraday
    infrastructure
+   development
    design
    cfd
    acoustics
@@ -37,3 +38,4 @@ small component examples before combining the models into a facility study.
 
    nomenclature
    faq
+

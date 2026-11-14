@@ -53,6 +53,15 @@ no market-price verification or vendor-performance calibration is asserted.
 The packaged evidence JSON records the source limitations, assumed denominator,
 unpriced scope and primary DOE/FEMP/Eaton engineering context.
 
+
+Development risk context
+------------------------
+
+Robinson Meyer, Heatmap, October 6, 2026: "Exclusive: Data Center Cancellations
+Top $260 Billion in 2026". User-supplied excerpt; underlying proprietary records
+not independently verified. Aggregate claims are context only, not probability
+calibration. See :doc:`user_guide/development` for provenance and boundaries.
+
 Unified facility telemetry
 --------------------------
 
