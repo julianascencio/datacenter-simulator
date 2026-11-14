@@ -470,3 +470,18 @@ Run `python -m datacenter_simulator.analysis.development --output outputs/develo
 for an offline sensitivity heatmap and replayable inputs. Reported canceled planned
 investment is kept separate from cash losses and site-level probability assumptions.
 [Guide](docs/user_guide/development.rst) · [Gallery](examples/analysis/plot_development_risk.py)
+
+## Site-first feasibility
+
+Generate capacity from a rectangular site, confirmed grid power and reusable hall
+rules, then compare density, orientation and storeys:
+
+```bash
+python examples/analysis/plot_site_feasibility.py
+```
+
+This AU2026 BLD4108-inspired example exports option metrics, hall coordinates and
+equipment quantities under `outputs/site-feasibility/`. It reuses electrical and
+cooling sizing and reports explicit shell-cost/structural-carbon allowances.
+See [scope and evidence](docs/reference/design.rst): this is early screening,
+with synthetic rates, not structural design or a native Autodesk integration.
