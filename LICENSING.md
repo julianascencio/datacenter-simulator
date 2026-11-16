@@ -21,3 +21,11 @@ New contributions must be submitted under the project license by someone with
 authority to grant those rights. Identify third-party material and its license;
 do not submit code whose terms conflict with the project license. Contributors
 retain their copyrights unless a separate written agreement provides otherwise.
+
+The published speed-to-power result subset in
+`src/datacenter_simulator/data/speed_to_power_published.csv` originates from
+Alex C. Newkirk's AI-Datacenter-Microgrid-Analysis repository and retains its MIT
+terms. The full notice is in `speed_to_power_upstream_LICENSE.txt` alongside
+the dataset; source commit, selection and checksums are in
+`speed_to_power_sources.json`. The native integration code is original project
+code under the project license. The paper itself is not redistributed.

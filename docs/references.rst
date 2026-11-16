@@ -85,3 +85,24 @@ Sources reviewed 13 November 2026. The :doc:`telemetry guide <user_guide/telemet
 documents independent engineering extensions, equations, financial assumptions
 and missing source material. No vendor-specific device specifications, measured
 savings or product prices are inferred from the excerpt.
+
+Speed-to-power technoeconomics
+------------------------------
+
+* Newkirk, A. C., Gerber, D. L., Fuchs, E. R. H., Hubbard, A., Morgan, M. G.,
+  Shehabi, A., Smith, S. J. and Samaras, C. (2026). **Speed-to-Power Dominates
+  Energy Costs for AI Data Centers: Technoeconomic Analysis of Powering AI in
+  the Continental United States**. `arXiv:2611.17098v1
+  <https://arxiv.org/abs/2611.17098v1>`_, 12 November 2026. User-supplied
+  80-page PDF including supplementary information; Figure 2, S1.1-S1.3.3,
+  Eqs. 1-2 and S17-S18 are the core methodological sources.
+* `Authors' public repository
+  <https://github.com/acnewkirk/AI-Datacenter-Microgrid-Analysis>`_, commit
+  ``729569fc32582ce4baa4426b5b025d073870f31a``. The 100,000-GPU subset of
+  ``output_tables/lcoe_results.csv`` is packaged with checksums and its MIT
+  license notice. Retrieved 16 November 2026. No upstream model code,
+  trained pickle or paper PDF is redistributed.
+
+See :doc:`user_guide/speed_to_power` for the knowledge-to-implementation mapping,
+source result replay, native screening assumptions and unavailable fidelity.
+Imported results are not observations or an independently re-executed study.
