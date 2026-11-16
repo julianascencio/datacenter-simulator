@@ -57,7 +57,7 @@ def summarize_line_to_line_pst(measurements: pd.DataFrame) -> pd.DataFrame:
             raise ValueError("each case/window needs exactly AB, BC and CA")
         if group.meter.nunique() != 1 or group.waveform_reference.nunique() != 1:
             raise ValueError("channels must share a meter and waveform reference")
-        worst = group.iloc[int(group.pst.to_numpy().argmax())]
+        worst = group.sort_values("pst", ascending=False, kind="stable").iloc[0]
         rows.append(
             {
                 "case": case,
