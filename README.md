@@ -118,6 +118,28 @@ on-site backup, bill savings or certified clean-energy procurement.
 [Runnable gallery example](examples/analysis/plot_faraday_storage.py) ·
 [API](docs/reference/utility_storage.rst)
 
+## Weak-grid power quality and E-STATCOM
+
+Compare no support, Q-only STATCOM, finite-energy E-STATCOM and an ideal
+voltage source behind finite impedance. Screen converter MVA and supercapacitor
+energy across load profiles and grid strengths, with P-Q limits, energy balances,
+reactive-control sign checks and a sustained-load stress case.
+
+```bash
+python -m datacenter_simulator.analysis.power_quality --output outputs/power-quality
+```
+
+Open `outputs/power-quality/power-quality.html` for offline interactive plots;
+CSV/JSON inputs and sizing results support replay. The supplied post's 200 MVA,
+35 kV, SCR 4 case motivates this **synthetic quasi-static study**. Its reported
+59% flicker / 44% power-swing reductions are not reproduced or claimed. Voltage
+excursion is not Pst: an external flickermeter-results importer requires all
+three AB/BC/CA channels and retains the worst result.
+
+[Guide and evidence](docs/user_guide/power_quality.rst) ·
+[Runnable gallery example](examples/analysis/plot_estatcom_power_quality.py) ·
+[API](docs/reference/power_quality.rst)
+
 ## 800 VDC power architecture and migration
 
 Compare **conventional AC, 800 V sidecar, row-level DC and central SST** at the
@@ -407,7 +429,7 @@ setting. See the guide for hardware identity checks, calibration limits and comm
 
 The [roadmap](docs/roadmap.rst) records delivered methods and the remaining vendor calibration, DC protection/EMT, live telemetry, measured CFD validation and editable workspace extensions.
 
-Electrical models are steady-state and resistive; workload networking uses fluid flows; cooling uses lumped balances and steady hydraulics. Numerical verification and the independent PyPSA comparison do not establish measured facility accuracy. The original facility API preserves requested demand; the new microgrid and contingency methods explicitly calculate served power. See [engineering boundaries](docs/user_guide/engineering.rst) and [evidence and validation](docs/research/engineering.rst).
+The original DC models are steady-state and resistive; the AC power-quality model is balanced and quasi-static. Workload networking uses fluid flows; cooling uses lumped balances and steady hydraulics. Numerical verification and the independent PyPSA comparison do not establish measured facility accuracy. The original facility API preserves requested demand; the new microgrid and contingency methods explicitly calculate served power. See [engineering boundaries](docs/user_guide/engineering.rst) and [evidence and validation](docs/research/engineering.rst).
 
 ## Creator and contact
 
