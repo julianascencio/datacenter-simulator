@@ -23,8 +23,8 @@ print(
 )
 
 # %%
-# Power and voltage at consistent boundaries
-# ------------------------------------------
+# Step 1: Compare power and voltage at consistent boundaries
+# ----------------------------------------------------------
 # The ideal source supplies sustained energy. Its lower original-grid draw is
 # not a storage efficiency gain. Voltage excursion is **not flicker Pst**.
 fig, axes = plt.subplots(2, 1, figsize=(10, 7), sharex=True, layout="constrained")
@@ -38,8 +38,8 @@ axes[0].legend(fontsize=8)
 axes[1].set(xlabel="Interval start [s]", ylabel="Balanced PCC voltage [pu]")
 
 # %%
-# Shared P-Q rating and finite energy
-# -----------------------------------
+# Step 2: Inspect shared P-Q rating and finite energy
+# ---------------------------------------------------
 # Active-power priority can leave less converter capacity for reactive support.
 # Charging and discharging losses enter every interval's energy balance.
 f = study.cases["estatcom"].timeseries
@@ -54,8 +54,8 @@ axes[1].set(xlabel="Interval start [s]", title="Negative Q absorbs reactive powe
 axes[1].legend()
 
 # %%
-# Independent power/energy sizing across two profiles and three SCR values
-# ------------------------------------------------------------------------
+# Step 3: Screen power and energy across profiles and grid strengths
+# ------------------------------------------------------------------
 # Every failed case remains in the result. Targets (60 MW, 0.025 pu) are
 # illustrative planning screens; passing is not flicker or grid compliance.
 counts = study.sizing.groupby(["nominal_energy_mj", "rating_mva"]).screen_pass.sum().unstack()
@@ -74,8 +74,8 @@ ax.set(
 fig.colorbar(im, ax=ax, label="Passing cases")
 
 # %%
-# A sustained increase cannot be buffered indefinitely
-# ----------------------------------------------------
+# Step 4: Test a sustained load increase
+# --------------------------------------
 # This stress case is separate from the pulse-sizing envelope. Terminal energy
 # is tracked rather than treated as free operating savings.
 stress = simulate_power_quality(synthetic_ai_load(shape="sustained"), WeakGrid(), EStatcom())

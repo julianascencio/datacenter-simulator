@@ -231,6 +231,9 @@ def export_power_quality_study(
     )
     html = fig.to_html(include_plotlyjs=True, full_html=True)
     html = html.replace(
+        "</head>", '<meta name="viewport" content="width=device-width, initial-scale=1"></head>'
+    )
+    html = html.replace(
         "</head>",
         "<style>body{font-family:system-ui;max-width:1200px;margin:24px auto;"
         "padding:0 16px;color:#18394b;line-height:1.5}table{border-collapse:collapse;"
