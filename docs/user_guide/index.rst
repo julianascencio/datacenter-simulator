@@ -18,6 +18,7 @@ small component examples before combining the models into a facility study.
 
    dc_single_line
    power_architecture
+   power_quality
    engineering
    gpu_lab
    grid_management

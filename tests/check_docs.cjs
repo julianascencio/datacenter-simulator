@@ -77,6 +77,8 @@ const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
       ['accuracy-example', 'gallery/analysis/plot_cfd_accuracy.html'],
       ['design-guide', 'user_guide/design.html'],
       ['design-example', 'gallery/methods/plot_facility_design.html'],
+      ['power-quality-guide', 'user_guide/power_quality.html'],
+      ['power-quality-example', 'gallery/analysis/plot_estatcom_power_quality.html'],
       ['power-guide', 'user_guide/power_architecture.html'],
       ['power-example', 'gallery/analysis/plot_800vdc_architecture.html'],
       ['cfd-guide', 'user_guide/cfd.html'],
