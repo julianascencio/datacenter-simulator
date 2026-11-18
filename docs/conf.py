@@ -14,6 +14,7 @@ from datacenter_simulator.analysis.infrastructure import export_infrastructure_s
 from datacenter_simulator.analysis.power_architecture import export_power_architecture_study
 from datacenter_simulator.analysis.power_quality import export_power_quality_study
 from datacenter_simulator.analysis.scada import export_scada_model
+from datacenter_simulator.analysis.speed_to_power import export_speed_power_study
 from datacenter_simulator.analysis.telemetry import export_telemetry_study
 from datacenter_simulator.analysis.wyoming import export_wyoming_study
 from datacenter_simulator.cli import generate_reference
@@ -96,3 +97,5 @@ export_power_architecture_study(Path(__file__).parent / "_static" / "lab" / "pow
 export_faraday_study(Path(__file__).parent / "_static" / "lab" / "faraday")
 
 export_power_quality_study(Path(__file__).parent / "_static" / "lab" / "power-quality")
+
+export_speed_power_study(Path(__file__).parent / "_static" / "lab" / "speed-to-power")

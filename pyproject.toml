@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 license = "LicenseRef-ASVA-Noncommercial-1.0"
-license-files = ["LICENSE", "LICENSING.md"]
+license-files = ["LICENSE", "LICENSING.md", "src/datacenter_simulator/data/speed_to_power_upstream_LICENSE.txt"]
 name = "datacenter-simulator"
 version = "0.2.0"
 description = "Composable data center models for DC power, communications, cooling and generation"
@@ -32,9 +32,10 @@ datacenter-noise = "datacenter_simulator.analysis.acoustics:main"
 datacenter-cfd-accuracy = "datacenter_simulator.analysis.cfd_accuracy:main"
 datacenter-cfd = "datacenter_simulator.analysis.cfd:main"
 datacenter-telemetry = "datacenter_simulator.analysis.telemetry:main"
+datacenter-speed-power = "datacenter_simulator.analysis.speed_to_power:main"
 
 [tool.setuptools.package-data]
-datacenter_simulator = ["py.typed", "utilities/report.html", "utilities/engineering.html", "utilities/grid_management.html", "utilities/scada.html", "utilities/design.html", "utilities/cfd.html", "utilities/acoustics.html", "data/*.csv", "data/*.json"]
+datacenter_simulator = ["py.typed", "utilities/report.html", "utilities/engineering.html", "utilities/grid_management.html", "utilities/scada.html", "utilities/design.html", "utilities/cfd.html", "utilities/acoustics.html", "data/*.csv", "data/*.json", "data/*.txt"]
 
 [tool.ruff]
 line-length = 100

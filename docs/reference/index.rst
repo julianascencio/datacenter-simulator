@@ -15,6 +15,7 @@ page links to the implementation and documents units and model boundaries.
    electrical
    power_architecture
    power_quality
+   speed_to_power
    engineering
    gpu_lab
    communications

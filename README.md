@@ -71,6 +71,33 @@ python -m pip install -e '.[solar,benchmarks]'  # pvlib and independent PyPSA ch
 
 See the [installation guide](https://julianascencio.github.io/datacenter-simulator/user_guide/installation.html) for an isolated environment and development setup.
 
+## Speed to power: energy cost versus earlier AI compute
+
+Integrate Newkirk et al., [arXiv:2611.17098v1](https://arxiv.org/abs/2611.17098v1):
+replay the authors' **4,317-location, 100,000-GPU** medium-voltage result table,
+then run an editable native AC/DC solar-storage, gas and grid comparison.
+The workflow includes validated data connectors, hourly storage and conversion
+balances, reliability filtering, common-horizon discounted cashflows,
+compute-value break-even analysis, and deployment sensitivities.
+
+```bash
+python -m datacenter_simulator.analysis.speed_to_power --output outputs/speed-to-power
+# Edit exported inputs/profiles and replay:
+python -m datacenter_simulator.analysis.speed_to_power \
+  --inputs outputs/speed-to-power/inputs.json \
+  --profiles outputs/speed-to-power/profiles.csv --output outputs/speed-to-power-replay
+```
+
+Open `speed-to-power.html` for the offline interactive report. Published results
+retain their source commit, hashes, MIT attribution and 2022 USD basis. Native
+profiles and costs are explicitly illustrative: this is a screening model, not
+a reproduction of the authors' cooling selection, BLAST-Lite degradation or
+turbine optimization. All infeasible candidates stay visible.
+
+[Knowledge, equations and boundaries](docs/user_guide/speed_to_power.rst) ·
+[Runnable gallery example](examples/analysis/plot_speed_to_power.py) ·
+[API](docs/reference/speed_to_power.rst)
+
 ## Unified BMS, EPMS and DCIM telemetry
 
 Reconstruct cooling failures, workload steps and utility disturbances with

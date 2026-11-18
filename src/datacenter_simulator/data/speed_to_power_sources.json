@@ -1,0 +1,41 @@
+{
+  "paper": {
+    "title": "Speed-to-Power Dominates Energy Costs for AI Data Centers: Technoeconomic Analysis of Powering AI in the Continental United States",
+    "authors": "Newkirk et al.",
+    "arxiv": "2611.17098v1",
+    "url": "https://arxiv.org/abs/2611.17098v1",
+    "date": "2026-11-12"
+  },
+  "upstream_repository": "https://github.com/acnewkirk/AI-Datacenter-Microgrid-Analysis",
+  "upstream_commit": "729569fc32582ce4baa4426b5b025d073870f31a",
+  "upstream_path": "output_tables/lcoe_results.csv",
+  "upstream_sha256": "978dcbc18b9400a30ec3e81f5d00474ca3c4d0df4d6c34d307a9555fe838e18b",
+  "snapshot_sha256": "404c516fcbebe3252dbc33042814c06b305455638f5435392c4d81cca4151c96",
+  "retrieved_date": "2026-11-16",
+  "selection": "gpu_count == 100000; all 34 original columns; pandas CSV serialization",
+  "rows": 4317,
+  "price_basis": "2022 USD",
+  "license": "MIT; see speed_to_power_upstream_LICENSE.txt",
+  "published_assumptions": {
+    "gpu_hour_value_usd": 2.4,
+    "discount_rate": 0.07,
+    "horizon_years": 27,
+    "minimum_full_load_hour_fraction": 0.99,
+    "solar_deployment_years": 2,
+    "accelerated_gas_deployment_years": 3
+  },
+  "source_sections": {
+    "load": "S1.1; Eq. S1; 8 GPUs/node, 7.3 kW average, 8.5 kW peak, 1.05 design margin",
+    "paths": "Figure 2, page 7; S1.1 power flow",
+    "dispatch": "S1.2.1",
+    "degradation": "S1.2.3; 1% first-year PV fade then 0.55%/year; BLAST-Lite-derived battery model in upstream only",
+    "finance": "Eqs. 1-2 and S17-S18; S1.3.1; common horizon and midyear discounting",
+    "limits": "Discussion; TMY extremes, supply-side queues as load-interconnection proxy, rental value as opportunity-cost assumption"
+  },
+  "boundaries": [
+    "Published CSV values are author-generated model results, not measurements or an independent rerun.",
+    "Snapshot includes MV cases only at 100000 GPUs. Upstream smaller facilities also use LV topologies.",
+    "Native scenarios are independent screening models with illustrative costs and profiles; they do not implement the authors cooling selection, turbine optimizer, or BLAST-Lite surrogate.",
+    "Do not interpret GPU rental value as guaranteed net profit. Opportunity-cost origin and readiness date affect ratios."
+  ]
+}
