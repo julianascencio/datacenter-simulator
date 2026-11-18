@@ -12,6 +12,7 @@ from datacenter_simulator.analysis.engineering import export_engineering_study
 from datacenter_simulator.analysis.faraday import export_faraday_study
 from datacenter_simulator.analysis.infrastructure import export_infrastructure_study
 from datacenter_simulator.analysis.power_architecture import export_power_architecture_study
+from datacenter_simulator.analysis.power_quality import export_power_quality_study
 from datacenter_simulator.analysis.scada import export_scada_model
 from datacenter_simulator.analysis.speed_to_power import export_speed_power_study
 from datacenter_simulator.analysis.telemetry import export_telemetry_study
@@ -94,5 +95,7 @@ export_noise_study(Path(__file__).parent / "_static" / "lab" / "noise")
 export_power_architecture_study(Path(__file__).parent / "_static" / "lab" / "power")
 
 export_faraday_study(Path(__file__).parent / "_static" / "lab" / "faraday")
+
+export_power_quality_study(Path(__file__).parent / "_static" / "lab" / "power-quality")
 
 export_speed_power_study(Path(__file__).parent / "_static" / "lab" / "speed-to-power")

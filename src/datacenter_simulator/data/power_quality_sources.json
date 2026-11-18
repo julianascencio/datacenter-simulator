@@ -1,0 +1,53 @@
+{
+  "retrieved_on": "2026-11-16",
+  "reported_case": {
+    "source": "User-supplied LinkedIn post screenshots; author, date and canonical URL unavailable",
+    "verification_status": "reported_only_not_reproduced",
+    "screenshots": [
+      {"filename": "1000216524.jpg", "sha256": "9c7255a5038428ef5bc728e1e160480e47ccfcb94608ba848d00061d82479fd4"},
+      {"filename": "1000216526.jpg", "sha256": "eec48126f5853c48c63a736ccba07af4d0821eb661f5c9fb9846800187fca70c"}
+    ],
+    "facility_mva": 200,
+    "connection_kv": 35,
+    "scr": 4,
+    "converter_mva": 100,
+    "reported_h_s": 4.52,
+    "h_energy_base": null,
+    "ups_battery_enabled": false,
+    "reported_topology": "step-down transformer; average-value double-conversion UPS with active rectifier, DC link and inverter; equivalent IT load",
+    "pst_before": 11.3,
+    "pst_after": 4.67,
+    "pcc_swing_before_mw": 99.7,
+    "pcc_swing_after_mw": 55.5,
+    "unavailable": ["raw client load profile", "PSCAD files", "controller gains", "X/R", "meter implementation and validation", "phase waveforms", "measurement window", "supercapacitor voltage and usable energy limits"],
+    "use": "motivation and reported targets only; no reproduction or calibration claim"
+  },
+  "primary_sources": [
+    {
+      "title": "Siemens Energy: E-STATCOM for data centers",
+      "url": "https://assets.siemens-energy.com/dam/59ee537b-fec7-4d97-b8a4-b2c000c4147c/2025_04_09_ST1835a-008_Broschuere-E-STATCOM_for_Data_Centers_A4_Screen-pdf_Original%20file.pdf",
+      "supports": "Supercapacitor-assisted active-power buffering and reactive-power/voltage support at the PCC.",
+      "boundary": "Conceptual architecture only; screenshot author and hardware vendor are unknown. No manufacturer performance curve or cost is assumed."
+    },
+    {
+      "title": "IEC 61000-4-15:2010",
+      "url": "https://webstore.iec.ch/en/publication/4173",
+      "supports": "Flickermeter functional and design specification; public abstract distinguishes measurement from tolerance limits.",
+      "boundary": "Public abstract inspected; no compliant flickermeter is implemented or certified here."
+    },
+    {
+      "title": "IEEE 1453-2022",
+      "url": "https://standards.ieee.org/ieee/1453/10459/",
+      "supports": "Pst/Plt measurement, planning/emission limits and assessment of fluctuating installations.",
+      "boundary": "Public scope inspected, not full standard. The three line-to-line import contract follows the supplied case and is not a universal wiring prescription."
+    }
+  ],
+  "implementation_assumptions": {
+    "energy": "E_nom=100 MVA*4.52 s=452 MJ=125.56 kWh is conditional on the converter MVA basis. At SOC 0.1..0.9 usable energy is 361.6 MJ; initial 0.5 permits only 180.8 MJ discharge before losses.",
+    "network": "Balanced constant-PQ two-bus high-voltage root; X/R=10, source=1.05 pu are synthetic.",
+    "controller": "P priority, first-order sampled load smoothing, SOC recovery, algebraic Q droop and shared P-Q MVA circle; no switching/current/delay/stability dynamics.",
+    "load": "Synthetic facility-PCC load, not the confidential North American client trace; no separate transformer/UPS dynamics.",
+    "flicker": "Voltage excursion is not Pst. Import external validated-meter results with case/window/channel provenance; importer cannot validate the meter itself.",
+    "sizing": "Finite discrete candidates and explicit synthetic thresholds; no procurement recommendation, compliance finding or minimum-cost optimum."
+  }
+}

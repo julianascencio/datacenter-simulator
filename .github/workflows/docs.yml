@@ -48,6 +48,7 @@ jobs:
           node tests/check_design.cjs docs/_build/html/_static/lab/design/design-workbench.html
           node tests/check_cfd.cjs docs/_build/html/_static/lab/cfd/cfd-3d.html
           node tests/check_noise.cjs docs/_build/html/_static/lab/noise/noise-3d.html
+          node tests/check_power_quality.cjs docs/_build/html/_static/lab/power-quality/power-quality.html
           node tests/check_faraday.cjs docs/_build/html/_static/lab/faraday/faraday-storage.html
           node tests/check_speed_to_power.cjs docs/_build/html/_static/lab/speed-to-power/speed-to-power.html
       - uses: actions/upload-artifact@v4
@@ -65,6 +66,7 @@ jobs:
             outputs/cfd-browser
             outputs/noise-browser
             outputs/faraday-browser
+            outputs/power-quality-browser
             outputs/speed-to-power-browser
       - name: Check whether Pages is configured for Actions
         id: pages-status

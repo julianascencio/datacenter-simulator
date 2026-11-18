@@ -86,6 +86,17 @@ documents independent engineering extensions, equations, financial assumptions
 and missing source material. No vendor-specific device specifications, measured
 savings or product prices are inferred from the excerpt.
 
+
+E-STATCOM power-quality planning
+--------------------------------
+
+The :doc:`user_guide/power_quality` guide separates the user-supplied post's
+reported PSCAD case from the synthetic planning model. Its source ledger
+(``data/power_quality_sources.json``) records screenshot hashes, missing
+validation evidence and primary Siemens Energy, IEC 61000-4-15 and IEEE
+1453-2022 links. Manufacturer material motivates the architecture only;
+voltage excursion is not Pst and no reproduction of the post is claimed.
+
 Speed-to-power technoeconomics
 ------------------------------
 
