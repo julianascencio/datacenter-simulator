@@ -1,6 +1,6 @@
 """
 How much of Anthropic's mapped US power could come from gas?
-===========================================================
+============================================================
 
 **Level:** Intermediate
 
@@ -99,7 +99,7 @@ ax.legend()
 
 # %%
 # Test the limits of the project list and generator order
-# ------------------------------------------------------
+# -------------------------------------------------------
 # Remove the five sites explicitly marked speculative in the workbook. Other
 # sites still have allocation and commissioning uncertainty. A separate test
 # assigns the unmapped portion of the reported 15 GW total either zero or
