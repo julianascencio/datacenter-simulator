@@ -20,6 +20,7 @@ small component examples before combining the models into a facility study.
    power_architecture
    power_quality
    speed_to_power
+   anthropic_gas
    engineering
    gpu_lab
    grid_management
