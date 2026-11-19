@@ -19,8 +19,8 @@ from datacenter_simulator.methods.gas_exposure import annual_gas_exposure
 from datacenter_simulator.use_cases.anthropic import anthropic_us_sites
 
 # %%
-# Attribute the same electricity demand two ways
-# ----------------------------------------------
+# Step 1. Attribute the same electricity demand two ways
+# ------------------------------------------------------
 # Both calculations give on-site gas facilities their own generation. For grid
 # purchases, the first uses each site's regional average mix. The second uses
 # the study's dedicated generation and short-run marginal dispatch estimates.
@@ -72,8 +72,8 @@ print(
 )
 
 # %%
-# Price the fuel behind the meter
-# -------------------------------
+# Step 2. Price the fuel behind the meter
+# ---------------------------------------
 # Assume the tenant pays the full on-site fuel commodity charge. Grid fuel
 # contributes to physical gas attribution. Actual grid electricity charges
 # require tariffs and contract terms. All prices below are illustrative.
@@ -98,8 +98,8 @@ ax.set(
 ax.legend()
 
 # %%
-# Test the limits of the project list and generator order
-# -------------------------------------------------------
+# Step 3. Test the limits of the project list and generator order
+# ---------------------------------------------------------------
 # Remove the five sites explicitly marked speculative in the workbook. Other
 # sites still have allocation and commissioning uncertainty. A separate test
 # assigns the unmapped portion of the reported 15 GW total either zero or
