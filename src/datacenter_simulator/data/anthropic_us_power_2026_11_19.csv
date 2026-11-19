@@ -1,0 +1,20 @@
+sheet_row,site,state,capacity_low_mw,capacity_high_mw,supply,speculative_attribution,regional_gas_pct,study_gas_pct,study_co2e_lb_per_mwh
+4,New Carlisle campus,IN,1037,1960,"Grid, new gas",false,37.8,100.000,703
+5,Canton campus,MS,284,683,"Grid, new gas",true,65.2,100.000,749
+6,Ridgeland campus,MS,228,840,"Grid, new gas",true,65.2,100.000,749
+7,Susquehanna campus,PA,108,169,"Grid, nuclear",true,54.1,0.000,0
+8,Colossus 1,TN,300,340,"Grid, existing gas and coal",false,29.8,71.127,1270
+9,Colossus 2,TN,200,600,On-site/BTM gas,false,29.8,100.000,1246
+10,Beacon Point,TX,350,352,"Grid, existing gas and coal",false,49.6,80.932,1235
+11,Monarch Compute Campus,WV,460,920,On-site/BTM gas,false,37.8,100.000,1331
+12,Nexus Hubbard,TX,500,500,On-site/BTM gas,false,49.6,100.000,719
+13,Justified Data campus,KY,401,401,"Grid, existing gas and coal",false,37.8,51.432,1581
+14,Lake Mariner,NY,378,378,"Grid, existing gas and coal",false,25.5,98.227,981
+15,Abernathy HPC campus,TX,168,168,"Grid, existing gas and coal",false,46.1,52.124,1615
+16,Meridian Arc,IN,430,430,"Grid, existing gas and coal",false,37.8,51.432,1581
+17,Barber Lake,TX,207,207,"Grid, existing gas and coal",false,49.6,80.932,1235
+18,Rockdale campus,TX,191,191,"Grid, existing gas and coal",false,49.6,80.932,1235
+19,River Bend,LA,245,245,"Grid, new gas",false,65.2,100.000,749
+20,Maysville campus,GA,120,180,"Grid, existing gas and coal",false,55.4,72.127,1344
+21,Project Flex,MI,200,525,"Grid, existing gas and coal",true,49.8,51.432,1581
+22,Cedar Creek campus,TX,100,490,On-site/BTM gas,true,49.6,100.000,986
