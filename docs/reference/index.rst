@@ -25,6 +25,7 @@ page links to the implementation and documents units and model boundaries.
    utility_storage
    bess_value
    infrastructure
+   ai_buildout
    development
    design
    cfd
