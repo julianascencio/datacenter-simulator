@@ -1,6 +1,8 @@
 """
 Powering and renewing a two-phase AI campus
-==========================================
+===========================================
+
+**Level:** Intermediate | **Subject:** AI capacity planning and grid flexibility
 
 When does a delayed grid connection shift capital spending, and how much
 electricity can the campus use over the same planning window? A second screen
@@ -19,8 +21,8 @@ from datacenter_simulator.methods.energy import Battery
 from datacenter_simulator.methods.optimization import DemandOption, optimize_dispatch
 
 # %%
-# Commissioning and chip life
-# ---------------------------
+# Step 1. Compare commissioning dates and chip lives
+# --------------------------------------------------
 # Goldman Sachs' illustrative package power, node-inclusive price and PUE are
 # scenario inputs. Host/network demand, phase sizes, reuse and load factor are
 # local assumptions. Infra is priced per new IT MW and generation per new kW.
@@ -57,8 +59,8 @@ capital.legend(fontsize=8)
 plt.show()
 
 # %%
-# A four-hour grid event on the first 4.2 MW facility phase
-# --------------------------------------------------------
+# Step 2. Meet a grid limit on the first 4.2 MW facility phase
+# ------------------------------------------------------------
 # GraviteQA's discrete flexibility problem motivates this smaller classical
 # benchmark. The facility can run one required 0.6 MW, one-hour batch job.
 # In slot 1 the grid ceiling falls from 4.2 to 2.8 MW. Fixed load is 3 MW.

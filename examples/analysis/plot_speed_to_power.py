@@ -1,6 +1,6 @@
 """
 Speed to power: when earlier compute outweighs cheaper energy
-============================================================
+=============================================================
 
 **Level:** Intermediate | **Subject:** AI infrastructure technoeconomics
 
@@ -18,7 +18,7 @@ from datacenter_simulator.methods.speed_to_power import published_cost_compariso
 
 # %%
 # Step 1: reproduce the authors' geographic ranking
-# ------------------------------------------------
+# -------------------------------------------------
 # The bundled snapshot is version-pinned and attributed. The gas acceleration
 # uses the authors' separate three-year result columns, including their costs.
 published = bundled_published_results()
@@ -43,7 +43,7 @@ for accelerated, ax in zip((False, True), axes, strict=True):
 
 # %%
 # Step 2: screen native AC/DC storage, gas and grid scenarios
-# ---------------------------------------------------------
+# -----------------------------------------------------------
 # Synthetic solar/cooling profiles serve the same H100-equivalent terminal
 # load. Nine designs per solar topology face a 99% full-load-hour requirement.
 # Storage state is periodic. Gas/grid are ideal firm baselines. Costs and
@@ -75,7 +75,7 @@ ax.legend()
 
 # %%
 # Step 3: make the deployment decision sensitive to compute value
-# -------------------------------------------------------------
+# ---------------------------------------------------------------
 # Recover each architecture's own discounted lost-GPU-hours / delivered-kWh
 # slope. A zero GPU-hour value recovers unadjusted energy costs exactly.
 fig, ax = plt.subplots(figsize=(8, 4), layout="constrained")
