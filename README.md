@@ -514,8 +514,8 @@ See [acoustic methods](docs/user_guide/acoustics.rst) and
 
 ## Project lifecycle and phased campus delivery
 
-Follow a hall from site selection and permitting through financial close, procurement,
-construction, commissioning, ramp-up, refresh and retirement. Compare when a planned
+Follow all eleven steps in Lâm Thuyên’s AI campus lifecycle, from demand and site
+selection to IT installation, acceptance and operations, then simulate refresh and retirement. Compare when a planned
 expansion draws power and how much has been spent if it stalls or is withdrawn.
 
 ```bash

@@ -5,12 +5,13 @@ from dataclasses import replace
 from datacenter_simulator.methods.project_recovery import month_id, month_label
 from datacenter_simulator.models.lifecycle import (
     BuildStage,
+    Cancellation,
+    EquipmentDeposit,
     Gate,
     LifecyclePlan,
     PowerDelivery,
     ServiceLife,
     StageWork,
-    Withdrawal,
 )
 
 
@@ -26,7 +27,8 @@ def reference_hall(name: str = "First hall", start: str = "2027-01") -> Lifecycl
         works=(
             StageWork(BuildStage.ORIGINATION, 2, 150_000),
             StageWork(BuildStage.SITE, 3, 450_000),
-            StageWork(BuildStage.PERMITTING, 6, 900_000, (Gate("Land option", due(5)),)),
+            StageWork(BuildStage.POWER, 3, 450_000, (Gate("Land option", due(5)),)),
+            StageWork(BuildStage.PERMITTING, 3, 450_000),
             StageWork(
                 BuildStage.FINANCING,
                 2,
@@ -35,29 +37,42 @@ def reference_hall(name: str = "First hall", start: str = "2027-01") -> Lifecycl
             ),
             StageWork(
                 BuildStage.DESIGN,
-                4,
-                4_000_000,
-                (Gate("Anchor lease and financing signed", due(13)),),
+                2,
+                1_000_000,
+                (
+                    Gate("Anchor tenant or owner commitment", due(11)),
+                    Gate("Executed power service agreement", due(10)),
+                    Gate("Construction financing closed", due(13)),
+                ),
             ),
+            StageWork(BuildStage.PROCUREMENT, 2, 2_000_000, (Gate("Design release", due(15)),)),
             StageWork(
                 BuildStage.CONSTRUCTION,
                 12,
                 83_000_000,
-                (Gate("Design release and long-lead equipment order", due(17)),),
+                (Gate("Long-lead equipment release", due(17)),),
             ),
+            StageWork(BuildStage.COMMISSIONING, 1, 700_000, (Gate("Diverse fiber live", due(28)),)),
             StageWork(
-                BuildStage.COMMISSIONING,
-                2,
-                1_200_000,
-                (Gate("Diverse fiber live", due(28)),),
+                BuildStage.IT_INSTALLATION,
+                1,
+                48_500_000,
+                (
+                    Gate("Factory acceptance", due(26)),
+                    Gate("Installation inspection", due(28)),
+                    Gate("System startup", due(29)),
+                    Gate("Functional tests", due(30)),
+                    Gate("Integrated systems acceptance", due(30)),
+                ),
             ),
         ),
+        equipment_deposit=EquipmentDeposit(due(7), 1_000_000),
         service=ServiceLife(
             it_mw=12,
             pue=1.25,
             load_factor=0.8,
             ramp_months=4,
-            service_months=120,
+            service_months=192,
             refresh_every_months=48,
             refresh_cost_usd=5_000_000,
             refresh_unavailable_fraction=0.25,
@@ -72,19 +87,49 @@ def reference_hall(name: str = "First hall", start: str = "2027-01") -> Lifecycl
 def expansion_cases() -> dict[str, LifecyclePlan]:
     """Counterfactuals for a second hall. Exactly one joins the first hall in each case."""
     base = reference_hall("Expansion hall", "2028-01")
-    pending_permit = replace(
-        base.works[3], gates=(Gate("Local planning and cooling-water approval"),)
+
+    def change_gates(stage: BuildStage, gates: tuple[Gate, ...]) -> LifecyclePlan:
+        works = tuple(
+            replace(work, gates=gates) if work.stage == stage else work for work in base.works
+        )
+        return replace(base, works=works)
+
+    pending_permit = change_gates(
+        BuildStage.FINANCING, (Gate("Local planning and cooling-water approval"),)
     )
-    withdrawn = replace(
-        base,
-        works=(*base.works[:3], pending_permit, *base.works[4:]),
-        withdrawal=Withdrawal("2029-02", "Sponsor withdrew after planning denial", 250_000),
+    denied = replace(
+        pending_permit,
+        cancellation=Cancellation("2029-02", "Rezoning denied; project ended", 250_000),
     )
+    commercial_hold = change_gates(
+        BuildStage.DESIGN,
+        (
+            Gate("Unconditional tenant commitment"),
+            Gate("Executed power service agreement", "2028-11"),
+            Gate("Construction financing closed"),
+        ),
+    )
+
+    def power_case(final_month: str | None) -> LifecyclePlan:
+        # Factory/installation checks can precede power. Live system tests require energization.
+        next_month = month_label(month_id(final_month) + 1) if final_month else None
+        acceptance = (
+            *base.works[-1].gates[:2],
+            Gate("System startup", final_month),
+            Gate("Functional tests", next_month),
+            Gate("Integrated systems acceptance", next_month),
+        )
+        deliveries: tuple[PowerDelivery, ...] = (PowerDelivery("2030-06", 9),)
+        if final_month:
+            deliveries += (PowerDelivery(final_month, 6),)
+        return replace(
+            change_gates(BuildStage.IT_INSTALLATION, acceptance), power_deliveries=deliveries
+        )
+
     return {
         "On time": base,
-        "Power six months late": replace(
-            base, power_deliveries=(PowerDelivery("2030-06", 9), PowerDelivery("2030-12", 6))
-        ),
-        "Power unresolved": replace(base, power_deliveries=(PowerDelivery("2030-06", 9),)),
-        "Withdrawn": withdrawn,
+        "Power six months late": power_case("2030-12"),
+        "Power unresolved": power_case(None),
+        "Tenant and financing unresolved": commercial_hold,
+        "Rezoning denied": denied,
     }

@@ -8,13 +8,16 @@ from datacenter_simulator.models.devices import finite, fraction
 
 
 class BuildStage(StrEnum):
-    ORIGINATION = "origination"
+    ORIGINATION = "demand definition"
     SITE = "site diligence"
-    PERMITTING = "permitting and interconnection"
+    POWER = "power contracting"
+    PERMITTING = "land entitlement"
     FINANCING = "commercial and financial close"
-    DESIGN = "design and procurement"
+    DESIGN = "design"
+    PROCUREMENT = "long-lead procurement"
     CONSTRUCTION = "construction and fit-out"
     COMMISSIONING = "commissioning"
+    IT_INSTALLATION = "IT installation and acceptance"
 
 
 def calendar_month(value: str) -> int:
@@ -73,7 +76,19 @@ class StageWork:
 
 
 @dataclass(frozen=True)
-class Withdrawal:
+class EquipmentDeposit:
+    """Nonrefundable advance paid before service, excluded from remaining work budgets."""
+
+    month: str
+    amount_usd: float
+
+    def __post_init__(self) -> None:
+        calendar_month(self.month)
+        finite("amount_usd", self.amount_usd, strict=True)
+
+
+@dataclass(frozen=True)
+class Cancellation:
     """Explicit terminal decision before service, effective at the start of a month."""
 
     month: str
@@ -83,7 +98,7 @@ class Withdrawal:
     def __post_init__(self) -> None:
         calendar_month(self.month)
         if not self.reason.strip():
-            raise ValueError("withdrawal reason is required")
+            raise ValueError("cancellation reason is required")
         finite("exit_cost_usd", self.exit_cost_usd)
 
 
@@ -129,8 +144,9 @@ class LifecyclePlan:
     works: tuple[StageWork, ...]
     service: ServiceLife
     stall_cost_usd_per_month: float = 0.0
-    withdrawal: Withdrawal | None = None
+    cancellation: Cancellation | None = None
     power_deliveries: tuple[PowerDelivery, ...] | None = None
+    equipment_deposit: EquipmentDeposit | None = None
 
     def __post_init__(self) -> None:
         start = calendar_month(self.start)
@@ -140,11 +156,13 @@ class LifecyclePlan:
             dates = [d.month for d in self.power_deliveries]
             if dates != sorted(set(dates)):
                 raise ValueError("power delivery months must be unique and in order")
+        if self.equipment_deposit and calendar_month(self.equipment_deposit.month) < start:
+            raise ValueError("equipment deposit precedes project start")
         stages = [work.stage for work in self.works]
         if stages != [stage for stage in BuildStage if stage in stages]:
             raise ValueError("build stages must be unique and in lifecycle order")
         if not {BuildStage.CONSTRUCTION, BuildStage.COMMISSIONING} <= set(stages):
             raise ValueError("construction and commissioning are required")
         finite("stall_cost_usd_per_month", self.stall_cost_usd_per_month)
-        if self.withdrawal is not None and calendar_month(self.withdrawal.month) < start:
-            raise ValueError("withdrawal precedes project start")
+        if self.cancellation is not None and calendar_month(self.cancellation.month) < start:
+            raise ValueError("cancellation precedes project start")

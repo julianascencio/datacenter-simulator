@@ -11,12 +11,13 @@ from datacenter_simulator.analysis.lifecycle import lifecycle_summary, main
 from datacenter_simulator.methods.lifecycle import simulate_lifecycle
 from datacenter_simulator.models.lifecycle import (
     BuildStage,
+    Cancellation,
+    EquipmentDeposit,
     Gate,
     LifecyclePlan,
     PowerDelivery,
     ServiceLife,
     StageWork,
-    Withdrawal,
 )
 from datacenter_simulator.use_cases.lifecycle import expansion_cases, reference_hall
 
@@ -68,10 +69,10 @@ def test_parallel_clearances_and_unresolved_gate():
     assert lifecycle_summary(frame)["first_service_month"] is None
 
 
-def test_mid_construction_withdrawal_stops_work_and_books_exit_once():
+def test_mid_construction_cancellation_stops_work_and_books_exit_once():
     plan = small_hall()
     works = (replace(plan.works[0], months=4), plan.works[1])
-    canceled = replace(plan, works=works, withdrawal=Withdrawal("2028-02", "Sponsor exit", 5))
+    canceled = replace(plan, works=works, cancellation=Cancellation("2028-02", "Sponsor exit", 5))
     frame = simulate_lifecycle(canceled, "2029-12")
     assert frame.work_usd.sum() == 50
     assert frame.spend_usd.sum() == 55
@@ -86,16 +87,18 @@ def test_expansion_counterfactuals_leave_first_hall_independent():
     results = {
         label: simulate_lifecycle(plan, "2031-12") for label, plan in expansion_cases().items()
     }
-    on_time, late, stalled, withdrawn = (lifecycle_summary(f) for f in results.values())
+    on_time, late, stalled, commercial, withdrawn = (lifecycle_summary(f) for f in results.values())
     assert on_time["first_service_month"] == "2030-08"
     assert late["first_service_month"] == "2031-02"
     assert late["months_stalled"] == 6
-    assert late["spend_usd"] == 90_000_000 + 6 * 125_000
+    assert late["spend_usd"] == 138_000_000 + 6 * 125_000
     assert stalled["spend_usd"] == 88_800_000 + 19 * 125_000
-    assert withdrawn["spend_usd"] == 1_500_000 + 2 * 125_000 + 250_000
+    assert withdrawn["spend_usd"] == 1_500_000 + 1_000_000 + 2 * 125_000 + 250_000
+    assert commercial["spend_usd"] == 2_800_000 + 35 * 125_000
+    assert commercial["reason"] == "Unconditional tenant commitment, Construction financing closed"
     assert on_time["facility_mwh"] == pytest.approx(131_544)
     assert late["facility_mwh"] == pytest.approx(79_200)
-    for label in ("Power unresolved", "Withdrawn"):
+    for label in ("Power unresolved", "Tenant and financing unresolved", "Rezoning denied"):
         expansion = results[label].set_index("month")
         combined = first.commissioned_it_mw.add(expansion.commissioned_it_mw, fill_value=0)
         pd.testing.assert_series_equal(combined, first.commissioned_it_mw.astype(float))
@@ -140,7 +143,9 @@ def test_stage_sequence_and_month_boundaries():
         with pytest.raises(ValueError):
             simulate_lifecycle(plan, bad_month)
     with pytest.raises(ValueError, match="before service"):
-        simulate_lifecycle(replace(plan, withdrawal=Withdrawal("2028-03", "Too late")), "2028-04")
+        simulate_lifecycle(
+            replace(plan, cancellation=Cancellation("2028-03", "Too late")), "2028-04"
+        )
 
 
 def test_power_gate_uses_nameplate_and_facility_boundary():
@@ -152,3 +157,25 @@ def test_power_gate_uses_nameplate_and_facility_boundary():
     assert simulate_lifecycle(replace(plan, power_deliveries=()), "2029-01").facility_mwh.sum() == 0
     with pytest.raises(ValueError, match="in order"):
         replace(plan, power_deliveries=steps[::-1])
+
+
+def test_early_deposit_at_risk_only_if_paid_before_cancellation():
+    plan = replace(small_hall(), equipment_deposit=EquipmentDeposit("2028-01", 50))
+    assert simulate_lifecycle(plan, "2028-05").deposit_usd.tolist() == [0, 50, 0, 0, 0, 0]
+    cancel = replace(plan, cancellation=Cancellation("2028-01", "Stopped", 5))
+    assert simulate_lifecycle(cancel, "2028-05").spend_usd.sum() == 105
+    denied = simulate_lifecycle(expansion_cases()["Rezoning denied"], "2031-12")
+    assert denied.deposit_usd.sum() == 1_000_000
+    assert denied.exit_usd.sum() == 250_000
+
+
+def test_first_power_and_it_acceptance_are_independent():
+    plan = reference_hall()
+    assert [w.stage for w in plan.works] == list(BuildStage)
+    install = replace(plan.works[-1], gates=(Gate("Integrated test sign-off"),))
+    ledger = simulate_lifecycle(replace(plan, works=(*plan.works[:-1], install)), "2030-12")
+    assert ledger[ledger.phase == "commissioning"].work_usd.sum() == 700_000
+    assert ledger.iloc[-1].reason == "Integrated test sign-off"
+    assert ledger.iloc[-1].phase == "IT installation and acceptance"
+    assert ledger[ledger.phase == install.stage].spend_usd.sum() == ledger.holding_usd.sum()
+    assert ledger.facility_mwh.sum() == ledger.commissioned_it_mw.sum() == 0

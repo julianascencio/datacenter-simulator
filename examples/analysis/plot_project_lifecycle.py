@@ -5,9 +5,12 @@ Which data halls actually reach service?
 A developer proposes a 24 MW IT campus in two independently funded, independently
 supplied 12 MW halls. The first hall proceeds in every scenario. How much of the
 expansion is online by December 2031 if the utility delivers the last 6 MW late,
-leaves their delivery unresolved, or the sponsor withdraws after a planning denial? Continue the
+leaves their delivery unresolved, or the project loses its rezoning application? Continue the
 same ledger through refresh and retirement. All dates, costs and loads are synthetic.
-See :doc:`/user_guide/project_lifecycle` for assumptions and evidence.
+Stargate Abilene motivates phased operation, Fermi's Matador motivates the
+commercial hold, and Balico's Pittsylvania proposal motivates the planning
+denial. The modeled campus is fictional. :doc:`/user_guide/project_lifecycle`
+links the observed event for each real project to its primary record.
 """
 
 from dataclasses import replace
@@ -23,11 +26,11 @@ from datacenter_simulator.use_cases.lifecycle import expansion_cases, reference_
 
 # %%
 # Compare the expansion decisions on a common reporting date
-# -----------------------------------------------------------
+# ----------------------------------------------------------
 # A stalled project retains the cash already spent and pays a monthly holding
 # cost. A cancellation books the explicit exit cost once. Energy starts in the
-# first service month after commissioning, with a four-month utilization ramp.
-cutoff, end = "2031-12", "2042-12"
+# first service month after IT acceptance, with a four-month utilization ramp.
+cutoff, end = "2031-12", "2048-12"
 first = simulate_lifecycle(reference_hall(), end).set_index("month")
 expansions = {name: simulate_lifecycle(plan, end) for name, plan in expansion_cases().items()}
 summaries = {
@@ -46,7 +49,9 @@ print(
 # in service while an independently permitted expansion waits. Step changes
 # reflect the monthly ramp, refresh downtime and eventual decommissioning.
 fig, (load, cost) = plt.subplots(2, 1, figsize=(10, 7), sharex=True)
-for (label, ledger), style in zip(expansions.items(), ["-", "--", "-.", ":"], strict=True):
+for (label, ledger), style in zip(
+    expansions.items(), ["-", "--", "-.", (0, (3, 1, 1, 1)), ":"], strict=True
+):
     expansion = ledger.set_index("month")
     campus = first.average_it_mw.add(expansion.average_it_mw, fill_value=0)
     load.step(pd.to_datetime(campus.index), campus, where="post", label=label, linestyle=style)
@@ -60,7 +65,7 @@ plt.show()
 
 # %%
 # Use the facility simulation to estimate operating energy
-# -------------------------------------------------------
+# --------------------------------------------------------
 # As a sensitivity, transfer the energy-weighted PUE of the simulator's synthetic
 # eight-rack facility profile to the on-time expansion. This explicitly assumes
 # that the reference module's efficiency scales to the hall. The two-day input

@@ -11,12 +11,13 @@ import pandas as pd
 from datacenter_simulator.methods.lifecycle import simulate_lifecycle
 from datacenter_simulator.models.lifecycle import (
     BuildStage,
+    Cancellation,
+    EquipmentDeposit,
     Gate,
     LifecyclePlan,
     PowerDelivery,
     ServiceLife,
     StageWork,
-    Withdrawal,
 )
 from datacenter_simulator.use_cases.lifecycle import reference_hall
 
@@ -32,14 +33,19 @@ def _load_plan(data: dict[str, Any]) -> LifecyclePlan:
         )
         for row in data["works"]
     )
-    withdrawal = Withdrawal(**data["withdrawal"]) if data.get("withdrawal") is not None else None
+    cancellation = (
+        Cancellation(**data["cancellation"]) if data.get("cancellation") is not None else None
+    )
     deliveries = data.get("power_deliveries")
     return LifecyclePlan(
         **{
             **data,
             "works": works,
             "service": ServiceLife(**data["service"]),
-            "withdrawal": withdrawal,
+            "cancellation": cancellation,
+            "equipment_deposit": EquipmentDeposit(**data["equipment_deposit"])
+            if data.get("equipment_deposit") is not None
+            else None,
             "power_deliveries": None
             if deliveries is None
             else tuple(PowerDelivery(**d) for d in deliveries),
@@ -50,14 +56,23 @@ def _load_plan(data: dict[str, Any]) -> LifecyclePlan:
 def lifecycle_summary(ledger: pd.DataFrame) -> dict[str, str | float | int | None]:
     """Summarize one simulated tranche as of the last month in the ledger."""
     last = ledger.iloc[-1]
-    in_service = ledger.loc[ledger.status == "in service", "month"]
+
+    def first_month(mask: pd.Series) -> str | None:
+        months = ledger.loc[mask, "month"]
+        return str(months.iloc[0]) if len(months) else None
+
+    active = ledger.status == "active"
     return {
         "project": last.project,
         "through": last.month,
         "status": last.status,
         "phase": last.phase,
         "reason": last.reason,
-        "first_service_month": in_service.iloc[0] if len(in_service) else None,
+        "commissioning_start_month": first_month(
+            active & (ledger.phase == BuildStage.COMMISSIONING)
+        ),
+        "it_installation_month": first_month(active & (ledger.phase == BuildStage.IT_INSTALLATION)),
+        "first_service_month": first_month(ledger.status == "in service"),
         "months_stalled": int((ledger.status == "stalled").sum()),
         "commissioned_it_mw": float(last.commissioned_it_mw),
         "facility_mwh": float(ledger.facility_mwh.sum()),
@@ -76,7 +91,7 @@ def main() -> None:
         data = json.loads(args.inputs.read_text())
         plan, through = _load_plan(data["plan"]), data["through"]
     else:
-        plan, through = reference_hall(), "2040-12"
+        plan, through = reference_hall(), "2047-12"
     through = args.through or through
     ledger = simulate_lifecycle(plan, through)
     summary = lifecycle_summary(ledger)

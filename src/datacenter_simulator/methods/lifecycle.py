@@ -1,7 +1,7 @@
 """Calendar-month lifecycle ledger for an independently deliverable data hall."""
 
 from collections.abc import Iterator
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, replace
 from itertools import islice, repeat
 from math import isclose
 
@@ -24,6 +24,7 @@ class _Month:
     reason: str = ""
     work_usd: float = 0
     holding_usd: float = 0
+    deposit_usd: float = 0
     exit_usd: float = 0
     refresh_usd: float = 0
     decommission_usd: float = 0
@@ -91,27 +92,34 @@ def _in_service(service: ServiceLife) -> Iterator[_Month]:
 
 
 def _timeline(plan: LifecyclePlan, start: int) -> Iterator[_Month]:
-    withdrawal = plan.withdrawal
-    decision = calendar_month(withdrawal.month) if withdrawal else None
+    cancellation = plan.cancellation
+    decision = calendar_month(cancellation.month) if cancellation else None
+    deposit = plan.equipment_deposit
+    deposit_due = calendar_month(deposit.month) if deposit else None
     for month, row in enumerate(_development(plan, start), start):
-        if withdrawal is not None and month == decision:
+        if cancellation is not None and month == decision:
             yield _Month(
-                row.phase, "cancelled", withdrawal.reason, exit_usd=withdrawal.exit_cost_usd
+                row.phase, "cancelled", cancellation.reason, exit_usd=cancellation.exit_cost_usd
             )
-            yield from repeat(_Month(row.phase, "cancelled", withdrawal.reason))
+            yield from repeat(_Month(row.phase, "cancelled", cancellation.reason))
             return
+        if deposit is not None and month == deposit_due:
+            row = replace(row, deposit_usd=deposit.amount_usd)
+            deposit_due = None
         yield row
-    if withdrawal is not None:
-        raise ValueError("withdrawal must occur before service begins")
+    if cancellation is not None:
+        raise ValueError("cancellation must occur before service begins")
+    if deposit_due is not None:
+        raise ValueError("equipment deposit must occur before service begins")
     yield from _in_service(plan.service)
 
 
 def simulate_lifecycle(plan: LifecyclePlan, through: str) -> pd.DataFrame:
     """Emit one row per month from project start through the inclusive reporting cutoff.
 
-    Gates and withdrawals are effective at the start of their calendar month.
-    A withdrawal stops pre-service work immediately, with one exit charge. A
-    later withdrawal of an already operating block is an inconsistent input.
+    Gates and cancellations are effective at the start of their calendar month.
+    A cancellation stops pre-service work immediately, with one exit charge. A
+    later cancellation of an already operating block is an inconsistent input.
     Construction and load-bank test energy are outside the facility MWh boundary.
     """
     start, end = calendar_month(plan.start), calendar_month(through)
@@ -129,6 +137,7 @@ def simulate_lifecycle(plan: LifecyclePlan, through: str) -> pd.DataFrame:
                 "it_mwh": it_mwh,
                 "facility_mwh": it_mwh * plan.service.pue,
                 "spend_usd": row.work_usd
+                + row.deposit_usd
                 + row.holding_usd
                 + row.exit_usd
                 + row.refresh_usd
