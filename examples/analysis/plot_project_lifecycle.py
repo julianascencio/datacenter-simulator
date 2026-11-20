@@ -59,8 +59,8 @@ fig.tight_layout()
 plt.show()
 
 # %%
-# Carry a facility-model result into the lifecycle energy estimate
-# --------------------------------------------------------------
+# Use the facility simulation to estimate operating energy
+# -------------------------------------------------------
 # As a sensitivity, transfer the energy-weighted PUE of the simulator's synthetic
 # eight-rack facility profile to the on-time expansion. This explicitly assumes
 # that the reference module's efficiency scales to the hall. The two-day input
