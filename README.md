@@ -512,6 +512,20 @@ See [acoustic methods](docs/user_guide/acoustics.rst) and
 [CFD verification](docs/user_guide/cfd.rst) for equations, assumptions and limits.
 
 
+## Project lifecycle and phased campus delivery
+
+Follow a hall from site selection and permitting through financial close, procurement,
+construction, commissioning, ramp-up, refresh and retirement. Compare when a planned
+expansion draws power and how much has been spent if it stalls or is withdrawn.
+
+```bash
+python examples/analysis/plot_project_lifecycle.py
+python -m datacenter_simulator.analysis.lifecycle --through 2031-12 --output outputs/lifecycle
+```
+
+[Monthly ledger and JSON replay](docs/user_guide/project_lifecycle.rst) ·
+[Two-hall gallery example](examples/analysis/plot_project_lifecycle.py)
+
 ## Local opposition and development risk
 
 Compare synthetic cancellation, permitting delay, mitigation and relocation economics.

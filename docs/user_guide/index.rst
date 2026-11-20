@@ -26,6 +26,7 @@ small component examples before combining the models into a facility study.
    faraday
    infrastructure
    development
+   project_lifecycle
    design
    cfd
    acoustics
