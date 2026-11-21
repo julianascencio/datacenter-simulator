@@ -2,6 +2,8 @@
 Which data halls actually reach service?
 ========================================
 
+**Level:** Intermediate | **Subject:** AI campus development and operations
+
 A developer proposes a 24 MW IT campus in two independently funded, independently
 supplied 12 MW halls. The first hall proceeds in every scenario. How much of the
 expansion is online by December 2031 if the utility delivers the last 6 MW late,
@@ -25,8 +27,8 @@ from datacenter_simulator.use_cases import reference_center, reference_profiles
 from datacenter_simulator.use_cases.lifecycle import expansion_cases, reference_hall
 
 # %%
-# Compare the expansion decisions on a common reporting date
-# ----------------------------------------------------------
+# Step 1. Compare the expansion decisions on a common reporting date
+# ------------------------------------------------------------------
 # A stalled project retains the cash already spent and pays a monthly holding
 # cost. A cancellation books the explicit exit cost once. Energy starts in the
 # first service month after IT acceptance, with a four-month utilization ramp.
@@ -42,9 +44,31 @@ print(
     .to_string()
 )
 
+# Display the outlays present by the cutoff, including stranded deposits and holding costs.
+spend_types = {
+    "work_usd": "Work and equipment",
+    "deposit_usd": "Early deposit",
+    "holding_usd": "Holding cost",
+    "exit_usd": "Exit cost",
+}
+spending = (
+    pd.DataFrame(
+        {
+            name: ledger.loc[ledger.month <= cutoff, list(spend_types)].sum()
+            for name, ledger in expansions.items()
+        }
+    ).T.rename(columns=spend_types)
+    / 1e6
+)
+axis = spending.plot.barh(stacked=True, figsize=(9, 4), width=0.65)
+axis.set_xlabel(f"Expansion spending through {cutoff} (USD million)")
+axis.legend(fontsize=8, ncols=2)
+axis.figure.tight_layout()
+plt.show()
+
 # %%
-# Track campus load and each expansion's spending through retirement
-# ------------------------------------------------------------------
+# Step 2. Track campus load and expansion spending through retirement
+# -------------------------------------------------------------------
 # Add the common first hall to each alternative separately. Its load remains
 # in service while an independently permitted expansion waits. Step changes
 # reflect the monthly ramp, refresh downtime and eventual decommissioning.
@@ -64,8 +88,8 @@ fig.tight_layout()
 plt.show()
 
 # %%
-# Use the facility simulation to estimate operating energy
-# --------------------------------------------------------
+# Step 3. Use the facility simulation to estimate operating energy
+# ----------------------------------------------------------------
 # As a sensitivity, transfer the energy-weighted PUE of the simulator's synthetic
 # eight-rack facility profile to the on-time expansion. This explicitly assumes
 # that the reference module's efficiency scales to the hall. The two-day input
