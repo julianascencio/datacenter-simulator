@@ -1,6 +1,7 @@
 """Reusable analyses behind gallery examples 07–12."""
 
 from dataclasses import replace
+from typing import Literal
 
 import numpy as np
 import pandas as pd
@@ -98,7 +99,8 @@ def climate_study() -> pd.DataFrame:
 
 def solar_study() -> tuple[pd.DataFrame, pd.Series, dict[str, MicrogridResult]]:
     """Two summer days, satellite/reanalysis TMY solar model and a six-hour outage."""
-    weather = bundled_weather("tenerife").loc["2021-06-15":"2021-06-16"]
+    weather = bundled_weather("tenerife")
+    weather = weather.iloc[weather.index.slice_indexer("2021-06-15", "2021-06-16")]
     generation = pv_from_weather(weather, latitude=28.46, longitude=-16.25, dc_rating_kw=400)
     hours = np.arange(len(weather))
     loads = pd.DataFrame(
@@ -108,7 +110,8 @@ def solar_study() -> tuple[pd.DataFrame, pd.Series, dict[str, MicrogridResult]]:
     limits = pd.Series(250.0, index=weather.index)
     limits.iloc[30:36] = 0
     battery = Battery(600, 200, 200, initial_soc=0.7)
-    results = {
+    couplings: tuple[Literal["dc", "ac"], ...] = ("dc", "ac")
+    results: dict[str, MicrogridResult] = {
         kind: simulate_dc_microgrid(
             engineering_grid(),
             loads,
@@ -117,7 +120,7 @@ def solar_study() -> tuple[pd.DataFrame, pd.Series, dict[str, MicrogridResult]]:
             grid_limit_ac_kw=limits,
             pv_coupling=kind,
         )
-        for kind in ("dc", "ac")
+        for kind in couplings
     }
     return loads, generation.pv_dc_kw, results
 
