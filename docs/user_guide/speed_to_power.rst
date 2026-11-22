@@ -34,7 +34,7 @@ hourly storage/energy balances, sensitivities and published location rankings.
 * :doc:`API <../reference/speed_to_power>`
 
 Knowledge transferred from the paper
------------------------------------
+------------------------------------
 
 .. list-table:: Evidence and implementation boundary
    :header-rows: 1
@@ -79,7 +79,7 @@ Knowledge transferred from the paper
      - Imported model outputs, not newly measured data or a full independent rerun
 
 Published data connector and reproducibility
--------------------------------------------
+--------------------------------------------
 
 ``connectors.speed_to_power`` validates the authors' wide CSV schema, retains
 auxiliary fields and rejects missing values, negative costs, duplicate site/GPU
@@ -115,7 +115,7 @@ order; ``winner_gap_usd_per_kwh`` and the one-cent near-tie flag expose fragile
 rankings.
 
 Connect operational and resource data
-------------------------------------
+-------------------------------------
 
 The native CSV contract is exactly aligned, timezone-aware, regular hourly data:
 

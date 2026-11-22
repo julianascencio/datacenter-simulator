@@ -403,6 +403,7 @@ Open `outputs/reference-lab.html`. It includes the Plotly runtime and works offl
 
 | Example | Subject | Complexity |
 |---|---|---|
+| [Anthropic gas exposure](examples/analysis/plot_anthropic_gas_exposure.py) | Regional versus marginal gas attribution across 19 US sites, fuel-price sensitivity and generator order ceiling | Intermediate |
 | [Faraday utility storage](https://julianascencio.github.io/datacenter-simulator/gallery/analysis/plot_faraday_storage.html) | Separate meters, hourly matching, losses, shared POI and expansion scenarios | Advanced |
 | [01. Device models and spatial layouts](https://julianascencio.github.io/datacenter-simulator/gallery/methods/plot_device_models.html) | Power curves, ports, and dimensioned 2D/3D placement | Beginner |
 | [02. Connect generation from Series and CSV](https://julianascencio.github.io/datacenter-simulator/gallery/connectors/plot_generation_adapter.html) | Units, timestamps, conversion losses, and grid imports | Beginner |

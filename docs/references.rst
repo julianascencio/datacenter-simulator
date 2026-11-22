@@ -117,3 +117,23 @@ Speed-to-power technoeconomics
 See :doc:`user_guide/speed_to_power` for the knowledge-to-implementation mapping,
 source result replay, native screening assumptions and unavailable fidelity.
 Imported results are not observations or an independently re-executed study.
+
+.. _anthropic-gas-sources:
+
+Anthropic gas exposure
+----------------------
+
+* Better Data Center Project, 16 November 2026. Source of the candidate sites,
+  capacity range, regional and marginal factors and operating assumptions.
+  `Case study <https://betterdatacenterproject.com/2026/11/16/how-ai-is-powered-a-breakdown-of-byop-and-grid-power/>`_
+  and `public site workbook, tab 880500164 <https://docs.google.com/spreadsheets/d/1XSqa0lJFJs6pQcmcTlBwUqLsQBEtDybNhjEiFGj-vbE/edit?gid=880500164>`_.
+* Anthropic, PBC, 17 November 2026. The filing describes fuel-cost pass-through
+  at certain planned facilities on p. 43 and compute and infrastructure
+  commitments under Contractual Obligations.
+  `SEC Form S-1/A <https://www.sec.gov/Archives/edgar/data/2130357/000162828026074338/anthropicpbc-sx1ax3.htm>`_.
+* Financial Times, 8 November 2026. Reporting on commitments for 1.7 GW of
+  generators from OnePWR Solutions for $3.4 billion.
+  `Equipment deal <https://www.ft.com/content/41bf5c6a-9735-4f1a-a8e3-2bcccad58ba0>`_.
+* US EIA, Electric Power Annual 2024, table 8.1. The 2024 natural gas operating
+  heat rate of 7,754 Btu/kWh supplies the grid-fuel conversion benchmark.
+  `Final 2024 tables <https://www.eia.gov/electricity/annual/archive/2024/pdf/epa.pdf>`_.
